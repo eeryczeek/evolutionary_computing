@@ -1,7 +1,31 @@
 import scala.util.control.TailCalls.TailRec
 import scala.util.Random
+import scala.io.Source
+
 object Main extends App {
-  def main(): Unit = {}
+  def main(): Unit = {
+    val initialData = CSVReader.readCSV("TSPA.csv")
+    val randomSolution = RandomSolution(initialData)
+    val result = randomSolution.cost
+
+    result
+  }
+}
+
+object CSVReader {
+  def readCSV(filePath: String): InitialData = {
+    val bufferedSource = Source.fromFile(filePath)
+    val cities = bufferedSource
+      .getLines()
+      .map { line =>
+        val Array(x, y, cost) = line.split(";").map(_.toInt)
+        City(x, y, cost)
+      }
+      .toSet
+    bufferedSource.close()
+
+    InitialData(cities)
+  }
 }
 
 object RandomSolution {
