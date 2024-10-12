@@ -7,6 +7,6 @@ class readCSVTest extends AnyFunSuite {
   test("readCSV should return InitialData") {
     val filePath = "TSPA.csv"
     val result = CSVReader.readCSV(filePath)
-    assert(result.isInstanceOf[InitialData])
+    assert(result.isInstanceOf[ProblemInstance])
   }
 }
