@@ -39,6 +39,18 @@ with open("tspa_greedy_cycle.txt") as f:
 with open("tspb_greedy_cycle.txt") as f:
     tspb_greedy_cycle = f.readlines()
 
+tspa_random_cost = int(tspa_random_solution[0].split(": ")[1].strip())
+tspb_random_cost = int(tspb_random_solution[0].split(": ")[1].strip())
+tspa_greedy_append_cost = int(tspa_greedy_append[0].split(": ")[1].strip())
+tspb_greedy_append_cost = int(tspb_greedy_append[0].split(": ")[1].strip())
+tspa_greedy_at_any_position_cost = int(
+    tspa_greedy_at_any_position[0].split(": ")[1].strip()
+)
+tspb_greedy_at_any_position_cost = int(
+    tspb_greedy_at_any_position[0].split(": ")[1].strip()
+)
+tspa_greedy_cycle_cost = int(tspa_greedy_cycle[0].split(": ")[1].strip())
+tspb_greedy_cycle_cost = int(tspb_greedy_cycle[0].split(": ")[1].strip())
 
 tspa = [
     City(index, *map(float, line.strip().split(";"))) for index, line in enumerate(tspa)
@@ -69,6 +81,8 @@ def plot_cities(tspa, tspb):
     plt.tight_layout()
     plt.subplot(1, 2, 1)
     plt.title("TSPA")
+    plt.xlabel("x")
+    plt.ylabel("y")
     scatter_tspa = plt.scatter(
         [city.x for city in tspa],
         [city.y for city in tspa],
@@ -79,6 +93,8 @@ def plot_cities(tspa, tspb):
 
     plt.subplot(1, 2, 2)
     plt.title("TSPB")
+    plt.xlabel("x")
+    plt.ylabel("y")
     scatter_tspb = plt.scatter(
         [city.x for city in tspb],
         [city.y for city in tspb],
@@ -88,12 +104,14 @@ def plot_cities(tspa, tspb):
     plt.colorbar(scatter_tspb, label="city cost")
 
 
-def plot_solution(tspa, tspa_solution, tspb, tspb_solution):
+def plot_solution(tspa, tspa_cost, tspa_solution, tspb, tspb_cost, tspb_solution):
     plt.figure(figsize=(16, 6))
     plt.tight_layout()
 
     plt.subplot(1, 2, 1)
-    plt.title("TSPA")
+    plt.title(f"TSPA [{tspa_cost}]")
+    plt.xlabel("x")
+    plt.ylabel("y")
     scatter_tspa = plt.scatter(
         [city.x for city in tspa],
         [city.y for city in tspa],
@@ -115,7 +133,9 @@ def plot_solution(tspa, tspa_solution, tspb, tspb_solution):
     )
 
     plt.subplot(1, 2, 2)
-    plt.title("TSPB")
+    plt.title(f"TSPB [{tspb_cost}]")
+    plt.xlabel("x")
+    plt.ylabel("y")
     scatter_tspb = plt.scatter(
         [city.x for city in tspb],
         [city.y for city in tspb],
@@ -140,14 +160,42 @@ def plot_solution(tspa, tspa_solution, tspb, tspb_solution):
 plot_cities(tspa, tspb)
 plt.savefig("cities.png")
 
-plot_solution(tspa, tspa_random_solution, tspb, tspb_random_solution)
+plot_solution(
+    tspa,
+    tspa_random_cost,
+    tspa_random_solution,
+    tspb,
+    tspb_random_cost,
+    tspb_random_solution,
+)
 plt.savefig("random_solution.png")
 
-plot_solution(tspa, tspa_greedy_append, tspb, tspb_greedy_append)
+plot_solution(
+    tspa,
+    tspa_greedy_append_cost,
+    tspa_greedy_append,
+    tspb,
+    tspb_greedy_append_cost,
+    tspb_greedy_append,
+)
 plt.savefig("greedy_append_solution.png")
 
-plot_solution(tspa, tspa_greedy_at_any_position, tspb, tspb_greedy_at_any_position)
+plot_solution(
+    tspa,
+    tspa_greedy_at_any_position_cost,
+    tspa_greedy_at_any_position,
+    tspb,
+    tspb_greedy_at_any_position_cost,
+    tspb_greedy_at_any_position,
+)
 plt.savefig("greedy_at_any_position_solution.png")
 
-plot_solution(tspa, tspa_greedy_cycle, tspb, tspb_greedy_cycle)
+plot_solution(
+    tspa,
+    tspa_greedy_cycle_cost,
+    tspa_greedy_cycle,
+    tspb,
+    tspb_greedy_cycle_cost,
+    tspb_greedy_cycle,
+)
 plt.savefig("greedy_cycle_solution.png")

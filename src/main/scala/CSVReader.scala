@@ -22,8 +22,7 @@ object CSVReader {
       )
       .toArray
 
-    val expectedSolutionLen =
-      if (cities.size % 2 == 1) (cities.size + 1) / 2 else cities.size / 2
+    val expectedSolutionLen = (cities.size + 1) / 2
 
     ProblemInstance(cities, distances, expectedSolutionLen)
   }

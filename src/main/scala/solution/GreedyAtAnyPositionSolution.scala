@@ -65,9 +65,13 @@ object GreedyAtAnyPositionSolution {
       path: Iterable[City],
       distances: Array[Array[Int]]
   ): Int = {
-    path
-      .zip(path.tail)
-      .map { case (city1, city2) => distances(city1.id)(city2.id) }
-      .sum + distances(path.head.id)(path.last.id)
+    if (path.isEmpty) 0
+    else {
+      val cityList = path.toList
+      cityList
+        .zip(cityList.tail :+ cityList.head)
+        .map { case (city1, city2) => distances(city1.id)(city2.id) }
+        .sum
+    }
   }
 }

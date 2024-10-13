@@ -69,7 +69,11 @@ object SolutionFactory {
     GreedyCycleSolution.generate(
       problemInstance,
       problemInstance.cities.filterNot(_ == initialCity),
-      PartialSolution(List(initialCity), Set(initialCity), 0)
+      PartialSolution(
+        List(initialCity),
+        Set(initialCity),
+        problemInstance.distances(initialCity.id)(initialCity.id)
+      )
     )
   }
 
