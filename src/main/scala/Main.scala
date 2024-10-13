@@ -9,24 +9,11 @@ import scala.concurrent.ExecutionContext
 
 object Main extends App {
   implicit val ec: ExecutionContext = ExecutionContext.global
-  val dataFilePath = Option(System.getProperty("data"))
-  if (dataFilePath.isEmpty) {
-    println("Proper use: sbt run -Ddata=[TSPA.csv|TSPB.csv]")
-    System.exit(-1)
-  }
-  dataFilePath match {
-    case None =>
-      println("Proper use: sbt run -Ddata=[TSPA.csv|TSPB.csv]")
-      System.exit(-1)
-    case Some(path) if !Files.exists(Paths.get(path)) =>
-      println("Data file does not exists")
-      System.exit(-1)
-    case Some(_) =>
-  }
 
-  val initialData = CSVReader.readCSV(dataFilePath.get)
+  val name = "tspa"
+  val initialData = CSVReader.readCSV(s"${name}.csv")
 
-  // greedy at the end
+  // greedy append
   println("Starting greedy appends")
   val greedyAppend = initialData.cities
     .map(city =>
@@ -38,6 +25,13 @@ object Main extends App {
     .toSeq
   val greedyAppendResult =
     Await.result(Future.sequence(greedyAppend), 30.seconds)
+  var bestSolution: FullSolution = greedyAppendResult
+    .flatMap {
+      case Right(value) =>
+        Seq(value)
+      case _ => Seq()
+    }
+    .minBy(_.cost)
   var distances = greedyAppendResult.map {
     case Left(value)  => value.cost
     case Right(value) => value.cost
@@ -45,9 +39,17 @@ object Main extends App {
   println(
     s"\nGreedy append min: ${distances.min}, avg: ${distances.sum / distances.size}, max: ${distances.max}"
   )
+  TXTWriter.writeTXT(s"${name}_greedy_append.txt", bestSolution)
 
   var randomSolutions =
     (1 to 200).map(_ => SolutionFactory.getRandomSolution(initialData))
+  bestSolution = randomSolutions
+    .flatMap {
+      case Right(value) =>
+        Seq(value)
+      case _ => Seq()
+    }
+    .minBy(_.cost)
   distances = randomSolutions.map {
     case Left(value)  => value.cost
     case Right(value) => value.cost
@@ -55,6 +57,7 @@ object Main extends App {
   println(
     s"Random append min: ${distances.min}, avg: ${distances.sum / distances.size}, max: ${distances.max}"
   )
+  TXTWriter.writeTXT(s"${name}_random.txt", bestSolution)
 
   // greedy at any position
   println("Starting greedy at any position")
@@ -68,6 +71,13 @@ object Main extends App {
     .toSeq
   val greedyAtAnyPositionResult =
     Await.result(Future.sequence(greedyAtAnyPosition), 30.seconds)
+  bestSolution = greedyAtAnyPositionResult
+    .flatMap {
+      case Right(value) =>
+        Seq(value)
+      case _ => Seq()
+    }
+    .minBy(_.cost)
   distances = greedyAtAnyPositionResult.map {
     case Left(value)  => value.cost
     case Right(value) => value.cost
@@ -75,16 +85,7 @@ object Main extends App {
   println(
     s"\nGreedy at any position min: ${distances.min}, avg: ${distances.sum / distances.size}, max: ${distances.max}"
   )
-
-  randomSolutions =
-    (1 to 200).map(_ => SolutionFactory.getRandomSolution(initialData))
-  distances = randomSolutions.map {
-    case Left(value)  => value.cost
-    case Right(value) => value.cost
-  }
-  println(
-    s"Random append min: ${distances.min}, avg: ${distances.sum / distances.size}, max: ${distances.max}"
-  )
+  TXTWriter.writeTXT(s"${name}_greedy_at_any_position.txt", bestSolution)
 
   // greedy cycle
   println("Starting greedy cycle")
@@ -97,22 +98,20 @@ object Main extends App {
     )
     .toSeq
   val greedyCycleResult =
-    Await.result(Future.sequence(greedyAppend), 30.seconds)
+    Await.result(Future.sequence(greedyCycle), 30.seconds)
+  bestSolution = greedyCycleResult
+    .flatMap {
+      case Right(value) =>
+        Seq(value)
+      case _ => Seq()
+    }
+    .minBy(_.cost)
   distances = greedyCycleResult.map {
     case Left(value)  => value.cost
     case Right(value) => value.cost
   }
   println(
-    s"\nGreedy at any position min: ${distances.min}, avg: ${distances.sum / distances.size}, max: ${distances.max}"
+    s"\nGreedy cycle min: ${distances.min}, avg: ${distances.sum / distances.size}, max: ${distances.max}"
   )
-
-  randomSolutions =
-    (1 to 200).map(_ => SolutionFactory.getRandomSolution(initialData))
-  distances = randomSolutions.map {
-    case Left(value)  => value.cost
-    case Right(value) => value.cost
-  }
-  println(
-    s"Random append min: ${distances.min}, avg: ${distances.sum / distances.size}, max: ${distances.max}"
-  )
+  TXTWriter.writeTXT(s"${name}_greedy_cycle.txt", bestSolution)
 }

@@ -3,4 +3,4 @@ case class ProblemInstance(
     distances: Array[Array[Int]],
     expectedSolutionLen: Int
 )
-case class City(cityId: Int, x: Int, y: Int, cost: Int)
+case class City(id: Int, x: Int, y: Int, cost: Int)

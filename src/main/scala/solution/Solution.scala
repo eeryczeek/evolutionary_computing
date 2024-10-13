@@ -100,7 +100,7 @@ object SolutionFactory {
       val additionalCost = lastCity match {
         case None => 0
         case Some(city) =>
-          problemInstance.distances(city.cityId)(choosenCity.get.cityId)
+          problemInstance.distances(city.id)(choosenCity.get.id)
       }
       val remainingCities = citiesToChooseFrom.filter(_ != choosenCity.get)
 
@@ -113,8 +113,8 @@ object SolutionFactory {
 
       if (newSolution.path.size == problemInstance.expectedSolutionLen) {
         val distanceFromLastToFirstCity = problemInstance.distances(
-          newSolution.path.last.cityId
-        )(newSolution.path.head.cityId)
+          newSolution.path.last.id
+        )(newSolution.path.head.id)
         Right(
           FullSolution(
             path = newSolution.path,
@@ -144,7 +144,7 @@ object SolutionFactory {
     val lastVisitedCity = solution.path.last
     cities
       .map(city =>
-        city -> problemInstance.distances(lastVisitedCity.cityId)(city.cityId)
+        city -> problemInstance.distances(lastVisitedCity.id)(city.id)
       )
       .minByOption(_._2)
       .map(_._1)

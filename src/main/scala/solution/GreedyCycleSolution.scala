@@ -24,9 +24,7 @@ object GreedyCycleSolution {
       )
       generate(
         problemInstance,
-        citiesToChooseFrom.filterNot(city =>
-          newSolution.visitedCities.contains(city)
-        ),
+        citiesToChooseFrom.filterNot(city => newSolution.path.contains(city)),
         newSolution
       )
     }
@@ -40,8 +38,10 @@ object GreedyCycleSolution {
     val currentCycle = currentSolution.path
     val (cityToInsertAfter, cityToInsert, additionalCost) = currentCycle
       .zip(
-        if (currentCycle.size < 2) currentCycle.tail
-        else currentCycle.tail :+ currentCycle.head
+        currentCycle.size match {
+          case 1 => List(currentCycle.head)
+          case _ => currentCycle.tail :+ currentCycle.head
+        }
       )
       .map(consecutiveCities => {
         val (city1, city2) = consecutiveCities
@@ -56,12 +56,10 @@ object GreedyCycleSolution {
       })
       .minBy(_._3)
 
-    val insertIndex =
-      currentSolution.path.zipWithIndex.find(_._1 == cityToInsertAfter).get._2
-    val newCycle =
-      currentCycle.take(insertIndex) ++
-        List(cityToInsert) ++
-        currentCycle.drop(insertIndex)
+    val insertIndex = currentSolution.path.indexOf(cityToInsertAfter)
+    val newCycle = currentCycle.take(insertIndex + 1) ++ List(
+      cityToInsert
+    ) ++ currentCycle.drop(insertIndex + 1)
 
     PartialSolution(
       path = newCycle,
@@ -76,14 +74,14 @@ object GreedyCycleSolution {
       distances: Array[Array[Int]],
       citiesToChooseFrom: Iterable[City]
   ): (City, Int) = {
-    val city1Id = city1.cityId
-    val city2Id = city2.cityId
     citiesToChooseFrom
       .map(middleCity => {
-        val middleCityId = middleCity.cityId
-        val additionalDistance =
-          distances(city1Id)(middleCityId) + distances(middleCityId)(city2Id)
-        (middleCity, additionalDistance)
+        (
+          middleCity,
+          distances(city1.id)(middleCity.id)
+            + distances(middleCity.id)(city2.id)
+            - distances(city1.id)(city2.id)
+        )
       })
       .minBy(_._2)
   }

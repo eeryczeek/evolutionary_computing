@@ -13,7 +13,7 @@ object CSVReader {
       }
       .toArray
     bufferedSource.close()
-    val sortedCities = cities.sortBy(_.cityId)
+    val sortedCities = cities.sortBy(_.id)
     val distances = sortedCities
       .map(city1 =>
         sortedCities
