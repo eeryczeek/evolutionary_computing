@@ -4,7 +4,7 @@ object GreedyCycleSolution {
   def generate(
       problemInstance: ProblemInstance,
       citiesToChooseFrom: Iterable[City],
-      currentSolution: PartrialSolution
+      currentSolution: PartialSolution
   ): Either[FaultySolution, FullSolution] = {
     if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
       Right(
@@ -17,24 +17,17 @@ object GreedyCycleSolution {
         )
       )
     } else {
-      val newPath = insertClosestCityIntoCycle(
+      val newSolution = insertClosestCityIntoCycle(
         problemInstance.distances,
         citiesToChooseFrom,
-        currentSolution.path
+        currentSolution
       )
       generate(
         problemInstance,
         citiesToChooseFrom.filterNot(city =>
-          newPath.exists(_.cityId == city.cityId)
+          newSolution.visitedCities.contains(city)
         ),
-        PartrialSolution(
-          newPath,
-          currentSolution.visitedCities ++ newPath,
-          GreedyAtAnyPositionSolution.calculatePathLength(
-            newPath,
-            problemInstance.distances
-          )
-        )
+        newSolution
       )
     }
   }
@@ -42,7 +35,56 @@ object GreedyCycleSolution {
   def insertClosestCityIntoCycle(
       distances: Array[Array[Int]],
       citiesToChooseFrom: Iterable[City],
-      currentCycle: List[City]
-  ): List[City] = ???
+      currentSolution: PartialSolution
+  ): PartialSolution = {
+    val currentCycle = currentSolution.path
+    val (cityToInsertAfter, cityToInsert, additionalCost) = currentCycle
+      .zip(
+        if (currentCycle.size < 2) currentCycle.tail
+        else currentCycle.tail :+ currentCycle.head
+      )
+      .map(consecutiveCities => {
+        val (city1, city2) = consecutiveCities
+        val (bestCity, additionalDistance) =
+          findBestCityConnectingTwoOthers(
+            city1,
+            city2,
+            distances,
+            citiesToChooseFrom
+          )
+        (city1, bestCity, additionalDistance)
+      })
+      .minBy(_._3)
 
+    val insertIndex =
+      currentSolution.path.zipWithIndex.find(_._1 == cityToInsertAfter).get._2
+    val newCycle =
+      currentCycle.take(insertIndex) ++
+        List(cityToInsert) ++
+        currentCycle.drop(insertIndex)
+
+    PartialSolution(
+      path = newCycle,
+      cost = currentSolution.cost + additionalCost,
+      visitedCities = currentSolution.visitedCities + cityToInsert
+    )
+  }
+
+  def findBestCityConnectingTwoOthers(
+      city1: City,
+      city2: City,
+      distances: Array[Array[Int]],
+      citiesToChooseFrom: Iterable[City]
+  ): (City, Int) = {
+    val city1Id = city1.cityId
+    val city2Id = city2.cityId
+    citiesToChooseFrom
+      .map(middleCity => {
+        val middleCityId = middleCity.cityId
+        val additionalDistance =
+          distances(city1Id)(middleCityId) + distances(middleCityId)(city2Id)
+        (middleCity, additionalDistance)
+      })
+      .minBy(_._2)
+  }
 }

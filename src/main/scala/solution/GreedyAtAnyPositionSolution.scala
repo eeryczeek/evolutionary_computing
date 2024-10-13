@@ -4,7 +4,7 @@ object GreedyAtAnyPositionSolution {
   def generate(
       problemInstance: ProblemInstance,
       citiesToChooseFrom: Iterable[City],
-      currentSolution: PartrialSolution
+      currentSolution: PartialSolution
   ): Either[FaultySolution, FullSolution] = {
     if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
       Right(
@@ -27,7 +27,7 @@ object GreedyAtAnyPositionSolution {
         citiesToChooseFrom.filterNot(city =>
           newPath.exists(_.cityId == city.cityId)
         ),
-        PartrialSolution(
+        PartialSolution(
           newPath,
           currentSolution.visitedCities ++ newPath,
           calculatePathLength(newPath, problemInstance.distances)

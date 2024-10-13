@@ -3,7 +3,7 @@ import scala.util.control.TailCalls.TailRec
 import scala.annotation.tailrec
 
 trait Solution
-case class PartrialSolution(
+case class PartialSolution(
     path: List[City],
     visitedCities: Set[City],
     cost: Int
@@ -35,7 +35,7 @@ object SolutionFactory {
         val randomIdx = Random.nextInt(cities.size - 1)
         cities.drop(randomIdx).take(1).toList.headOption
       },
-      PartrialSolution(List.empty, Set.empty, cost = 0)
+      PartialSolution(List.empty, Set.empty, cost = 0)
     )
   }
 
@@ -47,14 +47,31 @@ object SolutionFactory {
       problemInstance,
       problemInstance.cities.filter(_ != initialCity),
       selectGreedyCity,
-      PartrialSolution(List(initialCity), Set(initialCity), 0)
+      PartialSolution(List(initialCity), Set(initialCity), 0)
     )
   }
 
   def getGreedyAnyPositionSolution(
       problemInstance: ProblemInstance,
       initialCity: City
-  ): Either[FaultySolution, FullSolution] = ???
+  ): Either[FaultySolution, FullSolution] = {
+    GreedyAtAnyPositionSolution.generate(
+      problemInstance,
+      problemInstance.cities.filterNot(_ == initialCity),
+      PartialSolution(List(initialCity), Set(initialCity), 0)
+    )
+  }
+
+  def getGreedyCycleSolution(
+      problemInstance: ProblemInstance,
+      initialCity: City
+  ): Either[FaultySolution, FullSolution] = {
+    GreedyCycleSolution.generate(
+      problemInstance,
+      problemInstance.cities.filterNot(_ == initialCity),
+      PartialSolution(List(initialCity), Set(initialCity), 0)
+    )
+  }
 
   @tailrec
   def generate(
@@ -63,9 +80,9 @@ object SolutionFactory {
       nextCitySelector: (
           ProblemInstance,
           Iterable[City],
-          PartrialSolution
+          PartialSolution
       ) => Option[City],
-      currentSolution: PartrialSolution
+      currentSolution: PartialSolution
   ): Either[FaultySolution, FullSolution] = {
     val choosenCity =
       nextCitySelector(problemInstance, citiesToChooseFrom, currentSolution)
@@ -122,14 +139,14 @@ object SolutionFactory {
   def selectGreedyCity(
       problemInstance: ProblemInstance,
       cities: Iterable[City],
-      solution: PartrialSolution
+      solution: PartialSolution
   ): Option[City] = {
     val lastVisitedCity = solution.path.last
     cities
       .map(city =>
         city -> problemInstance.distances(lastVisitedCity.cityId)(city.cityId)
       )
-      .maxByOption(_._2)
+      .minByOption(_._2)
       .map(_._1)
   }
 }
