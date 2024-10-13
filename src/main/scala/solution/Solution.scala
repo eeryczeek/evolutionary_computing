@@ -3,7 +3,11 @@ import scala.util.control.TailCalls.TailRec
 import scala.annotation.tailrec
 
 trait Solution
-case class PartrialSolution(path: List[City], cost: Int) extends Solution
+case class PartrialSolution(
+    path: List[City],
+    visitedCities: Set[City],
+    cost: Int
+) extends Solution
 case class FullSolution(path: List[City], cost: Int) extends Solution
 case class FaultySolution(path: List[City], cost: Int, reason: String)
     extends Solution
@@ -31,26 +35,26 @@ object SolutionFactory {
         val randomIdx = Random.nextInt(cities.size - 1)
         cities.drop(randomIdx).take(1).toList.headOption
       },
-      PartrialSolution(List.empty, cost = 0)
+      PartrialSolution(List.empty, Set.empty, cost = 0)
     )
   }
 
-  def getGreedySolution(
-      problemInstance: ProblemInstance
+  def getGreedyAppendSolution(
+      problemInstance: ProblemInstance,
+      initialCity: City
   ): Either[FaultySolution, FullSolution] = {
-    val initialCity = selectRandomCity(problemInstance.cities)
-    initialCity match {
-      case None =>
-        Left(FaultySolution(List.empty, 0, "Can't find initial city"))
-      case Some(city) =>
-        generate(
-          problemInstance,
-          problemInstance.cities.filter(_ != city),
-          selectGreedyCity,
-          PartrialSolution(List(city), 0)
-        )
-    }
+    generate(
+      problemInstance,
+      problemInstance.cities.filter(_ != initialCity),
+      selectGreedyCity,
+      PartrialSolution(List(initialCity), Set(initialCity), 0)
+    )
   }
+
+  def getGreedyAnyPositionSolution(
+      problemInstance: ProblemInstance,
+      initialCity: City
+  ): Either[FaultySolution, FullSolution] = ???
 
   @tailrec
   def generate(
@@ -79,20 +83,21 @@ object SolutionFactory {
       val additionalCost = lastCity match {
         case None => 0
         case Some(city) =>
-          problemInstance.distances.get((city, choosenCity.get)).getOrElse(0)
+          problemInstance.distances(city.cityId)(choosenCity.get.cityId)
       }
       val remainingCities = citiesToChooseFrom.filter(_ != choosenCity.get)
 
       val newSolution =
         currentSolution.copy(
           path = currentSolution.path :+ choosenCity.get,
+          visitedCities = currentSolution.visitedCities ++ choosenCity,
           cost = currentSolution.cost + additionalCost
         )
 
       if (newSolution.path.size == problemInstance.expectedSolutionLen) {
         val distanceFromLastToFirstCity = problemInstance.distances(
-          (newSolution.path.head, newSolution.path.last)
-        )
+          newSolution.path.last.cityId
+        )(newSolution.path.head.cityId)
         Right(
           FullSolution(
             path = newSolution.path,
@@ -121,7 +126,9 @@ object SolutionFactory {
   ): Option[City] = {
     val lastVisitedCity = solution.path.last
     cities
-      .map(city => city -> problemInstance.distances((lastVisitedCity, city)))
+      .map(city =>
+        city -> problemInstance.distances(lastVisitedCity.cityId)(city.cityId)
+      )
       .maxByOption(_._2)
       .map(_._1)
   }

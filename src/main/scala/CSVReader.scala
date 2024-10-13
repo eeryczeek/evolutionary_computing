@@ -5,20 +5,26 @@ object CSVReader {
     val bufferedSource = Source.fromFile(filePath)
     val cities = bufferedSource
       .getLines()
-      .map { line =>
+      .zipWithIndex
+      .map { lineWithId =>
+        val (line, id) = lineWithId
         val Array(x, y, cost) = line.split(";").map(_.toInt)
-        City(x, y, cost)
+        City(id, x, y, cost)
       }
       .toArray
     bufferedSource.close()
-    val distances = for {
-      city1 <- cities
-      city2 <- cities
-    } yield (city1, city2) -> (Cost.euclidean(city1, city2) + city2.cost)
+    val sortedCities = cities.sortBy(_.cityId)
+    val distances = sortedCities
+      .map(city1 =>
+        sortedCities
+          .map(city2 => Cost.euclidean(city1, city2) + city2.cost)
+          .toArray
+      )
+      .toArray
 
     val expectedSolutionLen =
       if (cities.size % 2 == 1) (cities.size + 1) / 2 else cities.size / 2
 
-    ProblemInstance(cities, distances.toMap, expectedSolutionLen)
+    ProblemInstance(cities, distances, expectedSolutionLen)
   }
 }
