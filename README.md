@@ -1,7 +1,7 @@
-# Raport 1 - Greedy heuristics
+# Raport 1 - Greedy heuristics [GITHUB](https://github.com/eeryczeek/evolutionary_computing)
 
-Eryk Ptaszyński 151950
-Eryk Walter 1519XX
+Eryk Ptaszyński: 151950
+Eryk Walter: 151931
 
 The **Traveling Salesman Problem (TSP)** is an optimization problem where the objective is to find the shortest possible route that visits a set of cities exactly once and returns to the starting city. In its traditional form, the TSP assumes that the cost of traveling between any two cities is known and fixed, and the salesman must visit all cities.
 
@@ -55,7 +55,7 @@ function randomSolution(problemInstance, availableCities, currentSolution):
 function greedyAppendSolution(problemInstance, availableCities, currentSolution, initialCity):
    if currentSolution.path.size equals problemInstance.expectedSolutionLen:
       return currentSolution
-   city <- initialCity if not null, else take the city such that distance(currentSolution.last, city) is minimal
+   city <- initialCity if not null, else take the city such that the distance(currentSolution.last, city) is minimal
    append city to currentSolution
    currentSolution.cost += distance(currentSolution.last, city)
    remove city from availableCities
