@@ -23,7 +23,7 @@ This visual representation provides an intuitive way to interpret the spatial re
 | --------------------- | ------ | ------ | ------ |
 | `random`              | 237008 | 263994 | 294340 |
 | `greedy append`       | 83182  | 85108  | 89433  |
-| `greedy any position` | 78956  | 81062  | 82916  |
+| `greedy any position` | 78896  | 80974  | 82368  |
 | `greedy cycle`        | 71488  | 72609  | 74410  |
 
 ### Instance TSPB results table:
@@ -59,7 +59,7 @@ function greedyAppendSolution(problemInstance, availableCities, currentSolution,
    append city to currentSolution
    currentSolution.cost += distance(currentSolution.last, city)
    remove city from availableCities
-   randomSolution(problemInstance, availableCities, currentSolution)
+   greedyAppendSolution(problemInstance, availableCities, currentSolution)
 ```
 
 ![greedy_append_solution.png](greedy_append_solution.png)
@@ -78,13 +78,13 @@ function greedyAtAnyPositionSolution(problemInstance, availableCities, currentSo
       take pair (cityInPath, city) such that the distance(cityInPath, city) is minimal
    insert city after cityInPath
    remove city from availableCities
-   randomSolution(problemInstance, availableCities, currentSolution)
+   greedyAtAnyPositionSolution(problemInstance, availableCities, currentSolution)
 ```
 
 ![greedy_at_any_position_solution.png](greedy_at_any_position_solution.png)
 
-- `TSPA greedy at any position` **best solution:** `[115 68 46 139 41 108 18 146 22 159 193 34 184 190 10 177 30 54 160 181 42 43 116 131 149 65 59 127 84 4 112 123 70 135 154 180 75 86 101 90 165 196 81 119 40 144 148 9 62 14 102 49 178 55 52 106 185 57 129 92 179 145 31 56 113 175 171 16 78 25 44 120 2 1 152 100 26 97 53 124 94 79 63 133 162 151 80 140 93 117 0 143 186 23 89 183 137 176 51 118]`
-- `TSPB greedy at any position` **best solution:** `[107 40 63 135 54 113 179 66 94 47 60 148 4 149 28 20 140 183 152 34 55 18 147 6 188 13 132 169 70 15 155 3 145 195 168 139 11 182 138 111 104 21 82 8 144 160 33 29 109 35 0 143 106 124 62 99 130 95 185 86 194 166 176 137 165 127 114 103 89 163 187 153 81 77 141 91 61 36 177 5 45 142 78 175 80 190 193 73 31 27 38 1 198 117 121 51 90 122 133 10]`
+- `TSPA greedy at any position` **best solution:** `[118 51 176 137 183 89 23 186 143 117 93 140 0 80 151 162 133 63 79 94 124 53 97 26 100 152 1 2 120 44 25 78 16 171 175 113 56 31 145 179 92 129 57 185 106 52 55 178 49 102 14 62 9 148 144 40 119 81 196 165 90 101 86 75 180 154 135 70 123 112 4 84 127 59 65 149 131 116 43 42 181 160 54 30 177 10 190 184 34 193 159 22 146 18 108 41 139 46 68 115]`
+- `TSPB greedy at any position` **best solution:** `[10 133 122 90 51 121 117 198 1 38 27 31 73 193 190 80 175 78 142 45 5 177 36 61 91 141 77 81 153 187 163 89 103 114 127 165 137 176 166 194 86 185 95 130 99 62 124 106 143 0 35 109 29 33 160 144 8 82 21 104 111 138 182 11 139 168 195 145 3 155 15 70 169 132 13 188 6 147 18 55 34 152 183 140 20 28 149 4 148 60 47 94 66 179 113 54 135 63 40 107]`
 
 ```
 function greedyCycleSolution(problemInstance, availableCities, currentSolution, initialCity):
@@ -97,7 +97,7 @@ function greedyCycleSolution(problemInstance, availableCities, currentSolution, 
    insert middleCity after city1
    currentSolution.cost += distance(city1, middleCity) + distance(middleCity, city2) - distance(city1, city2)
    remove middleCity from availableCities
-   randomSolution(problemInstance, availableCities, currentSolution)
+   greedyCycleSolution(problemInstance, availableCities, currentSolution)
 ```
 
 ![greedy_cycle_solution.png](greedy_cycle_solution.png)

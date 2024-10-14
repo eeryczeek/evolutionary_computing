@@ -233,5 +233,5 @@ for city in tspb_greedy_cycle:
     print(city[0], end=" ")
 print()
 
-for city in tspa_greedy_cycle:
+for city in tspa_greedy_at_any_position:
     print(city[0])
