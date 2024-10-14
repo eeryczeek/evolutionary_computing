@@ -15,7 +15,7 @@ object GreedyAtAnyPositionSolution {
         )
       )
     } else {
-      val newPath = insertClosestCityIntoPath(
+      val newPath = insertCityIntoPath2(
         currentSolution.path,
         problemInstance.distances,
         citiesToChooseFrom
@@ -66,6 +66,68 @@ object GreedyAtAnyPositionSolution {
         .zip(cityList.tail :+ cityList.head)
         .map { case (city1, city2) => distances(city1.id)(city2.id) }
         .sum
+    }
+  }
+
+  def additionalCostOfInsertingCity(
+      city1: City,
+      city2: City,
+      cityToInsert: City,
+      distances: Array[Array[Int]]
+  ): Int = {
+    distances(city1.id)(cityToInsert.id) + distances(cityToInsert.id)(
+      city2.id
+    ) - distances(city1.id)(city2.id)
+  }
+
+  def insertCityIntoPath2(
+      path: List[City],
+      distances: Array[Array[Int]],
+      citiesToChooseFrom: Iterable[City]
+  ): List[City] = {
+    val (bestCityToPrepend, additionalCostPrepend) = citiesToChooseFrom
+      .map { cityToInsert =>
+        (cityToInsert, distances(cityToInsert.id)(path.head.id))
+      }
+      .minBy { case (city, additionalCost) => additionalCost }
+
+    val citiesWithAdditionalCosts = path
+      .zip(path.tail)
+      .map { case (city1, city2) =>
+        val (bestToInsert, additionalCost) = citiesToChooseFrom
+          .map(city =>
+            (city, additionalCostOfInsertingCity(city1, city2, city, distances))
+          )
+          .minBy { case (city, additionalCost) => additionalCost }
+        (path.indexOf(city1), bestToInsert, additionalCost)
+      }
+
+    val (indexToInsertAt, bestCityToInsert, additionalCostInsert) =
+      if (citiesWithAdditionalCosts.isEmpty) (0, path.head, 1_000_000)
+      else
+        citiesWithAdditionalCosts
+          .minBy { case (city1, cityToInsert, additionalCost) =>
+            additionalCost
+          }
+
+    val (bestCityToAppend, additionalCostAppend) = citiesToChooseFrom
+      .map { cityToAppend =>
+        (cityToAppend, distances(path.last.id)(cityToAppend.id))
+      }
+      .minBy { case (city, additionalCost) => additionalCost }
+
+    if (
+      additionalCostPrepend <= additionalCostInsert && additionalCostPrepend <= additionalCostAppend
+    ) {
+      bestCityToPrepend :: path
+    } else if (
+      additionalCostInsert <= additionalCostPrepend && additionalCostInsert <= additionalCostAppend
+    ) {
+      path.take(indexToInsertAt + 1) ++ List(bestCityToInsert) ++ path.drop(
+        indexToInsertAt + 1
+      )
+    } else {
+      path :+ bestCityToAppend
     }
   }
 }

@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext
 object Main extends App {
   implicit val ec: ExecutionContext = ExecutionContext.global
 
-  val names = List("tspa", "tspb")
+  val names = List("tspa", "tspb").map(_.toUpperCase)
 
   for (name <- names) {
     println(s"${name.toUpperCase()}")
