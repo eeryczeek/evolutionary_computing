@@ -63,8 +63,7 @@ object GreedyCycleSolution {
 
     PartialSolution(
       path = newCycle,
-      cost = currentSolution.cost + additionalCost,
-      visitedCities = currentSolution.visitedCities + cityToInsert
+      cost = currentSolution.cost + additionalCost
     )
   }
 

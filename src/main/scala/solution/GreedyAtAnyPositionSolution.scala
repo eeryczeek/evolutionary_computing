@@ -22,10 +22,9 @@ object GreedyAtAnyPositionSolution {
       )
       generate(
         problemInstance,
-        citiesToChooseFrom.filterNot(city => newPath.exists(_.id == city.id)),
+        citiesToChooseFrom.filterNot(city => newPath.contains(city)),
         PartialSolution(
           newPath,
-          currentSolution.visitedCities ++ newPath,
           calculatePathLength(newPath, problemInstance.distances)
         )
       )
@@ -37,12 +36,7 @@ object GreedyAtAnyPositionSolution {
       distances: Array[Array[Int]],
       citiesToChooseFrom: Iterable[City]
   ): City = {
-    val closestCityId = distances(city.id).zipWithIndex
-      .filter { case (_, id) => citiesToChooseFrom.exists(_.id == id) }
-      .minBy(_._1)
-      ._2
-
-    citiesToChooseFrom.find(_.id == closestCityId).get
+    citiesToChooseFrom.minBy(c => distances(city.id)(c.id))
   }
 
   def insertClosestCityIntoPath(
@@ -56,8 +50,8 @@ object GreedyAtAnyPositionSolution {
       }
       .minBy { case (idx, city) => distances(path(idx).id)(city.id) }
 
-    path.take(positionToInsertAfter) ++ List(closestCity) ++ path.drop(
-      positionToInsertAfter
+    path.take(positionToInsertAfter + 1) ++ List(closestCity) ++ path.drop(
+      positionToInsertAfter + 1
     )
   }
 

@@ -10,11 +10,10 @@ import scala.concurrent.ExecutionContext
 object Main extends App {
   implicit val ec: ExecutionContext = ExecutionContext.global
 
-  val name = "tspb"
+  val name = "tspa"
   val initialData = CSVReader.readCSV(s"${name}.csv")
 
-  // greedy append
-  println("Starting greedy appends")
+  println("greedy append")
   val greedyAppend = initialData.cities
     .map(city =>
       Future {
@@ -60,7 +59,7 @@ object Main extends App {
   TXTWriter.writeTXT(s"${name}_random.txt", bestSolution)
 
   // greedy at any position
-  println("Starting greedy at any position")
+  println("greedy at any position")
   val greedyAtAnyPosition = initialData.cities
     .map(city =>
       Future {

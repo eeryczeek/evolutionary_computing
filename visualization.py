@@ -206,3 +206,32 @@ plot_solution(
     tspb_greedy_cycle,
 )
 plt.savefig("greedy_cycle_solution.png")
+
+print("tspa random solution")
+for city in tspa_random_solution:
+    print(city[0], end=" ")
+print("\ntspb random solution")
+for city in tspb_random_solution:
+    print(city[0], end=" ")
+print("\ntspa greedy append solution")
+for city in tspa_greedy_append:
+    print(city[0], end=" ")
+print("\ntspb greedy append solution")
+for city in tspb_greedy_append:
+    print(city[0], end=" ")
+print("\ntspa greedy at any position solution")
+for city in tspa_greedy_at_any_position:
+    print(city[0], end=" ")
+print("\ntspb greedy at any position solution")
+for city in tspb_greedy_at_any_position:
+    print(city[0], end=" ")
+print("\ntspa greedy cycle solution")
+for city in tspa_greedy_cycle:
+    print(city[0], end=" ")
+print("\ntspb greedy cycle solution")
+for city in tspb_greedy_cycle:
+    print(city[0], end=" ")
+print()
+
+for city in tspa_greedy_cycle:
+    print(city[0])

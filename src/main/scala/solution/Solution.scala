@@ -5,7 +5,6 @@ import scala.annotation.tailrec
 trait Solution
 case class PartialSolution(
     path: List[City],
-    visitedCities: Set[City],
     cost: Int
 ) extends Solution
 case class FullSolution(path: List[City], cost: Int) extends Solution
@@ -35,7 +34,7 @@ object SolutionFactory {
         val randomIdx = Random.nextInt(cities.size - 1)
         cities.drop(randomIdx).take(1).toList.headOption
       },
-      PartialSolution(List.empty, Set.empty, cost = 0)
+      PartialSolution(List.empty, cost = 0)
     )
   }
 
@@ -47,7 +46,7 @@ object SolutionFactory {
       problemInstance,
       problemInstance.cities.filter(_ != initialCity),
       selectGreedyCity,
-      PartialSolution(List(initialCity), Set(initialCity), 0)
+      PartialSolution(List(initialCity), 0)
     )
   }
 
@@ -58,7 +57,7 @@ object SolutionFactory {
     GreedyAtAnyPositionSolution.generate(
       problemInstance,
       problemInstance.cities.filterNot(_ == initialCity),
-      PartialSolution(List(initialCity), Set(initialCity), 0)
+      PartialSolution(List(initialCity), 0)
     )
   }
 
@@ -71,7 +70,6 @@ object SolutionFactory {
       problemInstance.cities.filterNot(_ == initialCity),
       PartialSolution(
         List(initialCity),
-        Set(initialCity),
         problemInstance.distances(initialCity.id)(initialCity.id)
       )
     )
@@ -106,29 +104,25 @@ object SolutionFactory {
         case Some(city) =>
           problemInstance.distances(city.id)(choosenCity.get.id)
       }
-      val remainingCities = citiesToChooseFrom.filter(_ != choosenCity.get)
-
       val newSolution =
         currentSolution.copy(
           path = currentSolution.path :+ choosenCity.get,
-          visitedCities = currentSolution.visitedCities ++ choosenCity,
           cost = currentSolution.cost + additionalCost
         )
 
       if (newSolution.path.size == problemInstance.expectedSolutionLen) {
-        val distanceFromLastToFirstCity = problemInstance.distances(
-          newSolution.path.last.id
-        )(newSolution.path.head.id)
         Right(
           FullSolution(
             path = newSolution.path,
-            cost = newSolution.cost + distanceFromLastToFirstCity
+            cost = newSolution.cost + problemInstance.distances(
+              newSolution.path.last.id
+            )(newSolution.path.head.id)
           )
         )
       } else
         generate(
           problemInstance,
-          remainingCities,
+          citiesToChooseFrom.filterNot(_ == choosenCity.get),
           nextCitySelector,
           newSolution
         )
@@ -145,10 +139,9 @@ object SolutionFactory {
       cities: Iterable[City],
       solution: PartialSolution
   ): Option[City] = {
-    val lastVisitedCity = solution.path.last
     cities
       .map(city =>
-        city -> problemInstance.distances(lastVisitedCity.id)(city.id)
+        city -> problemInstance.distances(solution.path.last.id)(city.id)
       )
       .minByOption(_._2)
       .map(_._1)
