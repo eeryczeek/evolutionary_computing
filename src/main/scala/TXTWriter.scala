@@ -1,17 +1,10 @@
 import scala.io.Source
 
 object TXTWriter {
-  def writeTXT(filePath: String, solution: Solution): Unit = {
+  def writeTXT(filePath: String, solution: FullSolution): Unit = {
     val writer = new java.io.PrintWriter(filePath)
-    solution match {
-      case FullSolution(path, cost) =>
-        writer.write(s"Cost: ${cost}\n")
-        path.foreach(city => writer.write(s"${city.id} ${city.x} ${city.y}\n"))
-      case FaultySolution(path, cost, reason) =>
-        writer.write(s"Cost: ${cost}\n")
-        writer.write(s"Reason: ${reason}\n")
-        path.foreach(city => writer.write(s"${city.id} ${city.x} ${city.y}\n"))
-    }
+    writer.write(s"Cost: ${solution.cost}\n")
+    solution.path.foreach(city => writer.write(s"${city}\n"))
     writer.close()
   }
 }

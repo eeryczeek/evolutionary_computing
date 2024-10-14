@@ -9,76 +9,46 @@ class City:
         self.cost = cost
 
 
-with open("TSPA.csv") as f:
-    tspa = f.readlines()
+def read_file(file_path):
+    with open(file_path) as f:
+        return f.readlines()
 
-with open("TSPB.csv") as f:
-    tspb = f.readlines()
 
-with open("tspa_random.txt") as f:
-    tspa_random_solution = f.readlines()
+def parse_cities(data):
+    return [
+        City(index, *map(float, line.strip().split(";")))
+        for index, line in enumerate(data)
+    ]
 
-with open("tspb_random.txt") as f:
-    tspb_random_solution = f.readlines()
 
-with open("tspa_greedy_append.txt") as f:
-    tspa_greedy_append = f.readlines()
+def parse_solution(data):
+    return {
+        "cost": int(data[0].split(": ")[1].strip()),
+        "solution": [[int(x) for x in line.split()] for line in data[1:]],
+    }
 
-with open("tspb_greedy_append.txt") as f:
-    tspb_greedy_append = f.readlines()
 
-with open("tspa_greedy_at_any_position.txt") as f:
-    tspa_greedy_at_any_position = f.readlines()
+tspa = parse_cities(read_file("TSPA.csv"))
+tspb = parse_cities(read_file("TSPB.csv"))
 
-with open("tspb_greedy_at_any_position.txt") as f:
-    tspb_greedy_at_any_position = f.readlines()
-
-with open("tspa_greedy_cycle.txt") as f:
-    tspa_greedy_cycle = f.readlines()
-
-with open("tspb_greedy_cycle.txt") as f:
-    tspb_greedy_cycle = f.readlines()
-
-tspa_random_cost = int(tspa_random_solution[0].split(": ")[1].strip())
-tspb_random_cost = int(tspb_random_solution[0].split(": ")[1].strip())
-tspa_greedy_append_cost = int(tspa_greedy_append[0].split(": ")[1].strip())
-tspb_greedy_append_cost = int(tspb_greedy_append[0].split(": ")[1].strip())
-tspa_greedy_at_any_position_cost = int(
-    tspa_greedy_at_any_position[0].split(": ")[1].strip()
+tspa_random = parse_solution(read_file("tspa_random.txt"))
+tspb_random = parse_solution(read_file("tspb_random.txt"))
+tspa_greedy_append = parse_solution(read_file("tspa_greedy_append.txt"))
+tspb_greedy_append = parse_solution(read_file("tspb_greedy_append.txt"))
+tspa_greedy_at_any_position = parse_solution(
+    read_file("tspa_greedy_at_any_position.txt")
 )
-tspb_greedy_at_any_position_cost = int(
-    tspb_greedy_at_any_position[0].split(": ")[1].strip()
+tspb_greedy_at_any_position = parse_solution(
+    read_file("tspb_greedy_at_any_position.txt")
 )
-tspa_greedy_cycle_cost = int(tspa_greedy_cycle[0].split(": ")[1].strip())
-tspb_greedy_cycle_cost = int(tspb_greedy_cycle[0].split(": ")[1].strip())
-
-tspa = [
-    City(index, *map(float, line.strip().split(";"))) for index, line in enumerate(tspa)
-]
-tspb = [
-    City(index, *map(float, line.strip().split(";"))) for index, line in enumerate(tspb)
-]
-tspa_random_solution = [
-    [int(x) for x in line.split()] for line in tspa_random_solution[1:]
-]
-tspb_random_solution = [
-    [int(x) for x in line.split()] for line in tspb_random_solution[1:]
-]
-tspa_greedy_append = [[int(x) for x in line.split()] for line in tspa_greedy_append[1:]]
-tspb_greedy_append = [[int(x) for x in line.split()] for line in tspb_greedy_append[1:]]
-tspa_greedy_at_any_position = [
-    [int(x) for x in line.split()] for line in tspa_greedy_at_any_position[1:]
-]
-tspb_greedy_at_any_position = [
-    [int(x) for x in line.split()] for line in tspb_greedy_at_any_position[1:]
-]
-tspa_greedy_cycle = [[int(x) for x in line.split()] for line in tspa_greedy_cycle[1:]]
-tspb_greedy_cycle = [[int(x) for x in line.split()] for line in tspb_greedy_cycle[1:]]
+tspa_greedy_cycle = parse_solution(read_file("tspa_greedy_cycle.txt"))
+tspb_greedy_cycle = parse_solution(read_file("tspb_greedy_cycle.txt"))
 
 
-def plot_cities(tspa, tspb):
+def plot_cities(suptitle, tspa, tspb):
     plt.figure(figsize=(16, 6))
     plt.tight_layout()
+    plt.suptitle(suptitle)
     plt.subplot(1, 2, 1)
     plt.title("TSPA")
     plt.xlabel("x")
@@ -104,15 +74,13 @@ def plot_cities(tspa, tspb):
     plt.colorbar(scatter_tspb, label="city cost")
 
 
-def plot_solution(
-    suptitle, tspa, tspa_cost, tspa_solution, tspb, tspb_cost, tspb_solution
-):
+def plot_solution(suptitle, tspa, tspa_solution, tspb, tspb_solution):
     plt.figure(figsize=(16, 6))
     plt.tight_layout()
-
+    plt.suptitle(suptitle)
     plt.subplot(1, 2, 1)
     plt.suptitle(suptitle)
-    plt.title(f"TSPA [{tspa_cost}]")
+    plt.title(f"TSPA [{tspa_solution['cost']}]")
     plt.xlabel("x")
     plt.ylabel("y")
     scatter_tspa = plt.scatter(
@@ -136,7 +104,7 @@ def plot_solution(
     )
 
     plt.subplot(1, 2, 2)
-    plt.title(f"TSPB [{tspb_cost}]")
+    plt.title(f"TSPB [{tspb_solution['cost']}]")
     plt.xlabel("x")
     plt.ylabel("y")
     scatter_tspb = plt.scatter(
@@ -162,76 +130,3 @@ def plot_solution(
 
 plot_cities(tspa, tspb)
 plt.savefig("cities.png")
-
-plot_solution(
-    "Random solution",
-    tspa,
-    tspa_random_cost,
-    tspa_random_solution,
-    tspb,
-    tspb_random_cost,
-    tspb_random_solution,
-)
-plt.savefig("random_solution.png")
-
-plot_solution(
-    "Greedy append solution",
-    tspa,
-    tspa_greedy_append_cost,
-    tspa_greedy_append,
-    tspb,
-    tspb_greedy_append_cost,
-    tspb_greedy_append,
-)
-plt.savefig("greedy_append_solution.png")
-
-plot_solution(
-    "Greedy at any position solution",
-    tspa,
-    tspa_greedy_at_any_position_cost,
-    tspa_greedy_at_any_position,
-    tspb,
-    tspb_greedy_at_any_position_cost,
-    tspb_greedy_at_any_position,
-)
-plt.savefig("greedy_at_any_position_solution.png")
-
-plot_solution(
-    "Greedy cycle solution",
-    tspa,
-    tspa_greedy_cycle_cost,
-    tspa_greedy_cycle,
-    tspb,
-    tspb_greedy_cycle_cost,
-    tspb_greedy_cycle,
-)
-plt.savefig("greedy_cycle_solution.png")
-
-print("tspa random solution")
-for city in tspa_random_solution:
-    print(city[0], end=" ")
-print("\ntspb random solution")
-for city in tspb_random_solution:
-    print(city[0], end=" ")
-print("\ntspa greedy append solution")
-for city in tspa_greedy_append:
-    print(city[0], end=" ")
-print("\ntspb greedy append solution")
-for city in tspb_greedy_append:
-    print(city[0], end=" ")
-print("\ntspa greedy at any position solution")
-for city in tspa_greedy_at_any_position:
-    print(city[0], end=" ")
-print("\ntspb greedy at any position solution")
-for city in tspb_greedy_at_any_position:
-    print(city[0], end=" ")
-print("\ntspa greedy cycle solution")
-for city in tspa_greedy_cycle:
-    print(city[0], end=" ")
-print("\ntspb greedy cycle solution")
-for city in tspb_greedy_cycle:
-    print(city[0], end=" ")
-print()
-
-for city in tspa_greedy_at_any_position:
-    print(city[0])

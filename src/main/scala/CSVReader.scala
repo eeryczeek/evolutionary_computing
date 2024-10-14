@@ -17,13 +17,11 @@ object CSVReader {
     val distances = sortedCities
       .map(city1 =>
         sortedCities
-          .map(city2 => Cost.euclidean(city1, city2) + city2.cost)
+          .map(city2 => (Cost.euclidean(city1, city2) + city2.cost))
           .toArray
       )
       .toArray
 
-    val expectedSolutionLen = (cities.size + 1) / 2
-
-    ProblemInstance(cities, distances, expectedSolutionLen)
+    ProblemInstance(cities.map(_.id).toSet, distances, (cities.size + 1) / 2)
   }
 }
