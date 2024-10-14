@@ -104,11 +104,14 @@ def plot_cities(tspa, tspb):
     plt.colorbar(scatter_tspb, label="city cost")
 
 
-def plot_solution(tspa, tspa_cost, tspa_solution, tspb, tspb_cost, tspb_solution):
+def plot_solution(
+    suptitle, tspa, tspa_cost, tspa_solution, tspb, tspb_cost, tspb_solution
+):
     plt.figure(figsize=(16, 6))
     plt.tight_layout()
 
     plt.subplot(1, 2, 1)
+    plt.suptitle(suptitle)
     plt.title(f"TSPA [{tspa_cost}]")
     plt.xlabel("x")
     plt.ylabel("y")
@@ -161,6 +164,7 @@ plot_cities(tspa, tspb)
 plt.savefig("cities.png")
 
 plot_solution(
+    "Random solution",
     tspa,
     tspa_random_cost,
     tspa_random_solution,
@@ -171,6 +175,7 @@ plot_solution(
 plt.savefig("random_solution.png")
 
 plot_solution(
+    "Greedy append solution",
     tspa,
     tspa_greedy_append_cost,
     tspa_greedy_append,
@@ -181,6 +186,7 @@ plot_solution(
 plt.savefig("greedy_append_solution.png")
 
 plot_solution(
+    "Greedy at any position solution",
     tspa,
     tspa_greedy_at_any_position_cost,
     tspa_greedy_at_any_position,
@@ -191,6 +197,7 @@ plot_solution(
 plt.savefig("greedy_at_any_position_solution.png")
 
 plot_solution(
+    "Greedy cycle solution",
     tspa,
     tspa_greedy_cycle_cost,
     tspa_greedy_cycle,

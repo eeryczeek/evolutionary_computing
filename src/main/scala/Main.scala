@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext
 object Main extends App {
   implicit val ec: ExecutionContext = ExecutionContext.global
 
-  val name = "tspa"
+  val name = "tspb"
   val initialData = CSVReader.readCSV(s"${name}.csv")
 
   // greedy append
