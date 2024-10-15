@@ -1,7 +1,6 @@
 import scala.annotation.tailrec
 
 object GreedyAtAnyPositionSolution {
-
   def updateSolution(
       problemInstance: ProblemInstance,
       currentSolution: PartialSolution,

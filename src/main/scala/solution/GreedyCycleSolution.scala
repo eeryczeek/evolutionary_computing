@@ -1,33 +1,6 @@
 import scala.annotation.tailrec
 
 object GreedyCycleSolution {
-  @tailrec
-  def generate(
-      problemInstance: ProblemInstance,
-      currentSolution: PartialSolution,
-      availableCities: Set[Int]
-  ): FullSolution = {
-    if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
-      FullSolution(
-        currentSolution.path,
-        currentSolution.cost + problemInstance.distances(
-          currentSolution.path.last
-        )(currentSolution.path.head)
-      )
-    } else {
-      val (newSolution, newAvailableCities) = updateSolution(
-        problemInstance,
-        currentSolution,
-        availableCities
-      )
-      generate(
-        problemInstance,
-        newSolution,
-        newAvailableCities
-      )
-    }
-  }
-
   def updateSolution(
       problemInstance: ProblemInstance,
       currentSolution: PartialSolution,

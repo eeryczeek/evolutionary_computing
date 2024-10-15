@@ -22,6 +22,7 @@ object CSVReader {
       )
       .toArray
 
-    ProblemInstance(cities.map(_.id).toSet, distances, (cities.size + 1) / 2)
+    val expectedNumberOfCities = (cities.size + 1) / 2
+    ProblemInstance(cities.map(_.id).toSet, distances, expectedNumberOfCities)
   }
 }
