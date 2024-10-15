@@ -1,32 +1,6 @@
 import scala.annotation.tailrec
 
 object GreedyAtAnyPositionSolution {
-  @tailrec
-  def generate(
-      problemInstance: ProblemInstance,
-      currentSolution: PartialSolution,
-      citiesToChooseFrom: Set[Int]
-  ): FullSolution = {
-    if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
-      FullSolution(
-        currentSolution.path,
-        currentSolution.cost + problemInstance.distances(
-          currentSolution.path.last
-        )(currentSolution.path.head)
-      )
-    } else {
-      val (newPartialSolution, newCitiesToChooseFrom) = updateSolution(
-        problemInstance,
-        currentSolution,
-        citiesToChooseFrom
-      )
-      generate(
-        problemInstance,
-        newPartialSolution,
-        newCitiesToChooseFrom
-      )
-    }
-  }
 
   def updateSolution(
       problemInstance: ProblemInstance,
@@ -37,34 +11,30 @@ object GreedyAtAnyPositionSolution {
     val distances = problemInstance.distances
     val pathIndices = path.zipWithIndex.toMap
 
-    val (bestCity, bestCost, insertPosition) = citiesToChooseFrom.view
-      .flatMap { city =>
-        val prependCost = distances(city)(path.head)
-        val appendCost = distances(path.last)(city)
-        val insertCosts = path
-          .zip(path.tail)
-          .view
-          .map { case (city1, city2) =>
-            (
-              city,
-              distances(city1)(city) +
-                distances(city)(city2) -
-                distances(city1)(city2),
-              pathIndices(city1)
-            )
-          }
+    val (bestCity, bestCost, insertPosition) =
+      citiesToChooseFrom.foldLeft((Int.MinValue, Int.MaxValue, -1)) {
+        case ((bestCity, bestCost, insertPosition), city) =>
+          val prependCost = distances(city)(path.head)
+          val appendCost = distances(path.last)(city)
 
-        val bestInsert =
-          if (insertCosts.isEmpty) (city, prependCost, -1)
-          else insertCosts.minBy(_._2)
+          val (newBestCity, newBestCost, newInsertPosition) =
+            if (prependCost < bestCost) (city, prependCost, -1)
+            else if (appendCost < bestCost) (city, appendCost, path.size)
+            else (bestCity, bestCost, insertPosition)
 
-        Seq(
-          (city, prependCost, -1),
-          (city, appendCost, path.size),
-          bestInsert
-        )
+          val (finalBestCity, finalBestCost, finalInsertPosition) = path
+            .zip(path.tail)
+            .foldLeft((newBestCity, newBestCost, newInsertPosition)) {
+              case ((bestCity, bestCost, insertPosition), (city1, city2)) =>
+                val cost = distances(city1)(city) + distances(city)(
+                  city2
+                ) - distances(city1)(city2)
+                if (cost < bestCost) (city, cost, pathIndices(city1))
+                else (bestCity, bestCost, insertPosition)
+            }
+
+          (finalBestCity, finalBestCost, finalInsertPosition)
       }
-      .minBy(_._2)
 
     val newPath = insertPosition match {
       case -1                      => bestCity +: path

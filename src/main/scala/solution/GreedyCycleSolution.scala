@@ -15,7 +15,7 @@ object GreedyCycleSolution {
         )(currentSolution.path.head)
       )
     } else {
-      val (newSolution, newAvailableCities) = insertClosestCityIntoCycle(
+      val (newSolution, newAvailableCities) = updateSolution(
         problemInstance,
         currentSolution,
         availableCities
@@ -28,7 +28,7 @@ object GreedyCycleSolution {
     }
   }
 
-  def insertClosestCityIntoCycle(
+  def updateSolution(
       problemInstance: ProblemInstance,
       currentSolution: PartialSolution,
       availableCities: Set[Int]

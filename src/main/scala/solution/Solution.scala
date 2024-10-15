@@ -11,10 +11,11 @@ object SolutionFactory {
       problemInstance: ProblemInstance,
       initialCity: Int
   ): FullSolution = {
-    RandomSolution.generate(
+    generate(
       problemInstance,
       PartialSolution(List.empty, cost = 0),
-      problemInstance.cities
+      problemInstance.cities,
+      RandomSolution.updateSolution
     )
   }
 
@@ -22,10 +23,11 @@ object SolutionFactory {
       problemInstance: ProblemInstance,
       initialCity: Int
   ): FullSolution = {
-    GreedyTailSolution.generate(
+    generate(
       problemInstance,
       PartialSolution(List(initialCity), 0),
-      problemInstance.cities - initialCity
+      problemInstance.cities - initialCity,
+      GreedyTailSolution.updateSolution
     )
   }
 
@@ -33,10 +35,11 @@ object SolutionFactory {
       problemInstance: ProblemInstance,
       initialCity: Int
   ): FullSolution = {
-    GreedyAtAnyPositionSolution.generate(
+    generate(
       problemInstance,
       PartialSolution(List(initialCity), 0),
-      problemInstance.cities - initialCity
+      problemInstance.cities - initialCity,
+      GreedyAtAnyPositionSolution.updateSolution
     )
   }
 
@@ -44,10 +47,44 @@ object SolutionFactory {
       problemInstance: ProblemInstance,
       initialCity: Int
   ): FullSolution = {
-    GreedyCycleSolution.generate(
+    generate(
       problemInstance,
       PartialSolution(List(initialCity), 0),
-      problemInstance.cities - initialCity
+      problemInstance.cities - initialCity,
+      GreedyCycleSolution.updateSolution
     )
+  }
+
+  @tailrec
+  def generate(
+      problemInstance: ProblemInstance,
+      currentSolution: PartialSolution,
+      citiesToChooseFrom: Set[Int],
+      updateSolution: (
+          ProblemInstance,
+          PartialSolution,
+          Set[Int]
+      ) => (PartialSolution, Set[Int])
+  ): FullSolution = {
+    if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
+      FullSolution(
+        currentSolution.path,
+        currentSolution.cost + problemInstance.distances(
+          currentSolution.path.last
+        )(currentSolution.path.head)
+      )
+    } else {
+      val (newPartialSolution, newCitiesToChooseFrom) = updateSolution(
+        problemInstance,
+        currentSolution,
+        citiesToChooseFrom
+      )
+      generate(
+        problemInstance,
+        newPartialSolution,
+        newCitiesToChooseFrom,
+        updateSolution
+      )
+    }
   }
 }
