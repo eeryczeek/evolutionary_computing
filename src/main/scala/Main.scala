@@ -29,7 +29,7 @@ object Main extends App {
     println(
       s"$fileNameSuffix min: ${distances.min}, avg: ${distances.sum / distances.size}, max: ${distances.max}, time: ${(endTime - startTime) / 1e9} seconds"
     )
-    TXTWriter.writeTXT(s"${name}_$fileNameSuffix.txt", bestSolution)
+    TXTWriter.writeTXT(s"results/${name}_$fileNameSuffix.txt", bestSolution)
   }
 
   for (name <- names) {
@@ -49,7 +49,7 @@ object Main extends App {
       name,
       initialData,
       SolutionFactory.getGreedyAppendSolution _,
-      "greedy_append"
+      "greedy_tail"
     )
 
     // Greedy at any position
@@ -57,7 +57,7 @@ object Main extends App {
       name,
       initialData,
       SolutionFactory.getGreedyAnyPositionSolution _,
-      "greedy_at_any_position"
+      "greedy_any_position"
     )
 
     // Greedy cycle
