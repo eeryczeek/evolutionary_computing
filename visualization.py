@@ -15,34 +15,20 @@ def read_file(file_path):
 
 
 def parse_cities(data):
-    return [
+    cities = [
         City(index, *map(float, line.strip().split(";")))
         for index, line in enumerate(data)
     ]
+    return {city.id: city for city in cities}
 
 
 def parse_solution(data):
+    cost = int(data[0].split(": ")[1].strip())
+    path = [int(x) for x in data[1].split(": ")[1].split(",")]
     return {
-        "cost": int(data[0].split(": ")[1].strip()),
-        "solution": [[int(x) for x in line.split()] for line in data[1:]],
+        "cost": cost,
+        "solution": path,
     }
-
-
-tspa = parse_cities(read_file("TSPA.csv"))
-tspb = parse_cities(read_file("TSPB.csv"))
-
-tspa_random = parse_solution(read_file("tspa_random.txt"))
-tspb_random = parse_solution(read_file("tspb_random.txt"))
-tspa_greedy_append = parse_solution(read_file("tspa_greedy_append.txt"))
-tspb_greedy_append = parse_solution(read_file("tspb_greedy_append.txt"))
-tspa_greedy_at_any_position = parse_solution(
-    read_file("tspa_greedy_at_any_position.txt")
-)
-tspb_greedy_at_any_position = parse_solution(
-    read_file("tspb_greedy_at_any_position.txt")
-)
-tspa_greedy_cycle = parse_solution(read_file("tspa_greedy_cycle.txt"))
-tspb_greedy_cycle = parse_solution(read_file("tspb_greedy_cycle.txt"))
 
 
 def plot_cities(suptitle, tspa, tspb):
@@ -54,9 +40,9 @@ def plot_cities(suptitle, tspa, tspb):
     plt.xlabel("x")
     plt.ylabel("y")
     scatter_tspa = plt.scatter(
-        [city.x for city in tspa],
-        [city.y for city in tspa],
-        c=[city.cost for city in tspa],
+        [city.x for _, city in tspa.items()],
+        [city.y for _, city in tspa.items()],
+        c=[city.cost for _, city in tspa.items()],
         cmap="viridis",
     )
     plt.colorbar(scatter_tspa, label="city cost")
@@ -66,9 +52,9 @@ def plot_cities(suptitle, tspa, tspb):
     plt.xlabel("x")
     plt.ylabel("y")
     scatter_tspb = plt.scatter(
-        [city.x for city in tspb],
-        [city.y for city in tspb],
-        c=[city.cost for city in tspb],
+        [city.x for _, city in tspb.items()],
+        [city.y for _, city in tspb.items()],
+        c=[city.cost for _, city in tspb.items()],
         cmap="viridis",
     )
     plt.colorbar(scatter_tspb, label="city cost")
@@ -84,22 +70,23 @@ def plot_solution(suptitle, tspa, tspa_solution, tspb, tspb_solution):
     plt.xlabel("x")
     plt.ylabel("y")
     scatter_tspa = plt.scatter(
-        [city.x for city in tspa],
-        [city.y for city in tspa],
-        c=[city.cost for city in tspa],
+        [city.x for _, city in tspa.items()],
+        [city.y for _, city in tspa.items()],
+        c=[city.cost for _, city in tspa.items()],
         cmap="viridis",
     )
     plt.colorbar(scatter_tspa, label="city cost")
 
-    for i in range(len(tspa_solution) - 1):
+    tspa_path = tspa_solution["solution"]
+    for i in range(len(tspa_path) - 1):
         plt.plot(
-            [tspa_solution[i][1], tspa_solution[i + 1][1]],
-            [tspa_solution[i][2], tspa_solution[i + 1][2]],
+            [tspa[tspa_path[i]].x, tspa[tspa_path[i + 1]].x],
+            [tspa[tspa_path[i]].y, tspa[tspa_path[i + 1]].y],
             "black",
         )
     plt.plot(
-        [tspa_solution[-1][1], tspa_solution[0][1]],
-        [tspa_solution[-1][2], tspa_solution[0][2]],
+        [tspa[tspa_path[-1]].x, tspa[tspa_path[0]].x],
+        [tspa[tspa_path[-1]].y, tspa[tspa_path[0]].y],
         "black",
     )
 
@@ -108,25 +95,79 @@ def plot_solution(suptitle, tspa, tspa_solution, tspb, tspb_solution):
     plt.xlabel("x")
     plt.ylabel("y")
     scatter_tspb = plt.scatter(
-        [city.x for city in tspb],
-        [city.y for city in tspb],
-        c=[city.cost for city in tspb],
+        [city.x for _, city in tspb.items()],
+        [city.y for _, city in tspb.items()],
+        c=[city.cost for _, city in tspb.items()],
         cmap="viridis",
     )
     plt.colorbar(scatter_tspb, label="city cost")
 
-    for i in range(len(tspb_solution) - 1):
+    tspb_path = tspb_solution["solution"]
+    for i in range(len(tspb_path) - 1):
         plt.plot(
-            [tspb_solution[i][1], tspb_solution[i + 1][1]],
-            [tspb_solution[i][2], tspb_solution[i + 1][2]],
+            [tspb[tspb_path[i]].x, tspb[tspb_path[i + 1]].x],
+            [tspb[tspb_path[i]].y, tspb[tspb_path[i + 1]].y],
             "black",
         )
     plt.plot(
-        [tspb_solution[-1][1], tspb_solution[0][1]],
-        [tspb_solution[-1][2], tspb_solution[0][2]],
+        [tspb[tspb_path[-1]].x, tspb[tspb_path[0]].x],
+        [tspb[tspb_path[-1]].y, tspb[tspb_path[0]].y],
         "black",
     )
 
 
-plot_cities(tspa, tspb)
-plt.savefig("cities.png")
+tspa = parse_cities(read_file("TSPA.csv"))
+tspb = parse_cities(read_file("TSPB.csv"))
+
+tspa_random = parse_solution(read_file("results/tspa_random.txt"))
+tspb_random = parse_solution(read_file("results/tspb_random.txt"))
+tspa_greedy_tail = parse_solution(read_file("results/tspa_greedy_tail.txt"))
+tspb_greedy_tail = parse_solution(read_file("results/tspb_greedy_tail.txt"))
+tspa_greedy_any_position = parse_solution(
+    read_file("results/tspa_greedy_any_position.txt")
+)
+tspb_greedy_any_position = parse_solution(
+    read_file("results/tspb_greedy_any_position.txt")
+)
+tspa_greedy_cycle = parse_solution(read_file("results/tspa_greedy_cycle.txt"))
+tspb_greedy_cycle = parse_solution(read_file("results/tspb_greedy_cycle.txt"))
+
+
+plot_cities("cities", tspa, tspb)
+plt.savefig("plots/cities.png")
+
+plot_solution(
+    "random",
+    tspa,
+    tspa_random,
+    tspb,
+    tspb_random,
+)
+plt.savefig("plots/random.png")
+
+plot_solution(
+    "greedy tail",
+    tspa,
+    tspa_greedy_tail,
+    tspb,
+    tspb_greedy_tail,
+)
+plt.savefig("plots/greedy_tail.png")
+
+plot_solution(
+    "greedy any position",
+    tspa,
+    tspa_greedy_any_position,
+    tspb,
+    tspb_greedy_any_position,
+)
+plt.savefig("plots/greedy_any_position.png")
+
+plot_solution(
+    "greedy cycle",
+    tspa,
+    tspa_greedy_cycle,
+    tspb,
+    tspb_greedy_cycle,
+)
+plt.savefig("plots/greedy_cycle.png")
