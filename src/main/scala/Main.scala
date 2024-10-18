@@ -67,5 +67,13 @@ object Main extends App {
       SolutionFactory.getGreedyCycleSolution _,
       "greedy_cycle"
     )
+
+    // Greedy cycle with regret
+    processSolutions(
+      name,
+      initialData,
+      SolutionFactory.getGreedyCycleRegretSolution _,
+      "greedy_cycle_regret"
+    )
   }
 }

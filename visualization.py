@@ -131,6 +131,12 @@ tspb_greedy_any_position = parse_solution(
 )
 tspa_greedy_cycle = parse_solution(read_file("results/tspa_greedy_cycle.txt"))
 tspb_greedy_cycle = parse_solution(read_file("results/tspb_greedy_cycle.txt"))
+tspa_greedy_cycle_regret = parse_solution(
+    read_file("results/tspa_greedy_cycle_regret.txt")
+)
+tspb_greedy_cycle_regret = parse_solution(
+    read_file("results/tspb_greedy_cycle_regret.txt")
+)
 
 
 plot_cities("cities", tspa, tspb)
@@ -171,3 +177,12 @@ plot_solution(
     tspb_greedy_cycle,
 )
 plt.savefig("plots/greedy_cycle.png")
+
+plot_solution(
+    "greedy cycle regret",
+    tspa,
+    tspa_greedy_cycle_regret,
+    tspb,
+    tspb_greedy_cycle_regret,
+)
+plt.savefig("plots/greedy_cycle_regret.png")
