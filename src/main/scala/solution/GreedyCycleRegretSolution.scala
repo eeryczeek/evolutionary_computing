@@ -9,22 +9,27 @@ object GreedyCycleRegretSolution {
     val currentCycle = currentSolution.path
     val distances = problemInstance.distances
 
-    val (cityToInsertAfter, cityToInsert, additionalCost) = currentCycle
-      .zip(currentCycle.tail :+ currentCycle.head)
-      .view
-      .map { case (city1, city2) =>
-        val (bestCity, additionalDistance) =
-          findBestMiddleCityWithRegret(
-            city1,
-            city2,
-            distances,
-            availableCities
-          )
-        (city1, bestCity, additionalDistance)
+    val (cityToInsert, insertIndex, additionalCost, _) = availableCities.view
+      .flatMap { city =>
+        currentCycle
+          .zip(currentCycle.tail :+ currentCycle.head)
+          .zipWithIndex
+          .map { case ((city1, city2), i) =>
+            val insertionCost = distances(city1)(city) + distances(city)(
+              city2
+            ) - distances(city1)(city2)
+            (city, i, insertionCost)
+          }
       }
-      .minBy(_._3)
+      .groupBy(_._1)
+      .mapValues(_.toList.sortBy(_._3).take(2))
+      .map { case (city, costs) =>
+        val regret =
+          if (costs.size == 2) costs(1)._3 - costs(0)._3 else Int.MaxValue
+        (city, costs.head._2, costs.head._3, regret)
+      }
+      .maxBy(_._4)
 
-    val insertIndex = currentCycle.indexOf(cityToInsertAfter)
     val newCycle = currentCycle.take(insertIndex + 1) ++ List(
       cityToInsert
     ) ++ currentCycle.drop(insertIndex + 1)
@@ -35,36 +40,5 @@ object GreedyCycleRegretSolution {
       ),
       availableCities - cityToInsert
     )
-  }
-
-  def findBestMiddleCityWithRegret(
-      city1: Int,
-      city2: Int,
-      distances: Array[Array[Int]],
-      citiesToChooseFrom: Set[Int]
-  ): (Int, Int) = {
-
-    val insertionCosts = citiesToChooseFrom.view
-      .map { middleCity =>
-        (
-          middleCity,
-          distances(city1)(middleCity) +
-            distances(middleCity)(city2) -
-            distances(city1)(city2)
-        )
-      }
-      .toList
-      .sortBy(_._2)
-      .take(2)
-
-    val regrets = insertionCosts.map { case (city, cost) =>
-      val regret = insertionCosts
-        .filterNot(_._1 == city)
-        .map(_._2)
-        .max - cost
-      (city, regret)
-    }
-
-    regrets.maxBy(_._2)
   }
 }
