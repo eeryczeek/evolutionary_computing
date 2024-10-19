@@ -25,7 +25,7 @@ object GreedyCycleRegretSolution {
       .mapValues(_.toList.sortBy(_._3).take(2))
       .map { case (city, costs) =>
         val regret =
-          if (costs.size == 2) costs(1)._3 - costs(0)._3 else Int.MaxValue
+          if (costs.size == 2) costs(1)._3 - costs(0)._3 else costs.head._3
         (city, costs.head._2, costs.head._3, regret)
       }
       .maxBy(_._4)
