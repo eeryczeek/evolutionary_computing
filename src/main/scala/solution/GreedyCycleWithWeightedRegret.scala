@@ -29,7 +29,7 @@ object GreedyCycleWithWeightedRegret {
       .map { case (city, costs) =>
         val regret =
           if (costs.size == 2)
-            weightedRegret(costs.head.cost, costs.last.cost, 0.5)
+            weightedRegret(costs.head.cost, costs.last.cost, 0.4)
           else costs.head.cost
         CityWithPlaceCostAndRegret(
           city,
@@ -56,7 +56,7 @@ object GreedyCycleWithWeightedRegret {
       firstScore: Int,
       secondScore: Int,
       weight: Double
-  ): Double = weight * secondScore + (1d - 2 * weight) * firstScore
+  ): Double = weight * firstScore - (1 - weight) * (secondScore - firstScore)
 
   private case class CityWithPlaceAndCost(
       city: Int,
