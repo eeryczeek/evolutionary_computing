@@ -67,6 +67,18 @@ object SolutionFactory {
     )
   }
 
+  def getGreedyCycleWeightedRegretSolution(
+      problemInstance: ProblemInstance,
+      initialCity: Int
+  ): FullSolution = {
+    generate(
+      problemInstance,
+      PartialSolution(List(initialCity), 0),
+      problemInstance.cities - initialCity,
+      GreedyCycleWithWeightedRegret.updateSolution
+    )
+  }
+
   @tailrec
   def generate(
       problemInstance: ProblemInstance,
