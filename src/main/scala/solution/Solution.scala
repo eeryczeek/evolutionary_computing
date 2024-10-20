@@ -75,7 +75,7 @@ object SolutionFactory {
       problemInstance,
       PartialSolution(List(initialCity), 0),
       problemInstance.cities - initialCity,
-      GreedyCycleWithWeightedRegret.updateSolution
+      GreedyCycleWeightedRegretSolution.updateSolution
     )
   }
 

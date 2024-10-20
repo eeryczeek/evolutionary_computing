@@ -1,4 +1,4 @@
-object GreedyCycleWithWeightedRegret {
+object GreedyCycleWeightedRegretSolution {
   def updateSolution(
       problemInstance: ProblemInstance,
       currentSolution: PartialSolution,
