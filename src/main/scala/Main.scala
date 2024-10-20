@@ -1,8 +1,7 @@
 import scala.util.control.TailCalls.TailRec
 import scala.util.Random
 import scala.io.Source
-import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.{Files, Paths, StandardOpenOption}
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
@@ -10,6 +9,12 @@ import scala.concurrent.ExecutionContext
 object Main extends App {
   implicit val ec: ExecutionContext = ExecutionContext.global
   val names = List("tspa", "tspb")
+  Files.write(
+      Paths.get("results/results.txt"),
+      "".getBytes,
+      StandardOpenOption.CREATE,
+      StandardOpenOption.TRUNCATE_EXISTING
+    )
 
   def processSolutions(
       name: String,
@@ -25,15 +30,17 @@ object Main extends App {
     val endTime = System.nanoTime()
     val bestSolution = result.minBy(_.cost)
     val distances = result.map(_.cost).toIndexedSeq
-
-    println(
-      s"$fileNameSuffix min: ${distances.min}, avg: ${distances.sum / distances.size}, max: ${distances.max}, time: ${(endTime - startTime) / 1e9} seconds"
+    val output = f"| `$fileNameSuffix` | ${distances.min} | ${distances.sum / distances.size} | ${distances.max} | ${(endTime - startTime) / 1e9}%.4f |\n"
+    Files.write(
+      Paths.get("results/results.txt"),
+      output.getBytes,
+      StandardOpenOption.CREATE,
+      StandardOpenOption.APPEND
     )
     TXTWriter.writeTXT(s"results/${name}_$fileNameSuffix.txt", bestSolution)
   }
 
   for (name <- names) {
-    println(s"${name.toUpperCase()}")
     val initialData = CSVReader.readCSV(s"${name.toUpperCase()}.csv")
 
     // Random solutions
@@ -81,6 +88,13 @@ object Main extends App {
       initialData,
       SolutionFactory.getGreedyCycleWeightedRegretSolution _,
       "greedy_cycle_weighted_regret"
+    )
+
+    Files.write(
+      Paths.get("results/results.txt"),
+      "\n".getBytes,
+      StandardOpenOption.CREATE,
+      StandardOpenOption.APPEND
     )
   }
 }
