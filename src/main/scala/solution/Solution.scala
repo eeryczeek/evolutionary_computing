@@ -13,7 +13,10 @@ object SolutionFactory {
   ): FullSolution = {
     generate(
       problemInstance,
-      PartialSolution(List.empty, cost = 0),
+      PartialSolution(
+        List.empty,
+        cost = problemInstance.cityCosts(initialCity)
+      ),
       problemInstance.cities,
       RandomSolution.updateSolution
     )
@@ -25,7 +28,10 @@ object SolutionFactory {
   ): FullSolution = {
     generate(
       problemInstance,
-      PartialSolution(List(initialCity), 0),
+      PartialSolution(
+        List(initialCity),
+        problemInstance.cityCosts(initialCity)
+      ),
       problemInstance.cities - initialCity,
       GreedyTailSolution.updateSolution
     )
@@ -37,7 +43,10 @@ object SolutionFactory {
   ): FullSolution = {
     generate(
       problemInstance,
-      PartialSolution(List(initialCity), 0),
+      PartialSolution(
+        List(initialCity),
+        problemInstance.cityCosts(initialCity)
+      ),
       problemInstance.cities - initialCity,
       GreedyAtAnyPositionSolution.updateSolution
     )
@@ -49,7 +58,10 @@ object SolutionFactory {
   ): FullSolution = {
     generate(
       problemInstance,
-      PartialSolution(List(initialCity), 0),
+      PartialSolution(
+        List(initialCity),
+        problemInstance.cityCosts(initialCity)
+      ),
       problemInstance.cities - initialCity,
       GreedyCycleSolution.updateSolution
     )
@@ -61,7 +73,10 @@ object SolutionFactory {
   ): FullSolution = {
     generate(
       problemInstance,
-      PartialSolution(List(initialCity), 0),
+      PartialSolution(
+        List(initialCity),
+        problemInstance.cityCosts(initialCity)
+      ),
       problemInstance.cities - initialCity,
       GreedyCycleRegretSolution.updateSolution
     )
@@ -73,7 +88,10 @@ object SolutionFactory {
   ): FullSolution = {
     generate(
       problemInstance,
-      PartialSolution(List(initialCity), 0),
+      PartialSolution(
+        List(initialCity),
+        problemInstance.cityCosts(initialCity)
+      ),
       problemInstance.cities - initialCity,
       GreedyCycleWeightedRegretSolution.updateSolution
     )
@@ -93,9 +111,7 @@ object SolutionFactory {
     if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
       FullSolution(
         currentSolution.path,
-        currentSolution.cost + problemInstance.distances(
-          currentSolution.path.last
-        )(currentSolution.path.head)
+        currentSolution.cost
       )
     } else {
       val (newPartialSolution, newCitiesToChooseFrom) = updateSolution(

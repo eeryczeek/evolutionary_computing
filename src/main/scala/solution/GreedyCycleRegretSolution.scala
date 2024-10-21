@@ -8,6 +8,10 @@ object GreedyCycleRegretSolution {
   ): (PartialSolution, Set[Int]) = {
     val currentCycle = currentSolution.path
     val distances = problemInstance.distances
+    val cityCosts = problemInstance.cityCosts
+    val edgesWithIndexes = currentCycle
+      .zip(currentCycle.tail :+ currentCycle.head)
+      .zipWithIndex
 
     val CityWithPlaceCostAndRegret(
       cityToInsert,
@@ -16,15 +20,13 @@ object GreedyCycleRegretSolution {
       _
     ) = availableCities.view
       .flatMap { city =>
-        currentCycle
-          .zip(currentCycle.tail :+ currentCycle.head)
-          .zipWithIndex
-          .map { case ((city1, city2), i) =>
-            val insertionCost = distances(city1)(city) + distances(city)(
-              city2
-            ) - distances(city1)(city2)
-            CityWithPlaceAndCost(city, i, insertionCost)
-          }
+        edgesWithIndexes.map { case ((city1, city2), i) =>
+          val insertionCost = distances(city1)(city) +
+            distances(city)(city2) +
+            cityCosts(city) -
+            distances(city1)(city2)
+          CityWithPlaceAndCost(city, i, insertionCost)
+        }
       }
       .groupBy(_.city)
       .mapValues(_.toList.sortBy(_.cost).take(2))

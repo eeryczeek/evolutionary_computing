@@ -8,13 +8,14 @@ object GreedyAtAnyPositionSolution {
   ): (PartialSolution, Set[Int]) = {
     val path = currentSolution.path
     val distances = problemInstance.distances
+    val cityCosts = problemInstance.cityCosts
     val pathIndices = path.zipWithIndex.toMap
 
     val (bestCity, bestCost, insertPosition) =
       citiesToChooseFrom.foldLeft((Int.MinValue, Int.MaxValue, -1)) {
         case ((bestCity, bestCost, insertPosition), city) =>
-          val prependCost = distances(city)(path.head)
-          val appendCost = distances(path.last)(city)
+          val prependCost = distances(city)(path.head) + cityCosts(city)
+          val appendCost = distances(path.last)(city) + cityCosts(city)
 
           val (newBestCity, newBestCost, newInsertPosition) =
             if (prependCost < bestCost) (city, prependCost, -1)
@@ -25,9 +26,10 @@ object GreedyAtAnyPositionSolution {
             .zip(path.tail)
             .foldLeft((newBestCity, newBestCost, newInsertPosition)) {
               case ((bestCity, bestCost, insertPosition), (city1, city2)) =>
-                val cost = distances(city1)(city) + distances(city)(
-                  city2
-                ) - distances(city1)(city2)
+                val cost = distances(city1)(city) +
+                  distances(city)(city2) +
+                  cityCosts(city) -
+                  distances(city1)(city2)
                 if (cost < bestCost) (city, cost, pathIndices(city1))
                 else (bestCity, bestCost, insertPosition)
             }
@@ -43,7 +45,9 @@ object GreedyAtAnyPositionSolution {
 
     val newPartialSolution = PartialSolution(
       newPath,
-      currentSolution.cost + bestCost
+      currentSolution.cost + bestCost +
+        distances(newPath.last)(newPath.head) -
+        distances(path.last)(path.head)
     )
 
     (newPartialSolution, citiesToChooseFrom - bestCity)

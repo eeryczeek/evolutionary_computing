@@ -18,6 +18,7 @@ object GreedyCycleSolution {
             city1,
             city2,
             distances,
+            problemInstance.cityCosts,
             availableCities
           )
         (city1, bestCity, additionalDistance)
@@ -41,6 +42,7 @@ object GreedyCycleSolution {
       city1: Int,
       city2: Int,
       distances: Array[Array[Int]],
+      cityCosts: Array[Int],
       citiesToChooseFrom: Set[Int]
   ): (Int, Int) = {
     citiesToChooseFrom.view
@@ -48,7 +50,8 @@ object GreedyCycleSolution {
         (
           middleCity,
           distances(city1)(middleCity) +
-            distances(middleCity)(city2) -
+            distances(middleCity)(city2) +
+            cityCosts(middleCity) -
             distances(city1)(city2)
         )
       }
