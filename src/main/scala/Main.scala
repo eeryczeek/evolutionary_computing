@@ -10,11 +10,11 @@ object Main extends App {
   implicit val ec: ExecutionContext = ExecutionContext.global
   val names = List("tspa", "tspb")
   Files.write(
-      Paths.get("results/results.txt"),
-      "".getBytes,
-      StandardOpenOption.CREATE,
-      StandardOpenOption.TRUNCATE_EXISTING
-    )
+    Paths.get("results/results.txt"),
+    "".getBytes,
+    StandardOpenOption.CREATE,
+    StandardOpenOption.TRUNCATE_EXISTING
+  )
 
   def processSolutions(
       name: String,
@@ -30,7 +30,8 @@ object Main extends App {
     val endTime = System.nanoTime()
     val bestSolution = result.minBy(_.cost)
     val distances = result.map(_.cost).toIndexedSeq
-    val output = f"| `$fileNameSuffix` | ${distances.min} | ${distances.sum / distances.size} | ${distances.max} | ${(endTime - startTime) / 1e9}%.4f |\n"
+    val output =
+      f"| `$fileNameSuffix` | ${distances.min} | ${distances.sum / distances.size} | ${distances.max} | ${(endTime - startTime) / 1e9}%.4f |\n"
     Files.write(
       Paths.get("results/results.txt"),
       output.getBytes,
@@ -83,6 +84,7 @@ object Main extends App {
       "greedy_cycle_regret"
     )
 
+    // Greedy cycle with weighted regret
     processSolutions(
       name,
       initialData,

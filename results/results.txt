@@ -1,14 +1,14 @@
-| `random` | 240945 | 264800 | 292029 | 0.0102 |
-| `greedy_tail` | 83182 | 85107 | 89433 | 0.0341 |
-| `greedy_any_position` | 71868 | 73648 | 76178 | 0.7533 |
-| `greedy_cycle` | 71706 | 72806 | 74533 | 0.4911 |
-| `greedy_cycle_regret` | 109282 | 116771 | 127136 | 3.3343 |
-| `greedy_cycle_weighted_regret` | 71072 | 72173 | 73852 | 3.2706 |
+| `random` | 235292 | 264415 | 301307 | 0.0158 |
+| `greedy_tail` | 83182 | 85107 | 89433 | 0.0760 |
+| `greedy_any_position` | 71868 | 73648 | 76178 | 0.8030 |
+| `greedy_cycle` | 71706 | 72806 | 74533 | 0.5351 |
+| `greedy_cycle_regret` | 109282 | 116771 | 127136 | 3.5260 |
+| `greedy_cycle_weighted_regret` | 71224 | 72328 | 73816 | 3.4680 |
 
-| `random` | 191321 | 213229 | 240792 | 0.0058 |
-| `greedy_tail` | 52319 | 54390 | 59030 | 0.0197 |
-| `greedy_any_position` | 44609 | 48553 | 57315 | 0.5790 |
-| `greedy_cycle` | 48814 | 51477 | 57486 | 0.4561 |
-| `greedy_cycle_regret` | 67391 | 73388 | 80062 | 3.6976 |
-| `greedy_cycle_weighted_regret` | 49401 | 51664 | 55903 | 3.7458 |
+| `random` | 189578 | 212776 | 238786 | 0.0059 |
+| `greedy_tail` | 52319 | 54390 | 59030 | 0.0216 |
+| `greedy_any_position` | 44609 | 48553 | 57315 | 0.5879 |
+| `greedy_cycle` | 48814 | 51477 | 57486 | 0.4997 |
+| `greedy_cycle_regret` | 67391 | 73388 | 80062 | 3.5279 |
+| `greedy_cycle_weighted_regret` | 47308 | 51154 | 55829 | 3.5244 |
 
