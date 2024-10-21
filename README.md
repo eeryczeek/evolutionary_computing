@@ -188,18 +188,15 @@ function GreedyCycleRegret:
 [TOC](#table-of-contents)
 
 ```
-function getInsertionsAndCosts:
-    for edge in current_cycle:
-        for city in unvisited_cities:
-            Costs[edge][city] = additionalCost(city, edge)
-    return Costs
+function weightedRegret:
+    return weight * best_value - (1 - weight) * (second_best - best_value)
 
-function GreedyCycleRegret:
+function GreedyCycleWeightedRegret:
     while cycle.len < 200:
         costs = getInsertionsAndCosts
         2_best_inserts = for each city find 2 best inserts
-        regrets = for each city take (second best value - best value)
-        best_insert = insert with max regret
+        weightedRegrets = for each city take weightedRegret
+        best_insert = insert with min weighted regret
         update cycle with best_insert
 ```
 
