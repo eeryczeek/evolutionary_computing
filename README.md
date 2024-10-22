@@ -43,12 +43,12 @@ This visual representation provides an intuitive way to interpret the spatial re
 
 | **Algorithm**                  | **Min** | **Mean** | **Max** | **Time\* (s)** |
 | ------------------------------ | ------- | -------- | ------- | -------------- |
-| `random`                       | 235292  | 264415   | 301307  | 0.0158         |
-| `greedy_tail`                  | 83182   | 85107    | 89433   | 0.0760         |
-| `greedy_any_position`          | 71868   | 73648    | 76178   | 0.8030         |
-| `greedy_cycle`                 | 71706   | 72806    | 74533   | 0.5351         |
-| `greedy_cycle_regret`          | 109282  | 116771   | 127136  | 3.5260         |
-| `greedy_cycle_weighted_regret` | 71224   | 72328    | 73816   | 3.4680         |
+| `random`                       | 233148  | 263540   | 284518  | 0.1673         |
+| `greedy_tail`                  | 83182   | 85107    | 89433   | 0.1566         |
+| `greedy_any_position`          | 71263   | 73202    | 76156   | 0.9481         |
+| `greedy_cycle`                 | 71488   | 72609    | 74410   | 0.4627         |
+| `greedy_cycle_regret`          | 108935  | 116548   | 126990  | 2.5311         |
+| `greedy_cycle_weighted_regret` | 71108   | 72135    | 73395   | 2.3133         |
 
 </div>
 
@@ -57,12 +57,12 @@ This visual representation provides an intuitive way to interpret the spatial re
 
 | **Algorithm**                  | **Min** | **Mean** | **Max** | **Time\* (s)** |
 | ------------------------------ | ------- | -------- | ------- | -------------- |
-| `random`                       | 189578  | 212776   | 238786  | 0.0059         |
-| `greedy_tail`                  | 52319   | 54390    | 59030   | 0.0216         |
-| `greedy_any_position`          | 44609   | 48553    | 57315   | 0.5879         |
-| `greedy_cycle`                 | 48814   | 51477    | 57486   | 0.4997         |
-| `greedy_cycle_regret`          | 67391   | 73388    | 80062   | 3.5279         |
-| `greedy_cycle_weighted_regret` | 47308   | 51154    | 55829   | 3.5244         |
+| `random`                       | 185339  | 213695   | 239113  | 0.0071         |
+| `greedy_tail`                  | 52319   | 54390    | 59030   | 0.0280         |
+| `greedy_any_position`          | 44446   | 46131    | 53438   | 0.6900         |
+| `greedy_cycle`                 | 48765   | 51301    | 57324   | 0.4619         |
+| `greedy_cycle_regret`          | 67175   | 73164    | 79784   | 2.1903         |
+| `greedy_cycle_weighted_regret` | 47144   | 50985    | 55700   | 2.3359         |
 
 </div>
 

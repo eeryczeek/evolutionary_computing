@@ -2,18 +2,16 @@ import scala.util.Random
 import scala.util.control.TailCalls.TailRec
 import scala.annotation.tailrec
 
-trait Solution
-case class PartialSolution(path: List[Int], cost: Int) extends Solution
-case class FullSolution(path: List[Int], cost: Int) extends Solution
+case class Solution(path: List[Int], cost: Int)
 
 object SolutionFactory {
   def getRandomSolution(
       problemInstance: ProblemInstance,
       initialCity: Int
-  ): FullSolution = {
+  ): Solution = {
     generate(
       problemInstance,
-      PartialSolution(
+      Solution(
         List.empty,
         cost = problemInstance.cityCosts(initialCity)
       ),
@@ -25,10 +23,10 @@ object SolutionFactory {
   def getGreedyAppendSolution(
       problemInstance: ProblemInstance,
       initialCity: Int
-  ): FullSolution = {
+  ): Solution = {
     generate(
       problemInstance,
-      PartialSolution(
+      Solution(
         List(initialCity),
         problemInstance.cityCosts(initialCity)
       ),
@@ -40,10 +38,10 @@ object SolutionFactory {
   def getGreedyAnyPositionSolution(
       problemInstance: ProblemInstance,
       initialCity: Int
-  ): FullSolution = {
+  ): Solution = {
     generate(
       problemInstance,
-      PartialSolution(
+      Solution(
         List(initialCity),
         problemInstance.cityCosts(initialCity)
       ),
@@ -55,10 +53,10 @@ object SolutionFactory {
   def getGreedyCycleSolution(
       problemInstance: ProblemInstance,
       initialCity: Int
-  ): FullSolution = {
+  ): Solution = {
     generate(
       problemInstance,
-      PartialSolution(
+      Solution(
         List(initialCity),
         problemInstance.cityCosts(initialCity)
       ),
@@ -70,10 +68,10 @@ object SolutionFactory {
   def getGreedyCycleRegretSolution(
       problemInstance: ProblemInstance,
       initialCity: Int
-  ): FullSolution = {
+  ): Solution = {
     generate(
       problemInstance,
-      PartialSolution(
+      Solution(
         List(initialCity),
         problemInstance.cityCosts(initialCity)
       ),
@@ -85,10 +83,10 @@ object SolutionFactory {
   def getGreedyCycleWeightedRegretSolution(
       problemInstance: ProblemInstance,
       initialCity: Int
-  ): FullSolution = {
+  ): Solution = {
     generate(
       problemInstance,
-      PartialSolution(
+      Solution(
         List(initialCity),
         problemInstance.cityCosts(initialCity)
       ),
@@ -97,34 +95,59 @@ object SolutionFactory {
     )
   }
 
+  def getNodeExhangeGreedySolution(
+      problemInstance: ProblemInstance,
+      initialCity: Int
+  ): Solution = {
+    val randomSolution = getRandomSolution(problemInstance, initialCity)
+    generate(
+      problemInstance,
+      randomSolution,
+      problemInstance.cities.filterNot(randomSolution.path.contains),
+      NodeExchangeGreedySolution.updateSolution
+    )
+  }
+
+  def getNodeExhangeSteepestSolution(
+      problemInstance: ProblemInstance,
+      initialCity: Int
+  ): Solution = {
+    val randomSolution = getRandomSolution(problemInstance, initialCity)
+    generate(
+      problemInstance,
+      randomSolution,
+      problemInstance.cities.filterNot(randomSolution.path.contains),
+      NodeExchangeSteepestSolution.updateSolution
+    )
+  }
+
   @tailrec
   def generate(
       problemInstance: ProblemInstance,
-      currentSolution: PartialSolution,
-      citiesToChooseFrom: Set[Int],
+      currentSolution: Solution,
+      availableCities: Set[Int],
       updateSolution: (
           ProblemInstance,
-          PartialSolution,
+          Solution,
           Set[Int]
-      ) => (PartialSolution, Set[Int])
-  ): FullSolution = {
-    if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
-      FullSolution(
-        currentSolution.path,
-        currentSolution.cost
-      )
+      ) => (Solution, Set[Int])
+  ): Solution = {
+    val (newSolution, newAvailableCities) = updateSolution(
+      problemInstance,
+      currentSolution,
+      availableCities
+    )
+
+    if (newSolution == currentSolution) {
+      Solution(currentSolution.path, currentSolution.cost)
     } else {
-      val (newPartialSolution, newCitiesToChooseFrom) = updateSolution(
-        problemInstance,
-        currentSolution,
-        citiesToChooseFrom
-      )
       generate(
         problemInstance,
-        newPartialSolution,
-        newCitiesToChooseFrom,
+        newSolution,
+        newAvailableCities,
         updateSolution
       )
     }
   }
+
 }

@@ -19,14 +19,14 @@ object Main extends App {
   def processSolutions(
       name: String,
       problemInstance: ProblemInstance,
-      solutionMethod: (ProblemInstance, Int) => FullSolution,
+      solutionMethod: (ProblemInstance, Int) => Solution,
       fileNameSuffix: String
   ): Unit = {
     val startTime = System.nanoTime()
     val solutions = problemInstance.cities.view
       .map(city => Future { solutionMethod(problemInstance, city) })
       .toSeq
-    val result = Await.result(Future.sequence(solutions), 30.seconds)
+    val result = Await.result(Future.sequence(solutions), 3600.seconds)
     val endTime = System.nanoTime()
     val bestSolution = result.minBy(_.cost)
     val distances = result.map(_.cost).toIndexedSeq
@@ -90,6 +90,20 @@ object Main extends App {
       initialData,
       SolutionFactory.getGreedyCycleWeightedRegretSolution _,
       "greedy_cycle_weighted_regret"
+    )
+
+    processSolutions(
+      name,
+      initialData,
+      SolutionFactory.getNodeExhangeGreedySolution _,
+      "node_exchange_greedy"
+    )
+
+    processSolutions(
+      name,
+      initialData,
+      SolutionFactory.getNodeExhangeSteepestSolution _,
+      "node_exchange_steepest"
     )
 
     Files.write(

@@ -3,9 +3,12 @@ import scala.annotation.tailrec
 object GreedyCycleRegretSolution {
   def updateSolution(
       problemInstance: ProblemInstance,
-      currentSolution: PartialSolution,
+      currentSolution: Solution,
       availableCities: Set[Int]
-  ): (PartialSolution, Set[Int]) = {
+  ): (Solution, Set[Int]) = {
+    if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
+      return (currentSolution, availableCities)
+    }
     val currentCycle = currentSolution.path
     val distances = problemInstance.distances
     val cityCosts = problemInstance.cityCosts
@@ -47,7 +50,7 @@ object GreedyCycleRegretSolution {
       cityToInsert
     ) ++ currentCycle.drop(insertIndex + 1)
     (
-      PartialSolution(
+      Solution(
         newCycle,
         currentSolution.cost + additionalCost
       ),

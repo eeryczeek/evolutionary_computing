@@ -3,16 +3,19 @@ import scala.annotation.tailrec
 object GreedyAtAnyPositionSolution {
   def updateSolution(
       problemInstance: ProblemInstance,
-      currentSolution: PartialSolution,
-      citiesToChooseFrom: Set[Int]
-  ): (PartialSolution, Set[Int]) = {
+      currentSolution: Solution,
+      availableCities: Set[Int]
+  ): (Solution, Set[Int]) = {
+    if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
+      return (currentSolution, availableCities)
+    }
     val path = currentSolution.path
     val distances = problemInstance.distances
     val cityCosts = problemInstance.cityCosts
     val pathIndices = path.zipWithIndex.toMap
 
     val (bestCity, bestCost, insertPosition) =
-      citiesToChooseFrom.foldLeft((Int.MinValue, Int.MaxValue, -1)) {
+      availableCities.foldLeft((Int.MinValue, Int.MaxValue, -1)) {
         case ((bestCity, bestCost, insertPosition), city) =>
           val prependCost = distances(city)(path.head) + cityCosts(city)
           val appendCost = distances(path.last)(city) + cityCosts(city)
@@ -43,13 +46,13 @@ object GreedyAtAnyPositionSolution {
       case pos => path.take(pos + 1) ++ Array(bestCity) ++ path.drop(pos + 1)
     }
 
-    val newPartialSolution = PartialSolution(
+    val newSolution = Solution(
       newPath,
       currentSolution.cost + bestCost +
         distances(newPath.last)(newPath.head) -
         distances(path.last)(path.head)
     )
 
-    (newPartialSolution, citiesToChooseFrom - bestCity)
+    (newSolution, availableCities - bestCity)
   }
 }

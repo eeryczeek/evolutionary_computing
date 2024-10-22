@@ -17,7 +17,7 @@ object Cost {
 
   def calculateSolutionCost(
       problemInstance: ProblemInstance,
-      solution: PartialSolution
+      solution: Solution
   ): Int = {
     val distances = problemInstance.distances
     val costs = problemInstance.cityCosts

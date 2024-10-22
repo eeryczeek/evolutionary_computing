@@ -3,9 +3,12 @@ import scala.annotation.tailrec
 object GreedyTailSolution {
   def updateSolution(
       problemInstance: ProblemInstance,
-      currentSolution: PartialSolution,
+      currentSolution: Solution,
       availableCities: Set[Int]
-  ): (PartialSolution, Set[Int]) = {
+  ): (Solution, Set[Int]) = {
+    if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
+      return (currentSolution, availableCities)
+    }
     val nextCity = availableCities
       .minBy(cityId =>
         problemInstance.distances(currentSolution.path.last)(
@@ -15,7 +18,7 @@ object GreedyTailSolution {
     val head = currentSolution.path.head
     val last = currentSolution.path.last
     (
-      PartialSolution(
+      Solution(
         currentSolution.path :+ nextCity,
         currentSolution.cost +
           problemInstance.distances(last)(nextCity) +

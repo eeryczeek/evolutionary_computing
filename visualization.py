@@ -143,6 +143,18 @@ tspa_greedy_cycle_weighted_regret = parse_solution(
 tspb_greedy_cycle_weighted_regret = parse_solution(
     read_file("results/tspb_greedy_cycle_weighted_regret.txt")
 )
+tspa_node_exchange_greedy = parse_solution(
+    read_file("results/tspa_node_exchange_greedy.txt")
+)
+tspb_node_exchange_greedy = parse_solution(
+    read_file("results/tspb_node_exchange_greedy.txt")
+)
+tspa_node_exchange_steepest = parse_solution(
+    read_file("results/tspa_node_exchange_steepest.txt")
+)
+tspb_node_exchange_steepest = parse_solution(
+    read_file("results/tspb_node_exchange_steepest.txt")
+)
 
 
 plot_cities("cities", tspa, tspb)
@@ -210,3 +222,21 @@ plot_solution(
     tspb_greedy_cycle_weighted_regret,
 )
 plt.savefig("plots/greedy_cycle_weighted_regret.png")
+
+plot_solution(
+    "node exchange_greedy",
+    tspa,
+    tspa_node_exchange_greedy,
+    tspb,
+    tspb_node_exchange_greedy,
+)
+plt.savefig("plots/node_exchange_greedy.png")
+
+plot_solution(
+    "node exchange_steepest",
+    tspa,
+    tspa_node_exchange_steepest,
+    tspb,
+    tspb_node_exchange_steepest,
+)
+plt.savefig("plots/node_exchange_steepest.png")

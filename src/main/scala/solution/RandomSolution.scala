@@ -4,9 +4,12 @@ import scala.util.Random
 object RandomSolution {
   def updateSolution(
       problemInstance: ProblemInstance,
-      currentSolution: PartialSolution,
+      currentSolution: Solution,
       availableCities: Set[Int]
-  ): (PartialSolution, Set[Int]) = {
+  ): (Solution, Set[Int]) = {
+    if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
+      return (currentSolution, availableCities)
+    }
     val nextCity = availableCities.toSeq(Random.nextInt(availableCities.size))
     val newCost = currentSolution.path match {
       case path: List[Int] if path == List.empty =>
@@ -19,7 +22,7 @@ object RandomSolution {
           problemInstance.distances(path.last)(path.head)
     }
     (
-      PartialSolution(
+      Solution(
         currentSolution.path :+ nextCity,
         newCost
       ),
