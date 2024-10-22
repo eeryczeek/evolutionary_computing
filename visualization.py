@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import re
+from collections import defaultdict
 
 
 class City:
@@ -9,234 +11,128 @@ class City:
         self.cost = cost
 
 
+class Solution:
+    def __init__(self, instance, method, path, cost):
+        self.instance = instance
+        self.method = method
+        self.path = path
+        self.cost = cost
+
+    def __str__(self):
+        return f"{self.path}, {self.cost})\n"
+
+    def __repr__(self):
+        return self.__str__()
+
+
 def read_file(file_path):
     with open(file_path) as f:
         return f.readlines()
 
 
-def parse_cities(data):
-    cities = [
-        City(index, *map(float, line.strip().split(";")))
-        for index, line in enumerate(data)
-    ]
-    return {city.id: city for city in cities}
+def read_solutions(file_path):
+    with open(file_path) as f:
+        return f.read()
 
 
-def parse_solution(data):
-    cost = int(data[0].split(": ")[1].strip())
-    path = [int(x) for x in data[1].split(": ")[1].split(",")]
+def parse_cities(tspa, tspb):
     return {
-        "cost": cost,
-        "solution": path,
+        "tspa": [
+            City(index, *map(float, line.strip().split(";")))
+            for index, line in enumerate(tspa)
+        ],
+        "tspb": [
+            City(index, *map(float, line.strip().split(";")))
+            for index, line in enumerate(tspb)
+        ],
     }
 
 
-def plot_cities(suptitle, tspa, tspb):
+def parse_solutions(data):
+    solution_dict = defaultdict(dict)
+    pattern = re.compile(
+        r"Instance: (\w+)\nMethod: (\w+)\nBest Solution: Solution\(List\((.*?)\),(\d+)\)"
+    )
+
+    matches = pattern.findall(data)
+    for match in matches:
+        instance, method, path_str, cost = match
+        path = list(map(int, path_str.split(", ")))
+        cost = int(cost)
+        solution = Solution(instance, method, path, cost)
+        solution_dict[instance][method] = solution
+
+    return solution_dict
+
+
+def plot_cities(suptitle, cities: dict[str, list[City]]):
+    def plot_subplot(title, cities):
+        plt.title(title)
+        plt.xlabel("x")
+        plt.ylabel("y")
+        scatter = plt.scatter(
+            [city.x for city in cities],
+            [city.y for city in cities],
+            c=[city.cost for city in cities],
+            cmap="viridis",
+        )
+        plt.colorbar(scatter, label="city cost")
+
     plt.figure(figsize=(16, 6))
     plt.tight_layout()
     plt.suptitle(suptitle)
     plt.subplot(1, 2, 1)
-    plt.title("TSPA")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    scatter_tspa = plt.scatter(
-        [city.x for _, city in tspa.items()],
-        [city.y for _, city in tspa.items()],
-        c=[city.cost for _, city in tspa.items()],
-        cmap="viridis",
-    )
-    plt.colorbar(scatter_tspa, label="city cost")
-
+    plot_subplot("TSPA", cities["tspa"])
     plt.subplot(1, 2, 2)
-    plt.title("TSPB")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    scatter_tspb = plt.scatter(
-        [city.x for _, city in tspb.items()],
-        [city.y for _, city in tspb.items()],
-        c=[city.cost for _, city in tspb.items()],
-        cmap="viridis",
-    )
-    plt.colorbar(scatter_tspb, label="city cost")
+    plot_subplot("TSPB", cities["tspb"])
+    plt.savefig(f"plots/{suptitle.lower().replace(' ', '_')}.png")
 
 
-def plot_solution(suptitle, tspa, tspa_solution, tspb, tspb_solution):
-    plt.figure(figsize=(16, 6))
-    plt.tight_layout()
-    plt.suptitle(suptitle)
-    plt.subplot(1, 2, 1)
-    plt.suptitle(suptitle)
-    plt.title(f"TSPA [{tspa_solution['cost']}]")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    scatter_tspa = plt.scatter(
-        [city.x for _, city in tspa.items()],
-        [city.y for _, city in tspa.items()],
-        c=[city.cost for _, city in tspa.items()],
-        cmap="viridis",
-    )
-    plt.colorbar(scatter_tspa, label="city cost")
+def plot_solutions(
+    cities: dict[str, list[City]], solutions: dict[str, dict[str, Solution]]
+):
+    def plot_subplot(title, city_list, solution):
+        plt.title(f"{title} [{solution.cost}]")
+        plt.xlabel("x")
+        plt.ylabel("y")
+        scatter = plt.scatter(
+            [city.x for city in city_list],
+            [city.y for city in city_list],
+            c=[city.cost for city in city_list],
+            cmap="viridis",
+        )
+        plt.colorbar(scatter, label="city cost")
 
-    tspa_path = tspa_solution["solution"]
-    for i in range(len(tspa_path) - 1):
+        path = solution.path
+        for i in range(len(path) - 1):
+            plt.plot(
+                [city_list[path[i]].x, city_list[path[i + 1]].x],
+                [city_list[path[i]].y, city_list[path[i + 1]].y],
+                "black",
+            )
         plt.plot(
-            [tspa[tspa_path[i]].x, tspa[tspa_path[i + 1]].x],
-            [tspa[tspa_path[i]].y, tspa[tspa_path[i + 1]].y],
+            [city_list[path[-1]].x, city_list[path[0]].x],
+            [city_list[path[-1]].y, city_list[path[0]].y],
             "black",
         )
-    plt.plot(
-        [tspa[tspa_path[-1]].x, tspa[tspa_path[0]].x],
-        [tspa[tspa_path[-1]].y, tspa[tspa_path[0]].y],
-        "black",
-    )
 
-    plt.subplot(1, 2, 2)
-    plt.title(f"TSPB [{tspb_solution['cost']}]")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    scatter_tspb = plt.scatter(
-        [city.x for _, city in tspb.items()],
-        [city.y for _, city in tspb.items()],
-        c=[city.cost for _, city in tspb.items()],
-        cmap="viridis",
-    )
-    plt.colorbar(scatter_tspb, label="city cost")
-
-    tspb_path = tspb_solution["solution"]
-    for i in range(len(tspb_path) - 1):
-        plt.plot(
-            [tspb[tspb_path[i]].x, tspb[tspb_path[i + 1]].x],
-            [tspb[tspb_path[i]].y, tspb[tspb_path[i + 1]].y],
-            "black",
-        )
-    plt.plot(
-        [tspb[tspb_path[-1]].x, tspb[tspb_path[0]].x],
-        [tspb[tspb_path[-1]].y, tspb[tspb_path[0]].y],
-        "black",
-    )
+    instances = list(solutions.keys())
+    methods = set(solutions[instances[0]].keys()) & set(solutions[instances[1]].keys())
+    for method in methods:
+        plt.figure(figsize=(16, 6))
+        plt.suptitle(f"{method}")
+        plt.subplot(1, 2, 1)
+        plot_subplot("TSPA", cities["tspa"], solutions["tspa"][method])
+        plt.subplot(1, 2, 2)
+        plot_subplot("TSPB", cities["tspb"], solutions["tspb"][method])
+        plt.tight_layout(rect=[0, 0, 1, 0.96])
+        plt.savefig(f"plots/{method}.png")
+        plt.close()
 
 
-tspa = parse_cities(read_file("TSPA.csv"))
-tspb = parse_cities(read_file("TSPB.csv"))
-
-tspa_random = parse_solution(read_file("results/tspa_random.txt"))
-tspb_random = parse_solution(read_file("results/tspb_random.txt"))
-tspa_greedy_tail = parse_solution(read_file("results/tspa_greedy_tail.txt"))
-tspb_greedy_tail = parse_solution(read_file("results/tspb_greedy_tail.txt"))
-tspa_greedy_any_position = parse_solution(
-    read_file("results/tspa_greedy_any_position.txt")
-)
-tspb_greedy_any_position = parse_solution(
-    read_file("results/tspb_greedy_any_position.txt")
-)
-tspa_greedy_cycle = parse_solution(read_file("results/tspa_greedy_cycle.txt"))
-tspb_greedy_cycle = parse_solution(read_file("results/tspb_greedy_cycle.txt"))
-tspa_greedy_cycle_regret = parse_solution(
-    read_file("results/tspa_greedy_cycle_regret.txt")
-)
-tspb_greedy_cycle_regret = parse_solution(
-    read_file("results/tspb_greedy_cycle_regret.txt")
-)
-tspa_greedy_cycle_weighted_regret = parse_solution(
-    read_file("results/tspa_greedy_cycle_weighted_regret.txt")
-)
-tspb_greedy_cycle_weighted_regret = parse_solution(
-    read_file("results/tspb_greedy_cycle_weighted_regret.txt")
-)
-tspa_node_exchange_greedy = parse_solution(
-    read_file("results/tspa_node_exchange_greedy.txt")
-)
-tspb_node_exchange_greedy = parse_solution(
-    read_file("results/tspb_node_exchange_greedy.txt")
-)
-tspa_node_exchange_steepest = parse_solution(
-    read_file("results/tspa_node_exchange_steepest.txt")
-)
-tspb_node_exchange_steepest = parse_solution(
-    read_file("results/tspb_node_exchange_steepest.txt")
-)
+cities = parse_cities(read_file("TSPA.csv"), read_file("TSPB.csv"))
+solutions = parse_solutions(read_solutions("results/results_best.txt"))
 
 
-plot_cities("cities", tspa, tspb)
-plt.savefig("plots/cities.png")
-
-plot_solution(
-    "random",
-    tspa,
-    tspa_random,
-    tspb,
-    tspb_random,
-)
-plt.savefig("plots/random.png")
-
-plot_solution(
-    "greedy tail",
-    tspa,
-    tspa_greedy_tail,
-    tspb,
-    tspb_greedy_tail,
-)
-plt.savefig("plots/greedy_tail.png")
-
-plot_solution(
-    "greedy any position",
-    tspa,
-    tspa_greedy_any_position,
-    tspb,
-    tspb_greedy_any_position,
-)
-plt.savefig("plots/greedy_any_position.png")
-
-plot_solution(
-    "greedy cycle",
-    tspa,
-    tspa_greedy_cycle,
-    tspb,
-    tspb_greedy_cycle,
-)
-plt.savefig("plots/greedy_cycle.png")
-
-plot_solution(
-    "greedy cycle regret",
-    tspa,
-    tspa_greedy_cycle_regret,
-    tspb,
-    tspb_greedy_cycle_regret,
-)
-plt.savefig("plots/greedy_cycle_regret.png")
-
-plot_solution(
-    "greedy cycle weighted regret",
-    tspa,
-    tspa_greedy_cycle_weighted_regret,
-    tspb,
-    tspb_greedy_cycle_weighted_regret,
-)
-plt.savefig("plots/greedy_cycle_weighted_regret.png")
-
-plot_solution(
-    "greedy cycle weighted regret",
-    tspa,
-    tspa_greedy_cycle_weighted_regret,
-    tspb,
-    tspb_greedy_cycle_weighted_regret,
-)
-plt.savefig("plots/greedy_cycle_weighted_regret.png")
-
-plot_solution(
-    "node exchange_greedy",
-    tspa,
-    tspa_node_exchange_greedy,
-    tspb,
-    tspb_node_exchange_greedy,
-)
-plt.savefig("plots/node_exchange_greedy.png")
-
-plot_solution(
-    "node exchange_steepest",
-    tspa,
-    tspa_node_exchange_steepest,
-    tspb,
-    tspb_node_exchange_steepest,
-)
-plt.savefig("plots/node_exchange_steepest.png")
+plot_cities("cities", cities)
+plot_solutions(cities, solutions)

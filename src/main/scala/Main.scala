@@ -9,18 +9,41 @@ import scala.concurrent.ExecutionContext
 object Main extends App {
   implicit val ec: ExecutionContext = ExecutionContext.global
   val names = List("tspa", "tspb")
+  val resultsTablePath = Paths.get("results/results_table.txt")
+  val resultsBestPath = Paths.get("results/results_best.txt")
   Files.write(
-    Paths.get("results/results.txt"),
+    resultsTablePath,
+    "".getBytes,
+    StandardOpenOption.CREATE,
+    StandardOpenOption.TRUNCATE_EXISTING
+  )
+  Files.write(
+    resultsBestPath,
     "".getBytes,
     StandardOpenOption.CREATE,
     StandardOpenOption.TRUNCATE_EXISTING
   )
 
+  def writeHeader(name: String): Unit = {
+    val header =
+      s"Instance: $name\n| Method | Min | Avg | Max | Time |\n| --- | --- | --- | --- | --- |\n"
+    writeResults(header, resultsTablePath)
+  }
+
+  def writeResults(output: String, path: java.nio.file.Path): Unit = {
+    Files.write(
+      path,
+      output.getBytes,
+      StandardOpenOption.CREATE,
+      StandardOpenOption.APPEND
+    )
+  }
+
   def processSolutions(
-      name: String,
+      instance: String,
+      methodName: String,
       problemInstance: ProblemInstance,
-      solutionMethod: (ProblemInstance, Int) => Solution,
-      fileNameSuffix: String
+      solutionMethod: (ProblemInstance, Int) => Solution
   ): Unit = {
     val startTime = System.nanoTime()
     val solutions = problemInstance.cities.view
@@ -30,87 +53,35 @@ object Main extends App {
     val endTime = System.nanoTime()
     val bestSolution = result.minBy(_.cost)
     val distances = result.map(_.cost).toIndexedSeq
-    val output =
-      f"| `$fileNameSuffix` | ${distances.min} | ${distances.sum / distances.size} | ${distances.max} | ${(endTime - startTime) / 1e9}%.4f |\n"
-    Files.write(
-      Paths.get("results/results.txt"),
-      output.getBytes,
-      StandardOpenOption.CREATE,
-      StandardOpenOption.APPEND
-    )
-    TXTWriter.writeTXT(s"results/${name}_$fileNameSuffix.txt", bestSolution)
+    val outputTable =
+      f"| `$methodName` | ${distances.min} | ${distances.sum / distances.size} | ${distances.max} | ${(endTime - startTime) / 1e9}%.4f |\n"
+    writeResults(outputTable, resultsTablePath)
+    val outputBest =
+      s"Instance: $instance\nMethod: $methodName\nBest Solution: ${bestSolution}\n\n"
+    writeResults(outputBest, resultsBestPath)
   }
 
+  val solutionMethods = List(
+    ("random", SolutionFactory.getRandomSolution _),
+    ("greedy_tail", SolutionFactory.getGreedyAppendSolution _),
+    ("greedy_any_position", SolutionFactory.getGreedyAnyPositionSolution _),
+    ("greedy_cycle", SolutionFactory.getGreedyCycleSolution _),
+    ("greedy_cycle_regret", SolutionFactory.getGreedyCycleRegretSolution _),
+    (
+      "greedy_cycle_weighted_regret",
+      SolutionFactory.getGreedyCycleWeightedRegretSolution _
+    ),
+    ("node_exchange_greedy", SolutionFactory.getNodeExhangeGreedySolution _),
+    ("node_exchange_steepest", SolutionFactory.getNodeExhangeSteepestSolution _)
+  )
+
   for (name <- names) {
+    writeHeader(name)
     val initialData = CSVReader.readCSV(s"${name.toUpperCase()}.csv")
-
-    // Random solutions
-    processSolutions(
-      name,
-      initialData,
-      SolutionFactory.getRandomSolution _,
-      "random"
-    )
-
-    // Greedy append
-    processSolutions(
-      name,
-      initialData,
-      SolutionFactory.getGreedyAppendSolution _,
-      "greedy_tail"
-    )
-
-    // Greedy at any position
-    processSolutions(
-      name,
-      initialData,
-      SolutionFactory.getGreedyAnyPositionSolution _,
-      "greedy_any_position"
-    )
-
-    // Greedy cycle
-    processSolutions(
-      name,
-      initialData,
-      SolutionFactory.getGreedyCycleSolution _,
-      "greedy_cycle"
-    )
-
-    // Greedy cycle with regret
-    processSolutions(
-      name,
-      initialData,
-      SolutionFactory.getGreedyCycleRegretSolution _,
-      "greedy_cycle_regret"
-    )
-
-    // Greedy cycle with weighted regret
-    processSolutions(
-      name,
-      initialData,
-      SolutionFactory.getGreedyCycleWeightedRegretSolution _,
-      "greedy_cycle_weighted_regret"
-    )
-
-    processSolutions(
-      name,
-      initialData,
-      SolutionFactory.getNodeExhangeGreedySolution _,
-      "node_exchange_greedy"
-    )
-
-    processSolutions(
-      name,
-      initialData,
-      SolutionFactory.getNodeExhangeSteepestSolution _,
-      "node_exchange_steepest"
-    )
-
-    Files.write(
-      Paths.get("results/results.txt"),
-      "\n".getBytes,
-      StandardOpenOption.CREATE,
-      StandardOpenOption.APPEND
-    )
+    solutionMethods.foreach { case (suffix, method) =>
+      processSolutions(name, suffix, initialData, method)
+    }
+    writeResults("\n", resultsTablePath)
+    writeResults("\n", resultsBestPath)
   }
 }

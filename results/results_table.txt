@@ -1,0 +1,24 @@
+Instance: tspa
+| Method | Min | Avg | Max | Time |
+| --- | --- | --- | --- | --- |
+| `random` | 242414 | 263676 | 292507 | 0.0188 |
+| `greedy_tail` | 83182 | 85107 | 89433 | 0.0339 |
+| `greedy_any_position` | 71263 | 73202 | 76156 | 0.7121 |
+| `greedy_cycle` | 71488 | 72609 | 74410 | 0.4323 |
+| `greedy_cycle_regret` | 108935 | 116548 | 126990 | 2.5140 |
+| `greedy_cycle_weighted_regret` | 71108 | 72135 | 73395 | 2.4011 |
+| `node_exchange_greedy` | 89317 | 98727 | 106634 | 0.8397 |
+| `node_exchange_steepest` | 99827 | 108499 | 119724 | 0.7268 |
+
+Instance: tspb
+| Method | Min | Avg | Max | Time |
+| --- | --- | --- | --- | --- |
+| `random` | 192024 | 214221 | 236216 | 0.0061 |
+| `greedy_tail` | 52319 | 54390 | 59030 | 0.0197 |
+| `greedy_any_position` | 44446 | 46131 | 53438 | 0.5983 |
+| `greedy_cycle` | 48765 | 51301 | 57324 | 0.4329 |
+| `greedy_cycle_regret` | 67175 | 73164 | 79784 | 2.5729 |
+| `greedy_cycle_weighted_regret` | 47144 | 50985 | 55700 | 2.7413 |
+| `node_exchange_greedy` | 61025 | 67386 | 74932 | 0.8750 |
+| `node_exchange_steepest` | 65929 | 75233 | 83876 | 0.7729 |
+
