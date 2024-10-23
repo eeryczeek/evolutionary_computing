@@ -45,6 +45,7 @@ object Main extends App {
       problemInstance: ProblemInstance,
       solutionMethod: (ProblemInstance, Int) => Solution
   ): Unit = {
+    println("started processing " + methodName)
     val startTime = System.nanoTime()
     val solutions = problemInstance.cities.view
       .map(city => Future { solutionMethod(problemInstance, city) })
@@ -62,17 +63,27 @@ object Main extends App {
   }
 
   val solutionMethods = List(
-    ("random", SolutionFactory.getRandomSolution _),
-    ("greedy_tail", SolutionFactory.getGreedyAppendSolution _),
-    ("greedy_any_position", SolutionFactory.getGreedyAnyPositionSolution _),
-    ("greedy_cycle", SolutionFactory.getGreedyCycleSolution _),
-    ("greedy_cycle_regret", SolutionFactory.getGreedyCycleRegretSolution _),
-    (
-      "greedy_cycle_weighted_regret",
-      SolutionFactory.getGreedyCycleWeightedRegretSolution _
-    ),
     ("node_exchange_greedy", SolutionFactory.getNodeExhangeGreedySolution _),
-    ("node_exchange_steepest", SolutionFactory.getNodeExhangeSteepestSolution _)
+    (
+      "node_exchange_steepest",
+      SolutionFactory.getNodeExhangeSteepestSolution _
+    ),
+    (
+      "intra_route_steepest_random",
+      SolutionFactory.getIntraSteepestBasedOnRandomSolution _
+    ),
+    (
+      "intra_route_greedy_random",
+      SolutionFactory.getIntraGreedyBasedOnRandomSolution _
+    ),
+    (
+      "intra_route_greedy_heuristic",
+      SolutionFactory.getIntraGreedyBasedOnHeuristicSolution _
+    ),
+    (
+      "intra_route_greedy_heuristic",
+      SolutionFactory.getIntraSteepestBasedOnHeuristicSolution _
+    )
   )
 
   for (name <- names) {

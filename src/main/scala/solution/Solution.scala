@@ -121,6 +121,60 @@ object SolutionFactory {
     )
   }
 
+  def getIntraGreedyBasedOnRandomSolution(
+      problemInstance: ProblemInstance,
+      initialCity: Int
+  ): Solution = {
+    val randomSolution = getRandomSolution(problemInstance, initialCity)
+    generate(
+      problemInstance,
+      randomSolution,
+      problemInstance.cities -- randomSolution.path,
+      IntraRouteGreedy.updateSolution
+    )
+  }
+
+  def getIntraGreedyBasedOnHeuristicSolution(
+      problemInstance: ProblemInstance,
+      initialCity: Int
+  ): Solution = {
+    val initialSolution =
+      getGreedyAnyPositionSolution(problemInstance, initialCity)
+    generate(
+      problemInstance,
+      initialSolution,
+      problemInstance.cities -- initialSolution.path,
+      IntraRouteGreedy.updateSolution
+    )
+  }
+
+  def getIntraSteepestBasedOnRandomSolution(
+      problemInstance: ProblemInstance,
+      initialCity: Int
+  ): Solution = {
+    val randomSolution = getRandomSolution(problemInstance, initialCity)
+    generate(
+      problemInstance,
+      randomSolution,
+      problemInstance.cities -- randomSolution.path,
+      IntraRouteSteepest.updateSolution
+    )
+  }
+
+  def getIntraSteepestBasedOnHeuristicSolution(
+      problemInstance: ProblemInstance,
+      initialCity: Int
+  ): Solution = {
+    val initialSolution =
+      getGreedyAnyPositionSolution(problemInstance, initialCity)
+    generate(
+      problemInstance,
+      initialSolution,
+      problemInstance.cities -- initialSolution.path,
+      IntraRouteSteepest.updateSolution
+    )
+  }
+
   @tailrec
   def generate(
       problemInstance: ProblemInstance,
