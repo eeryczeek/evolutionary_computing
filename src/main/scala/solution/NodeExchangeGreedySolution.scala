@@ -23,11 +23,7 @@ object NodeExchangeGreedySolution {
         if (additionalCost < 0) {
           val cityToRemove = city2
           val newCycle = currentSolution.path
-            .patch(
-              currentSolution.path.indexOf(cityToRemove),
-              List(cityToInsert),
-              1
-            )
+            .updated(currentSolution.path.indexOf(cityToRemove), cityToInsert)
           return (
             Solution(
               newCycle,

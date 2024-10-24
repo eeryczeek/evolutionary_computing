@@ -1,6 +1,8 @@
 import scala.util.Random
+import com.typesafe.scalalogging.Logger
 
 object IntraRouteGreedy extends IntraRoute with SolutionUpdater {
+  val logger = Logger("IntraRouteGreedy")
   def updateSolution(
       problemInstance: ProblemInstance,
       currentSolution: Solution,
@@ -19,7 +21,11 @@ object IntraRouteGreedy extends IntraRoute with SolutionUpdater {
     firstImprovingMove match {
       case Some((move, additionalCost)) =>
         (
-          updateSolutionWithMove(currentSolution, move, additionalCost),
+          updateSolutionWithMove(
+            currentSolution,
+            move,
+            additionalCost
+          ),
           availableCities
         )
       case None =>

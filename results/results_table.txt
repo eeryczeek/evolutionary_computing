@@ -1,24 +1,24 @@
 Instance: tspa
 | Method | Min | Avg | Max | Time |
 | --- | --- | --- | --- | --- |
-| `random` | 242414 | 263676 | 292507 | 0.0188 |
-| `greedy_tail` | 83182 | 85107 | 89433 | 0.0339 |
-| `greedy_any_position` | 71263 | 73202 | 76156 | 0.7121 |
-| `greedy_cycle` | 71488 | 72609 | 74410 | 0.4323 |
-| `greedy_cycle_regret` | 108935 | 116548 | 126990 | 2.5140 |
-| `greedy_cycle_weighted_regret` | 71108 | 72135 | 73395 | 2.4011 |
-| `node_exchange_greedy` | 89317 | 98727 | 106634 | 0.8397 |
-| `node_exchange_steepest` | 99827 | 108499 | 119724 | 0.7268 |
+| `node_exchange_greedy_random` | 89735 | 98688 | 106741 | 0.8018 |
+| `node_exchange_steepest_random` | 96934 | 108657 | 121461 | 0.8739 |
+| `node_exchange_greedy_heuristic` | 71120 | 73001 | 75698 | 0.9042 |
+| `node_exchange_steepest_heuristic` | 71120 | 73001 | 75698 | 0.8450 |
+| `intra_route_greedy_random` | 107876 | 122645 | 135244 | 23.5389 |
+| `intra_route_steepest_random` | 110763 | 121964 | 133273 | 35.9182 |
+| `intra_route_greedy_heuristic` | 69771 | 71356 | 74115 | 2.2762 |
+| `intra_route_greedy_heuristic` | 69864 | 71171 | 73934 | 4.8449 |
 
 Instance: tspb
 | Method | Min | Avg | Max | Time |
 | --- | --- | --- | --- | --- |
-| `random` | 192024 | 214221 | 236216 | 0.0061 |
-| `greedy_tail` | 52319 | 54390 | 59030 | 0.0197 |
-| `greedy_any_position` | 44446 | 46131 | 53438 | 0.5983 |
-| `greedy_cycle` | 48765 | 51301 | 57324 | 0.4329 |
-| `greedy_cycle_regret` | 67175 | 73164 | 79784 | 2.5729 |
-| `greedy_cycle_weighted_regret` | 47144 | 50985 | 55700 | 2.7413 |
-| `node_exchange_greedy` | 61025 | 67386 | 74932 | 0.8750 |
-| `node_exchange_steepest` | 65929 | 75233 | 83876 | 0.7729 |
+| `node_exchange_greedy_random` | 60086 | 67279 | 76175 | 0.5270 |
+| `node_exchange_steepest_random` | 63969 | 75717 | 85006 | 0.7751 |
+| `node_exchange_greedy_heuristic` | 44195 | 45849 | 51960 | 0.8581 |
+| `node_exchange_steepest_heuristic` | 44181 | 45881 | 51960 | 0.8775 |
+| `intra_route_greedy_random` | 68590 | 73817 | 82229 | 22.6670 |
+| `intra_route_steepest_random` | 67633 | 73233 | 80004 | 35.7794 |
+| `intra_route_greedy_heuristic` | 43943 | 45397 | 52436 | 1.8728 |
+| `intra_route_greedy_heuristic` | 43943 | 45337 | 52388 | 3.4341 |
 

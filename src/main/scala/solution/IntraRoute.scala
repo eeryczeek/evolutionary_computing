@@ -1,5 +1,7 @@
 import scala.io.Source
+import com.typesafe.scalalogging.Logger
 trait IntraRoute {
+  private val logger = Logger("IntraRoute")
   case class Edge(city1: Int, city2: Int, city1Position: Int)
   sealed trait Move
   case class NodeSwap(
@@ -48,6 +50,7 @@ trait IntraRoute {
   ): Int = {
     val cityAt: Int => Int = readPathInAsCycle(solution.path)
     val distances = problemInstance.distances
+    val path = solution.path.last +: solution.path :+ solution.path.head
 
     move match {
       case EdgeSwap(edge1, edge2) =>
@@ -57,14 +60,26 @@ trait IntraRoute {
           distances(edge2.city1)(edge2.city2)
 
       case NodeSwap(city1, city1Position, city2, city2Position) =>
-        distances(cityAt(city1Position - 1))(city2) +
-          distances(city2)(cityAt(city1Position + 1)) +
+        if (city1Position == 0 && city2Position == solution.path.size - 1) {
           distances(cityAt(city2Position - 1))(city1) +
-          distances(city1)(cityAt(city2Position + 1)) -
-          distances(cityAt(city1Position - 1))(city1) -
-          distances(city1)(cityAt(city1Position + 1)) -
-          distances(cityAt(city2Position - 1))(city2) -
-          distances(city2)(cityAt(city2Position + 1))
+            distances(city2)(cityAt(city1Position + 1)) -
+            distances(cityAt(city2Position - 1))(city2) -
+            distances(city1)(cityAt(city1Position + 1))
+        } else if (math.abs(city1Position - city2Position) == 1) {
+          distances(cityAt(city1Position - 1))(city2) +
+            distances(city1)(cityAt(city2Position + 1)) -
+            distances(cityAt(city1Position - 1))(city1) -
+            distances(city2)(cityAt(city2Position + 1))
+        } else {
+          distances(cityAt(city1Position - 1))(city2) +
+            distances(city2)(cityAt(city1Position + 1)) +
+            distances(cityAt(city2Position - 1))(city1) +
+            distances(city1)(cityAt(city2Position + 1)) -
+            distances(cityAt(city1Position - 1))(city1) -
+            distances(city1)(cityAt(city1Position + 1)) -
+            distances(cityAt(city2Position - 1))(city2) -
+            distances(city2)(cityAt(city2Position + 1))
+        }
     }
   }
 
@@ -109,6 +124,6 @@ trait IntraRoute {
           .updated(city2Position, city1)
     }
 
-    Solution(newPath, solution.cost + additionalCost)
+    Solution(path = newPath, cost = solution.cost + additionalCost)
   }
 }

@@ -63,18 +63,29 @@ object Main extends App {
   }
 
   val solutionMethods = List(
-    ("node_exchange_greedy", SolutionFactory.getNodeExhangeGreedySolution _),
     (
-      "node_exchange_steepest",
-      SolutionFactory.getNodeExhangeSteepestSolution _
+      "node_exchange_greedy_random",
+      SolutionFactory.getNodeExhangeGreedyBasedOnRandomSolution _
     ),
     (
-      "intra_route_steepest_random",
-      SolutionFactory.getIntraSteepestBasedOnRandomSolution _
+      "node_exchange_steepest_random",
+      SolutionFactory.getNodeExhangeSteepestBasedOnRandomSolution _
+    ),
+    (
+      "node_exchange_greedy_heuristic",
+      SolutionFactory.getNodeExhangeGreedyBasedOnHeuristicSolution _
+    ),
+    (
+      "node_exchange_steepest_heuristic",
+      SolutionFactory.getNodeExhangeSteepestBasedOnHeuristicSolution _
     ),
     (
       "intra_route_greedy_random",
       SolutionFactory.getIntraGreedyBasedOnRandomSolution _
+    ),
+    (
+      "intra_route_steepest_random",
+      SolutionFactory.getIntraSteepestBasedOnRandomSolution _
     ),
     (
       "intra_route_greedy_heuristic",
