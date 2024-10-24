@@ -5,6 +5,7 @@ import java.nio.file.{Files, Paths, StandardOpenOption}
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
+import java.util.concurrent.atomic.AtomicInteger
 
 object Main extends App {
   implicit val ec: ExecutionContext = ExecutionContext.global
@@ -26,7 +27,7 @@ object Main extends App {
 
   def writeHeader(name: String): Unit = {
     val header =
-      s"Instance: $name\n| Method | Min | Avg | Max | Time |\n| --- | --- | --- | --- | --- |\n"
+      s"Instance: $name\n| **Method** | **Min** | **Mean** | **Max** | **Time\\* (s)** |\n| --- | --- | --- | --- | --- |\n"
     writeResults(header, resultsTablePath)
   }
 
@@ -45,11 +46,21 @@ object Main extends App {
       problemInstance: ProblemInstance,
       solutionMethod: (ProblemInstance, Int) => Solution
   ): Unit = {
-    println("started processing " + methodName)
     val startTime = System.nanoTime()
-    val solutions = problemInstance.cities.view
-      .map(city => Future { solutionMethod(problemInstance, city) })
+    val totalTasks = problemInstance.cities.size
+    val completedTasks = new AtomicInteger(0)
+
+    val solutions = problemInstance.cities.toList.view
+      .map(city =>
+        Future {
+          val solution = solutionMethod(problemInstance, city)
+          val completed = completedTasks.incrementAndGet()
+          print(s"\rprocessing $methodName [$completed/$totalTasks]")
+          solution
+        }
+      )
       .toSeq
+
     val result = Await.result(Future.sequence(solutions), 3600.seconds)
     val endTime = System.nanoTime()
     val bestSolution = result.minBy(_.cost)
@@ -58,42 +69,50 @@ object Main extends App {
       f"| `$methodName` | ${distances.min} | ${distances.sum / distances.size} | ${distances.max} | ${(endTime - startTime) / 1e9}%.4f |\n"
     writeResults(outputTable, resultsTablePath)
     val outputBest =
-      s"Instance: $instance\nMethod: $methodName\nBest Solution: ${bestSolution}\n\n"
+      s"Instance: $instance\nMethod: $methodName\nBest Solution Path: ${bestSolution.path
+          .mkString(", ")}\nBest Solution Cost: ${bestSolution.cost}\n\n"
     writeResults(outputBest, resultsBestPath)
+    println()
   }
 
   val solutionMethods = List(
+    ("random", SolutionFactory.getRandomSolution _),
+    ("greedy_tail", SolutionFactory.getGreedyTailSolution _),
+    ("greedy_any_position", SolutionFactory.getGreedyAnyPositionSolution _),
+    ("greedy_cycle", SolutionFactory.getGreedyCycleSolution _),
+    ("regret", SolutionFactory.getGreedyCycleRegretSolution _),
+    ("weighted_regret", SolutionFactory.getGreedyCycleWeightedRegretSolution _),
     (
-      "node_exchange_greedy_random",
-      SolutionFactory.getNodeExhangeGreedyBasedOnRandomSolution _
+      "ls_edges_greedy_random",
+      SolutionFactory.getLocalSearchWithEdgesSwapsGreedyRandomStart _
     ),
     (
-      "node_exchange_steepest_random",
-      SolutionFactory.getNodeExhangeSteepestBasedOnRandomSolution _
+      "ls_edges_greedy_heuristics",
+      SolutionFactory.getLocalSearchWithEdgesSwapsGreedyHeuristicStart _
     ),
     (
-      "node_exchange_greedy_heuristic",
-      SolutionFactory.getNodeExhangeGreedyBasedOnHeuristicSolution _
+      "ls_edges_steepest_random",
+      SolutionFactory.getLocalSearchWithEdgesSwapsSteepestRandomStart _
     ),
     (
-      "node_exchange_steepest_heuristic",
-      SolutionFactory.getNodeExhangeSteepestBasedOnHeuristicSolution _
+      "ls_edges_steepest_heuristics",
+      SolutionFactory.getLocalSearchWithEdgesSwapsSteepestHeuristicStart _
     ),
     (
-      "intra_route_greedy_random",
-      SolutionFactory.getIntraGreedyBasedOnRandomSolution _
+      "ls_nodes_greedy_random",
+      SolutionFactory.getLocalSearchWithNodesSwapsGreedyRandomStart _
     ),
     (
-      "intra_route_steepest_random",
-      SolutionFactory.getIntraSteepestBasedOnRandomSolution _
+      "ls_nodes_greedy_heuristics",
+      SolutionFactory.getLocalSearchWithNodesSwapsGreedyHeuristicStart _
     ),
     (
-      "intra_route_greedy_heuristic",
-      SolutionFactory.getIntraGreedyBasedOnHeuristicSolution _
+      "ls_nodes_steepest_random",
+      SolutionFactory.getLocalSearchWithNodesSwapsSteepestRandomStart _
     ),
     (
-      "intra_route_steepest_heuristic",
-      SolutionFactory.getIntraSteepestBasedOnHeuristicSolution _
+      "ls_nodes_steepest_heuristics",
+      SolutionFactory.getLocalSearchWithNodesSwapsSteepestHeuristicStart _
     )
   )
 

@@ -1,4 +1,6 @@
-object GreedyCycleWeightedRegretSolution {
+object GreedyCycleWeightedRegretSolution
+    extends MoveOperations
+    with CostManager {
   def updateSolution(
       problemInstance: ProblemInstance,
       currentSolution: Solution,

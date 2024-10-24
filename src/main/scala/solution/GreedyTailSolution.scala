@@ -1,32 +1,23 @@
 import scala.annotation.tailrec
 
-object GreedyTailSolution {
+object GreedyTailSolution extends MoveOperations with CostManager {
   def updateSolution(
       problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
     if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
-      return (currentSolution, availableCities)
+      val solutionCost = getSolutionCost(problemInstance, currentSolution)
+      return (currentSolution.copy(cost = solutionCost), availableCities)
     }
-    val nextCity = availableCities
-      .minBy(cityId =>
-        problemInstance.distances(currentSolution.path.last)(
-          cityId
-        ) + problemInstance.cityCosts(cityId)
-      )
-    val head = currentSolution.path.head
-    val last = currentSolution.path.last
-    (
-      Solution(
-        currentSolution.path :+ nextCity,
-        currentSolution.cost +
-          problemInstance.distances(last)(nextCity) +
-          problemInstance.cityCosts(nextCity) +
-          problemInstance.distances(nextCity)(head) -
-          problemInstance.distances(last)(head)
-      ),
-      availableCities - nextCity
-    )
+
+    val allPossibleMoves =
+      availableCities.map(city => AppendAtEnd(currentSolution.path.last, city))
+    val nextMove = allPossibleMoves
+      .minBy(getDeltaCost(problemInstance, _))
+
+    val (newSolution, newAvailableCities) =
+      performMove(currentSolution, nextMove, availableCities)
+    (newSolution, newAvailableCities)
   }
 }

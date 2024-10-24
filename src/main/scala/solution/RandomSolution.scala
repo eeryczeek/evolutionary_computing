@@ -1,32 +1,25 @@
 import scala.annotation.tailrec
 import scala.util.Random
 
-object RandomSolution {
+object RandomSolution extends CostManager {
   def updateSolution(
       problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
     if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
-      return (currentSolution, availableCities)
+      val solutionCost = getSolutionCost(problemInstance, currentSolution)
+      return (currentSolution.copy(cost = solutionCost), availableCities)
     }
-    val nextCity = availableCities.toSeq(Random.nextInt(availableCities.size))
-    val newCost = currentSolution.path match {
-      case path: List[Int] if path == List.empty =>
-        problemInstance.cityCosts(nextCity)
-      case path: List[Int] =>
-        currentSolution.cost +
-          problemInstance.distances(path.last)(nextCity) +
-          problemInstance.cityCosts(nextCity) +
-          problemInstance.distances(nextCity)(path.head) -
-          problemInstance.distances(path.last)(path.head)
-    }
+
+    val solutionPath = Random
+      .shuffle(availableCities)
+      .take(problemInstance.expectedSolutionLen)
+      .toArray
+
     (
-      Solution(
-        currentSolution.path :+ nextCity,
-        newCost
-      ),
-      availableCities - nextCity
+      Solution(solutionPath, 0),
+      availableCities -- solutionPath
     )
   }
 }

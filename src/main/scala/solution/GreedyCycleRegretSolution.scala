@@ -1,6 +1,6 @@
 import scala.annotation.tailrec
 
-object GreedyCycleRegretSolution {
+object GreedyCycleRegretSolution extends MoveOperations with CostManager {
   def updateSolution(
       problemInstance: ProblemInstance,
       currentSolution: Solution,
