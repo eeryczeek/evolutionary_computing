@@ -8,7 +8,7 @@ Instance: tspa
 | `intra_route_greedy_random` | 107876 | 122645 | 135244 | 23.5389 |
 | `intra_route_steepest_random` | 110763 | 121964 | 133273 | 35.9182 |
 | `intra_route_greedy_heuristic` | 69771 | 71356 | 74115 | 2.2762 |
-| `intra_route_greedy_heuristic` | 69864 | 71171 | 73934 | 4.8449 |
+| `intra_route_steepest_heuristic` | 69864 | 71171 | 73934 | 4.8449 |
 
 Instance: tspb
 | Method | Min | Avg | Max | Time |
@@ -20,5 +20,5 @@ Instance: tspb
 | `intra_route_greedy_random` | 68590 | 73817 | 82229 | 22.6670 |
 | `intra_route_steepest_random` | 67633 | 73233 | 80004 | 35.7794 |
 | `intra_route_greedy_heuristic` | 43943 | 45397 | 52436 | 1.8728 |
-| `intra_route_greedy_heuristic` | 43943 | 45337 | 52388 | 3.4341 |
+| `intra_route_steepest_heuristic` | 43943 | 45337 | 52388 | 3.4341 |
 

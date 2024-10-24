@@ -92,7 +92,7 @@ object Main extends App {
       SolutionFactory.getIntraGreedyBasedOnHeuristicSolution _
     ),
     (
-      "intra_route_greedy_heuristic",
+      "intra_route_steepest_heuristic",
       SolutionFactory.getIntraSteepestBasedOnHeuristicSolution _
     )
   )
