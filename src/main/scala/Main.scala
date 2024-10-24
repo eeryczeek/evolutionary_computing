@@ -47,7 +47,9 @@ object Main extends App {
   ): Unit = {
     println("started processing " + methodName)
     val startTime = System.nanoTime()
-    val solutions = problemInstance.cities.view
+    val solutions = problemInstance.cities.toList
+      .take(1)
+      .view
       .map(city => Future { solutionMethod(problemInstance, city) })
       .toSeq
     val result = Await.result(Future.sequence(solutions), 3600.seconds)
@@ -64,36 +66,8 @@ object Main extends App {
 
   val solutionMethods = List(
     (
-      "node_exchange_greedy_random",
-      SolutionFactory.getNodeExhangeGreedyBasedOnRandomSolution _
-    ),
-    (
-      "node_exchange_steepest_random",
-      SolutionFactory.getNodeExhangeSteepestBasedOnRandomSolution _
-    ),
-    (
-      "node_exchange_greedy_heuristic",
-      SolutionFactory.getNodeExhangeGreedyBasedOnHeuristicSolution _
-    ),
-    (
-      "node_exchange_steepest_heuristic",
-      SolutionFactory.getNodeExhangeSteepestBasedOnHeuristicSolution _
-    ),
-    (
       "intra_route_greedy_random",
       SolutionFactory.getIntraGreedyBasedOnRandomSolution _
-    ),
-    (
-      "intra_route_steepest_random",
-      SolutionFactory.getIntraSteepestBasedOnRandomSolution _
-    ),
-    (
-      "intra_route_greedy_heuristic",
-      SolutionFactory.getIntraGreedyBasedOnHeuristicSolution _
-    ),
-    (
-      "intra_route_steepest_heuristic",
-      SolutionFactory.getIntraSteepestBasedOnHeuristicSolution _
     )
   )
 

@@ -95,60 +95,6 @@ object SolutionFactory {
     )
   }
 
-  def getNodeExhangeGreedyBasedOnRandomSolution(
-      problemInstance: ProblemInstance,
-      initialCity: Int
-  ): Solution = {
-    val randomSolution = getRandomSolution(problemInstance, initialCity)
-    generate(
-      problemInstance,
-      randomSolution,
-      problemInstance.cities.filterNot(randomSolution.path.contains),
-      NodeExchangeGreedySolution.updateSolution
-    )
-  }
-
-  def getNodeExhangeGreedyBasedOnHeuristicSolution(
-      problemInstance: ProblemInstance,
-      initialCity: Int
-  ): Solution = {
-    val initialSolution =
-      getGreedyAnyPositionSolution(problemInstance, initialCity)
-    generate(
-      problemInstance,
-      initialSolution,
-      problemInstance.cities.filterNot(initialSolution.path.contains),
-      NodeExchangeGreedySolution.updateSolution
-    )
-  }
-
-  def getNodeExhangeSteepestBasedOnRandomSolution(
-      problemInstance: ProblemInstance,
-      initialCity: Int
-  ): Solution = {
-    val randomSolution = getRandomSolution(problemInstance, initialCity)
-    generate(
-      problemInstance,
-      randomSolution,
-      problemInstance.cities.filterNot(randomSolution.path.contains),
-      NodeExchangeSteepestSolution.updateSolution
-    )
-  }
-
-  def getNodeExhangeSteepestBasedOnHeuristicSolution(
-      problemInstance: ProblemInstance,
-      initialCity: Int
-  ): Solution = {
-    val initialSolution =
-      getGreedyAnyPositionSolution(problemInstance, initialCity)
-    generate(
-      problemInstance,
-      initialSolution,
-      problemInstance.cities.filterNot(initialSolution.path.contains),
-      NodeExchangeSteepestSolution.updateSolution
-    )
-  }
-
   def getIntraGreedyBasedOnRandomSolution(
       problemInstance: ProblemInstance,
       initialCity: Int
