@@ -7,29 +7,11 @@ trait LocalSearch extends MoveOperations with CostManager {
       currentSolution: Solution,
       availableCities: Set[Int]
   ): Seq[Move] = {
-    val path = currentSolution.path.toArray
-    val pairs = getConsecutivePairs(currentSolution)
-    val triplets = getConsecutiveTriplets(currentSolution)
-
-    val edgeSwapsIn = pairs
-      .combinations(2)
-      .collect {
-        case Array(pair1, pair2)
-            if Set(
-              pair1.city1,
-              pair1.city2,
-              pair2.city1,
-              pair2.city2
-            ).size == 4 =>
-          EdgeSwap(pair1, pair2)
-      }
-      .toSeq
-
-    val nodesSwapsOut = availableCities
-      .flatMap(city => triplets.map(triplet => NodeSwapOut(triplet, city)))
-      .toSeq
-
-    val possibleMoves = edgeSwapsIn ++ nodesSwapsOut
+    val possibleMoves = getNeighbourhoodWithEdgesSwapsIn(
+      problemInstance,
+      currentSolution,
+      availableCities
+    )
     possibleMoves.filter(move => anyEdgeInCandidateEdges(problemInstance, move))
   }
 

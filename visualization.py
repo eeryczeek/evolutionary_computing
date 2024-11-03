@@ -51,7 +51,7 @@ def parse_cities(tspa, tspb):
 def parse_solutions(data):
     solution_dict = defaultdict(dict)
     pattern = re.compile(
-        r"Instance: (\w+)\nMethod: (\w+)\nBest Solution: Solution\(List\((.*?)\),(\d+)\)"
+        r"Instance: (\w+)\nMethod: (\w+)\nBest Solution Path: ([\d, ]+)\nBest Solution Cost: (\d+)"
     )
 
     matches = pattern.findall(data)

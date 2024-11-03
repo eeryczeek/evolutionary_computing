@@ -24,16 +24,8 @@ This visual representation provides an intuitive way to interpret the spatial re
 1. [Modified TSP Problem with Additional Constraints](#modified-tsp-problem-with-additional-constraints)
 2. [Combined TSPA and TSPB results table](#combined-tspa-and-tspb-results-table)
 3. [Solutions](#solutions)
-   - [Random](#random)
-   - [Greedy tail](#greedy-tail)
-   - [Greedy any position](#greedy-any-position)
-   - [Greedy cycle](#greedy-cycle)
-   - [Greedy cycle regret](#greedy-cycle-regret)
-   - [Greedy cycle weighted regret](#greedy-cycle-weightd-regret)
    - [Local search with edges swaps greedy](#local-search-with-edges-swaps-greedy)
    - [Local search with edges swaps steepest](#local-search-with-edges-swaps-steepest)
-   - [Local search with nodes swaps greedy](#local-search-with-nodes-swaps-greedy)
-   - [Local search with nodes swaps steepest](#local-search-with-nodes-swaps-steepest)
 4. [Conclusions](#conclusions)
 
 <div style="page-break-after: always;"></div>
@@ -42,51 +34,21 @@ This visual representation provides an intuitive way to interpret the spatial re
 
 Instance TSPA results table:
 
-| **Method**                     | **Min** | **Mean** | **Max** | **Time\* (s)** |
-| ------------------------------ | ------- | -------- | ------- | -------------- |
-| `random`                       | 233148  | 263540   | 284518  | 0.1673         |
-| `greedy_tail`                  | 83182   | 85107    | 89433   | 0.1566         |
-| `greedy_any_position`          | 71263   | 73202    | 76156   | 0.9481         |
-| `greedy_cycle`                 | 71488   | 72609    | 74410   | 0.4627         |
-| `greedy_cycle_regret`          | 108935  | 116548   | 126990  | 2.5311         |
-| `greedy_cycle_weighted_regret` | 71108   | 72135    | 73395   | 2.3133         |
-
-| **Method**                                         | **Min** | **Mean** | **Max** | **Time\* (s)** |
-| -------------------------------------------------- | ------- | -------- | ------- | -------------- |
-| `local_search_with_edges_swaps_greedy_random`      | 71492   | 73710    | 76560   | 63.7732        |
-| `local_search_with_edges_swaps_greedy_heuristic`   | 69620   | 71167    | 73909   | 3.1254         |
-| `local_search_with_edges_swaps_steepest_random`    | 71646   | 73914    | 78738   | 15.9961        |
-| `local_search_with_edges_swaps_steepest_heuristic` | 69864   | 70963    | 73030   | 2.1335         |
-| `local_search_with_nodes_swaps_greedy_random`      | 77870   | 86045    | 93708   | 81.1029        |
-| `local_search_with_nodes_swaps_greedy_heuristic`   | 70917   | 72792    | 75353   | 1.1359         |
-| `local_search_with_nodes_swaps_steepest_random`    | 79894   | 88098    | 96234   | 16.0166        |
-| `local_search_with_nodes_swaps_steepest_heuristic` | 70844   | 72810    | 75353   | 1.1488         |
-| `ls_candidate_greedy_random`                       | 71195   | 74208    | 77623   | 36.8685        |
-| `ls_candidate_steepest_random`                     | 73447   | 73447    | 73447   | 14.2395        |
+| **Method**                       | **Min** | **Mean** | **Max** | **Time\* (s)** |
+| -------------------------------- | ------- | -------- | ------- | -------------- |
+| `ls_edges_swaps_greedy_random`   | 71492   | 73710    | 76560   | 63.7732        |
+| `ls_edges_swaps_steepest_random` | 71646   | 73914    | 78738   | 15.9961        |
+| `ls_candidate_greedy_random`     | 75908   | 80351    | 85536   | 35.0503        |
+| `ls_candidate_steepest_random`   | 77983   | 77983    | 77983   | 13.6452        |
 
 Instance TSPB results table:
 
-| **Method**                     | **Min** | **Mean** | **Max** | **Time\* (s)** |
-| ------------------------------ | ------- | -------- | ------- | -------------- |
-| `random`                       | 185339  | 213695   | 239113  | 0.0071         |
-| `greedy_tail`                  | 52319   | 54390    | 59030   | 0.0280         |
-| `greedy_any_position`          | 44446   | 46131    | 53438   | 0.6900         |
-| `greedy_cycle`                 | 48765   | 51301    | 57324   | 0.4619         |
-| `greedy_cycle_regret`          | 67175   | 73164    | 79784   | 2.1903         |
-| `greedy_cycle_weighted_regret` | 47144   | 50985    | 55700   | 2.3359         |
-
-| **Method**                                         | **Min** | **Mean** | **Max** | **Time\* (s)** |
-| -------------------------------------------------- | ------- | -------- | ------- | -------------- |
-| `local_search_with_edges_swaps_greedy_random`      | 46029   | 48352    | 51147   | 66.4630        |
-| `local_search_with_edges_swaps_greedy_heuristic`   | 43758   | 45089    | 51466   | 2.0703         |
-| `local_search_with_edges_swaps_steepest_random`    | 46021   | 48303    | 50845   | 16.3699        |
-| `local_search_with_edges_swaps_steepest_heuristic` | 43921   | 45024    | 50766   | 1.9482         |
-| `local_search_with_nodes_swaps_greedy_random`      | 54949   | 61246    | 68531   | 95.5620        |
-| `local_search_with_nodes_swaps_greedy_heuristic`   | 43826   | 45667    | 51789   | 1.4737         |
-| `local_search_with_nodes_swaps_steepest_random`    | 57028   | 63071    | 73731   | 15.8347        |
-| `local_search_with_nodes_swaps_steepest_heuristic` | 43826   | 45619    | 51789   | 1.3292         |
-| `ls_candidate_greedy_random`                       | 45098   | 48224    | 54947   | 35.3349        |
-| `ls_candidate_steepest_random`                     | 47357   | 47357    | 47357   | 14.8591        |
+| **Method**                       | **Min** | **Mean** | **Max** | **Time\* (s)** |
+| -------------------------------- | ------- | -------- | ------- | -------------- |
+| `ls_edges_swaps_greedy_random`   | 46029   | 48352    | 51147   | 66.4630        |
+| `ls_edges_swaps_steepest_random` | 46021   | 48303    | 50845   | 16.3699        |
+| `ls_candidate_greedy_random`     | 44892   | 47775    | 50155   | 36.7747        |
+| `ls_candidate_steepest_random`   | 47367   | 47367    | 47367   | 14.7428        |
 
 **Time\* - to solve all 200 instances**
 
