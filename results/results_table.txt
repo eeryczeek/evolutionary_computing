@@ -1,12 +1,12 @@
 Instance: tspa
 | **Method** | **Min** | **Mean** | **Max** | **Time\* (s)** |
 | --- | --- | --- | --- | --- |
-| `ls_candidate_greedy_random` | 71195 | 74208 | 77623 | 36.8685 |
-| `ls_candidate_steepest_random` | 73447 | 73447 | 73447 | 14.2395 |
+| `ls_candidate_greedy_random` | 75477 | 80401 | 86160 | 34.6538 |
+| `ls_candidate_steepest_random` | 77983 | 77983 | 77983 | 13.3986 |
 
 Instance: tspb
 | **Method** | **Min** | **Mean** | **Max** | **Time\* (s)** |
 | --- | --- | --- | --- | --- |
-| `ls_candidate_greedy_random` | 45098 | 48224 | 54947 | 35.3349 |
-| `ls_candidate_steepest_random` | 47357 | 47357 | 47357 | 14.8591 |
+| `ls_candidate_greedy_random` | 45170 | 47739 | 49756 | 36.2164 |
+| `ls_candidate_steepest_random` | 47367 | 47367 | 47367 | 15.6377 |
 
