@@ -200,6 +200,32 @@ object SolutionFactory {
     )
   }
 
+  def getLocalsearchWithCandidateMovesGreedyRandomStart(
+      problemInstance: ProblemInstance,
+      initialCity: Int
+  ): Solution = {
+    val randomSolution = getRandomSolution(problemInstance, initialCity)
+    generate(
+      problemInstance,
+      randomSolution,
+      problemInstance.cities -- randomSolution.path,
+      LocalSearchWithCandidateMovesGreedy.updateSolution
+    )
+  }
+
+  def getLocalsearchWithCandidateMovesSteepestRandomStart(
+      problemInstance: ProblemInstance,
+      initialCity: Int
+  ): Solution = {
+    val initialSolution = getRandomSolution(problemInstance, initialCity)
+    generate(
+      problemInstance,
+      initialSolution,
+      problemInstance.cities -- initialSolution.path,
+      LocalSearchWithCandidateMovesSteepest.updateSolution
+    )
+  }
+
   @tailrec
   def generate(
       problemInstance: ProblemInstance,

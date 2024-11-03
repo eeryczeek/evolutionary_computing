@@ -1,36 +1,12 @@
 Instance: tspa
 | **Method** | **Min** | **Mean** | **Max** | **Time\* (s)** |
 | --- | --- | --- | --- | --- |
-| `random` | 263677 | 263677 | 263677 | 0.1561 |
-| `greedy_tail` | 83182 | 85107 | 89433 | 0.3279 |
-| `greedy_any_position` | 71263 | 73202 | 76156 | 0.9744 |
-| `greedy_cycle` | 71488 | 72636 | 74410 | 3.5065 |
-| `regret` | 108935 | 116548 | 126990 | 2.5080 |
-| `weighted_regret` | 71108 | 72135 | 73395 | 2.3880 |
-| `ls_edges_greedy_random` | 71321 | 73843 | 77452 | 118.9761 |
-| `ls_edges_greedy_heuristics` | 69846 | 71160 | 73365 | 3.5927 |
-| `ls_edges_steepest_random` | 263677 | 263677 | 263677 | 17.2410 |
-| `ls_edges_steepest_heuristics` | 71263 | 73202 | 76156 | 2.1924 |
-| `ls_nodes_greedy_random` | 263677 | 263677 | 263677 | 147.5986 |
-| `ls_nodes_greedy_heuristics` | 71263 | 73202 | 76156 | 1.2196 |
-| `ls_nodes_steepest_random` | 263677 | 263677 | 263677 | 15.6903 |
-| `ls_nodes_steepest_heuristics` | 71263 | 73202 | 76156 | 1.0903 |
+| `ls_candidate_greedy_random` | 71195 | 74208 | 77623 | 36.8685 |
+| `ls_candidate_steepest_random` | 73447 | 73447 | 73447 | 14.2395 |
 
 Instance: tspb
 | **Method** | **Min** | **Mean** | **Max** | **Time\* (s)** |
 | --- | --- | --- | --- | --- |
-| `random` | 226494 | 226494 | 226494 | 0.0097 |
-| `greedy_tail` | 52319 | 54390 | 59030 | 0.0520 |
-| `greedy_any_position` | 44446 | 46131 | 53438 | 0.5920 |
-| `greedy_cycle` | 48765 | 51355 | 57324 | 3.1893 |
-| `regret` | 67175 | 73164 | 79784 | 2.5906 |
-| `weighted_regret` | 47144 | 50985 | 55700 | 2.4187 |
-| `ls_edges_greedy_random` | 46209 | 48341 | 51712 | 125.0156 |
-| `ls_edges_greedy_heuristics` | 43790 | 45093 | 50775 | 2.4899 |
-| `ls_edges_steepest_random` | 226494 | 226494 | 226494 | 16.8501 |
-| `ls_edges_steepest_heuristics` | 44446 | 46131 | 53438 | 1.8407 |
-| `ls_nodes_greedy_random` | 226494 | 226494 | 226494 | 152.4450 |
-| `ls_nodes_greedy_heuristics` | 44446 | 46131 | 53438 | 1.5589 |
-| `ls_nodes_steepest_random` | 226494 | 226494 | 226494 | 17.3418 |
-| `ls_nodes_steepest_heuristics` | 44446 | 46131 | 53438 | 1.4248 |
+| `ls_candidate_greedy_random` | 45098 | 48224 | 54947 | 35.3349 |
+| `ls_candidate_steepest_random` | 47357 | 47357 | 47357 | 14.8591 |
 

@@ -1,6 +1,6 @@
 import scala.util.Random
 
-object LocalSearchWithEdgesSwapsSteepest
+object LocalSearchWithCandidateMovesGreedy
     extends LocalSearch
     with MoveOperations
     with CostManager {
@@ -10,29 +10,27 @@ object LocalSearchWithEdgesSwapsSteepest
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
     val possibleMoves =
-      getNeighbourhoodWithEdgesSwapsIn(
+      getCandidateMoves(
         problemInstance,
         currentSolution,
         availableCities
       )
 
-    val bestImprovingMove = possibleMoves
-      .map(move => (move, getDeltaCost(problemInstance, move)))
-      .minBy { case (_, cost) => cost }
+    val firstImprovingMove = Random
+      .shuffle(possibleMoves)
+      .find { move => getDeltaCost(problemInstance, move) < 0 }
 
-    bestImprovingMove match {
-      case (move, deltaCost) if deltaCost < 0 => {
-        val (newSolution, newAvailableCities) = performMove(
-          currentSolution,
-          move,
-          availableCities
-        )
+    firstImprovingMove match {
+      case Some(move) => {
+        val deltaCost = getDeltaCost(problemInstance, move)
+        val (newSolution, newAvailableCities) =
+          performMove(currentSolution, move, availableCities)
         (
           newSolution.copy(cost = currentSolution.cost + deltaCost),
           newAvailableCities
         )
       }
-      case _ =>
+      case None =>
         (currentSolution, availableCities)
     }
   }

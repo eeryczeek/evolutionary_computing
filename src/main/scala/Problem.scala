@@ -2,6 +2,7 @@ case class ProblemInstance(
     cities: Set[Int],
     distances: Array[Array[Int]],
     cityCosts: Array[Int],
+    candidateEdges: Array[Set[Int]],
     expectedSolutionLen: Int
 )
 case class City(id: Int, x: Int, y: Int, cost: Int)

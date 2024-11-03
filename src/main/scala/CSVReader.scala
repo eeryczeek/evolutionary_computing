@@ -22,13 +22,24 @@ object CSVReader {
       )
       .toArray
 
+    val candidateEdges = distances
+      .map(_.zipWithIndex)
+      .zipWithIndex
+      .map { case (distancesWithIndex, city1) =>
+        distancesWithIndex
+          .filter { case (_, city2) => city1 != city2 }
+          .sortBy { case (distance, _) => distance }
+          .take(10)
+          .map { case (_, city2) => city2 }
+          .toSet
+      }
     val cityCosts = sortedCities.map(_.cost).toArray
-
     val expectedNumberOfCities = (cities.size + 1) / 2
     ProblemInstance(
       cities.map(_.id).toSet,
       distances,
       cityCosts,
+      candidateEdges,
       expectedNumberOfCities
     )
   }

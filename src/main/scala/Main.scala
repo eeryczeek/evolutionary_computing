@@ -76,43 +76,13 @@ object Main extends App {
   }
 
   val solutionMethods = List(
-    ("random", SolutionFactory.getRandomSolution _),
-    ("greedy_tail", SolutionFactory.getGreedyTailSolution _),
-    ("greedy_any_position", SolutionFactory.getGreedyAnyPositionSolution _),
-    ("greedy_cycle", SolutionFactory.getGreedyCycleSolution _),
-    ("regret", SolutionFactory.getGreedyCycleRegretSolution _),
-    ("weighted_regret", SolutionFactory.getGreedyCycleWeightedRegretSolution _),
     (
-      "ls_edges_greedy_random",
-      SolutionFactory.getLocalSearchWithEdgesSwapsGreedyRandomStart _
+      "ls_candidate_greedy_random",
+      SolutionFactory.getLocalsearchWithCandidateMovesGreedyRandomStart _
     ),
     (
-      "ls_edges_greedy_heuristics",
-      SolutionFactory.getLocalSearchWithEdgesSwapsGreedyHeuristicStart _
-    ),
-    (
-      "ls_edges_steepest_random",
-      SolutionFactory.getLocalSearchWithEdgesSwapsSteepestRandomStart _
-    ),
-    (
-      "ls_edges_steepest_heuristics",
-      SolutionFactory.getLocalSearchWithEdgesSwapsSteepestHeuristicStart _
-    ),
-    (
-      "ls_nodes_greedy_random",
-      SolutionFactory.getLocalSearchWithNodesSwapsGreedyRandomStart _
-    ),
-    (
-      "ls_nodes_greedy_heuristics",
-      SolutionFactory.getLocalSearchWithNodesSwapsGreedyHeuristicStart _
-    ),
-    (
-      "ls_nodes_steepest_random",
-      SolutionFactory.getLocalSearchWithNodesSwapsSteepestRandomStart _
-    ),
-    (
-      "ls_nodes_steepest_heuristics",
-      SolutionFactory.getLocalSearchWithNodesSwapsSteepestHeuristicStart _
+      "ls_candidate_steepest_random",
+      SolutionFactory.getLocalsearchWithCandidateMovesSteepestRandomStart _
     )
   )
 

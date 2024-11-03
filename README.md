@@ -61,6 +61,8 @@ Instance TSPA results table:
 | `local_search_with_nodes_swaps_greedy_heuristic`   | 70917   | 72792    | 75353   | 1.1359         |
 | `local_search_with_nodes_swaps_steepest_random`    | 79894   | 88098    | 96234   | 16.0166        |
 | `local_search_with_nodes_swaps_steepest_heuristic` | 70844   | 72810    | 75353   | 1.1488         |
+| `ls_candidate_greedy_random`                       | 71195   | 74208    | 77623   | 36.8685        |
+| `ls_candidate_steepest_random`                     | 73447   | 73447    | 73447   | 14.2395        |
 
 Instance TSPB results table:
 
@@ -83,6 +85,8 @@ Instance TSPB results table:
 | `local_search_with_nodes_swaps_greedy_heuristic`   | 43826   | 45667    | 51789   | 1.4737         |
 | `local_search_with_nodes_swaps_steepest_random`    | 57028   | 63071    | 73731   | 15.8347        |
 | `local_search_with_nodes_swaps_steepest_heuristic` | 43826   | 45619    | 51789   | 1.3292         |
+| `ls_candidate_greedy_random`                       | 45098   | 48224    | 54947   | 35.3349        |
+| `ls_candidate_steepest_random`                     | 47357   | 47357    | 47357   | 14.8591        |
 
 **Time\* - to solve all 200 instances**
 

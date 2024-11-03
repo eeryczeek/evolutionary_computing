@@ -1,6 +1,6 @@
 import scala.util.Random
 
-object LocalSearchWithEdgesSwapsSteepest
+object LocalSearchWithCandidateMovesSteepest
     extends LocalSearch
     with MoveOperations
     with CostManager {
@@ -10,7 +10,7 @@ object LocalSearchWithEdgesSwapsSteepest
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
     val possibleMoves =
-      getNeighbourhoodWithEdgesSwapsIn(
+      getCandidateMoves(
         problemInstance,
         currentSolution,
         availableCities
