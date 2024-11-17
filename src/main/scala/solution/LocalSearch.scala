@@ -7,27 +7,23 @@ trait LocalSearch extends MoveOperations with CostManager {
       problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
-  ): Seq[Move] = {
-    for (triplet <- getConsecutiveTriplets(currentSolution)) {
-      for (city <- problemInstance.candidateEdges(triplet.city2)) {
-        if (currentSolution.path.contains(city2)) {
-          getCandidateEdgeSwap(currentSolution, city1, city2)
-        } else {
-          getCandidateNodeSwap(currentSolution, city1, city2)
-        }
-      }
-    }
-  }
+  ): Seq[Move] = ???
+  // {
+  //   for (triplet <- getConsecutiveTriplets(currentSolution)) {
+  //     for (city <- problemInstance.candidateEdges(triplet.city2)) {
+  //       if (currentSolution.path.contains(city2)) {
+  //         getCandidateEdgeSwap(currentSolution, city1, city2)
+  //       } else {
+  //         getCandidateNodeSwap(currentSolution, city1, city2)
+  //       }
+  //     }
+  //   }
 
   def getCandidateEdgeSwap(
       currentSolution: Solution,
       city1: Int,
       city2: Int
-  ): {
-    city1Index = currentSolution.path.indexOf(city1)
-    city2Index = currentSolution.path.indexOf(city2)
-    
-  }
+  ): EdgeSwap = ???
 
   def getAllNodeSwapsOut(
       problemInstance: ProblemInstance,
@@ -45,11 +41,11 @@ trait LocalSearch extends MoveOperations with CostManager {
       currentSolution: Solution,
       availableCities: Set[Int]
   ): Seq[Move] = {
-    for {
+    (for {
       pair1 <- getConsecutivePairs(currentSolution)
       pair2 <- getConsecutivePairs(currentSolution)
       if Set(pair1.city1, pair1.city2, pair2.city1, pair2.city2).size == 4
-    } yield EdgeSwap(pair1, pair2)
+    } yield EdgeSwap(pair1, pair2)).toSeq
   }
 
   def getAllNodeSwapsIn(
@@ -57,11 +53,11 @@ trait LocalSearch extends MoveOperations with CostManager {
       currentSolution: Solution,
       availableCities: Set[Int]
   ): Seq[Move] = {
-    for {
+    (for {
       pair1 <- getConsecutivePairs(currentSolution)
       pair2 <- getConsecutivePairs(currentSolution)
       if Set(pair1.city1, pair1.city2, pair2.city1, pair2.city2).size == 4
-    } yield EdgeSwap(pair1, pair2)
+    } yield EdgeSwap(pair1, pair2)).toSeq
   }
 
   def getCandidateMoves(

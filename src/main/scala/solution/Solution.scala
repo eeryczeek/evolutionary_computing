@@ -226,6 +226,24 @@ object SolutionFactory {
     )
   }
 
+  def getLocalSearchWithListOfImprovingMoves(
+      problemInstance: ProblemInstance,
+      initialCity: Int
+  ): Solution = {
+    val initialSolution = getRandomSolution(problemInstance, initialCity)
+    val localSearchInstance = ListOfImprovingMovesSolution(
+      problemInstance,
+      initialSolution,
+      problemInstance.cities -- initialSolution.path
+    )
+    generate(
+      problemInstance,
+      initialSolution,
+      problemInstance.cities -- initialSolution.path,
+      localSearchInstance.updateSolution
+    )
+  }
+
   @tailrec
   def generate(
       problemInstance: ProblemInstance,

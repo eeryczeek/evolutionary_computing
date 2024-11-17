@@ -77,8 +77,8 @@ object Main extends App {
 
   val solutionMethods = List(
     (
-      "ls_candidate_steepest_random",
-      SolutionFactory.getLocalsearchWithCandidateMovesSteepestRandomStart _
+      "ls_list_of_improving_moves",
+      SolutionFactory.getLocalSearchWithListOfImprovingMoves _
     )
   )
 
