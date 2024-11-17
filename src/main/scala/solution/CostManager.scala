@@ -13,13 +13,6 @@ trait CostManager {
       .sum
   }
 
-  def updateCost(
-      currentCost: Int,
-      deltaCost: Int
-  ): Int = {
-    currentCost + deltaCost
-  }
-
   def getDeltaCost(
       problemInstance: ProblemInstance,
       move: Move

@@ -204,11 +204,11 @@ object SolutionFactory {
       problemInstance: ProblemInstance,
       initialCity: Int
   ): Solution = {
-    val randomSolution = getRandomSolution(problemInstance, initialCity)
+    val initialSolution = getRandomSolution(problemInstance, initialCity)
     generate(
       problemInstance,
-      randomSolution,
-      problemInstance.cities -- randomSolution.path,
+      initialSolution,
+      problemInstance.cities -- initialSolution.path,
       LocalSearchWithCandidateMovesGreedy.updateSolution
     )
   }

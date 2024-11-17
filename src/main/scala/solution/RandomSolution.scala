@@ -11,7 +11,7 @@ object RandomSolution extends CostManager {
       val solutionCost = getSolutionCost(problemInstance, currentSolution)
       return (currentSolution.copy(cost = solutionCost), availableCities)
     }
-
+    Random.setSeed(System.currentTimeMillis())
     val solutionPath = Random
       .shuffle(availableCities)
       .take(problemInstance.expectedSolutionLen)
