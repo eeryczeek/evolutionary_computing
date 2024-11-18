@@ -6,24 +6,28 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
     with MoveOperations
     with CostManager {
 
-  private var improvingMoves = mutable.PriorityQueue[(Move, Int)]()(
+  private implicit val ordering: Ordering[(Move, Int)] =
     Ordering.by((_: (Move, Int))._2).reverse
-  )
-
-  private var lastDiff = 0
+  private var improvingMoves = collection.mutable.PriorityQueue[(Move, Int)]()
 
   def init(initialSolution: Solution, availableCities: Set[Int]): Unit = {
     val edgeSwaps =
       getAllEdgeSwaps(problemInstance, initialSolution, availableCities)
+
+    val invertedEdgeSwaps = edgeSwaps.map { case EdgeSwap(edge1, edge2) =>
+      EdgeSwap(edge1, Pair(edge2.city2, edge2.city1))
+    }
+
     val nodeSwapsOut =
       getAllNodeSwapsOut(problemInstance, initialSolution, availableCities)
-    val possibleMoves = edgeSwaps ++ nodeSwapsOut
+
+    val possibleMoves = edgeSwaps ++ invertedEdgeSwaps ++ nodeSwapsOut
 
     val improvingMovesWithCosts = possibleMoves
       .map(move => (move, getDeltaCost(problemInstance, move)))
       .filter(_._2 < 0)
 
-    improvingMoves.enqueue(improvingMovesWithCosts: _*)
+    improvingMoves ++= improvingMovesWithCosts
   }
 
   def updateSolution(
@@ -57,68 +61,7 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
           performMove(currentSolution, trueMove, availableCities)
         }
 
-        // {
-        //   val newCost = Cost.calculateSolutionCost(problemInstance, newSolution)
-        //   val oldCost = currentSolution.cost
-        //   val diffBetweenCosts = newCost - (oldCost + deltaCost)
-        //   if (diffBetweenCosts != 0) {
-        //     throw new Exception(
-        //       s"diff between costs is not 0: $diffBetweenCosts"
-        //     )
-        //   }
-        //   val fullNeighbourhood = getAllEdgeSwaps(
-        //     problemInstance,
-        //     newSolution,
-        //     newAvailableCities
-        //   ) ++ getAllNodeSwapsOut(
-        //     problemInstance,
-        //     newSolution,
-        //     newAvailableCities
-        //   )
-        //   val numberOfImprovingMoves = fullNeighbourhood
-        //     .map(move => (move, getDeltaCost(problemInstance, move)))
-        //     .count(_._2 < 0)
-        //
-        //   val numberOfMovesWithWrongCost = fullNeighbourhood
-        //     .map(move => (move, getDeltaCost(problemInstance, move)))
-        //     .filter { case (move, cost) =>
-        //       cost < 0 && improvingMoves
-        //         .find(_._1 == move)
-        //         .map(_._2 != cost)
-        //         .getOrElse(true)
-        //     }
-        //     .count(_ => true)
-        //
-        //   val freshDeltaCost = getDeltaCost(problemInstance, trueMove)
-        //   println(
-        //     s"Move: $move, delta cost $deltaCost, cost old: $oldCost, real new cost: $newCost, diff: $diffBetweenCosts"
-        //   )
-        //   println(
-        //     s"number of improving moves: ${improvingMoves.size}, expected: $numberOfImprovingMoves"
-        //   )
-        //
-        //   if (
-        //     currentSolution.path.distinct.size != newSolution.path.distinct.size
-        //   ) {
-        //     println(s"faulty move introduced duplicates: $move")
-        //     println(
-        //       s"current Solution:\n ${currentSolution.path.mkString(", ")}"
-        //     )
-        //     println(s"new Solution:\n ${newSolution.path.mkString(", ")}")
-        //   }
-        //   if (diffBetweenCosts != lastDiff) {
-        //     println(
-        //       s"current Solution:\n ${currentSolution.path.mkString(", ")}"
-        //     )
-        //     println(s"new Solution:\n ${newSolution.path.mkString(", ")}")
-        //     lastDiff = diffBetweenCosts
-        //   }
-        //   println
-        // }
-
-        improvingMoves = improvingMoves.filter { case (m, _) =>
-          m != move
-        }
+        improvingMoves = improvingMoves.filter { case (m, _) => m != move }
 
         updateImprovingMoves(
           problemInstance,
@@ -166,8 +109,6 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
   ): Unit = {
     move match {
       case EdgeSwap(edge1, edge2) =>
-        // val reversedEdge1 = Pair(edge1.city2, edge1.city1)
-        // val reversedEdge2 = Pair(edge2.city2, edge2.city1)
         val citiesInRemovedEdges =
           Set(edge1.city1, edge1.city2, edge2.city1, edge2.city2)
 
@@ -180,36 +121,33 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
             case _ => true
           }
 
-        val newEdgeSwaps = getAllEdgeSwapsForEdge(
+        val newMoves = getAllEdgeSwapsForEdge(
           currentSolution,
           Pair(edge1.city1, edge2.city1)
         ) ++ getAllEdgeSwapsForEdge(
           currentSolution,
           Pair(edge1.city2, edge2.city2)
-        ) ++ getAllEdgeSwapsWithReversedEdges(
+        ) ++ getAllEdgeSwapsForEdge(
           currentSolution,
-          move.asInstanceOf[EdgeSwap]
-        )
-
-        val newEdgeSwapsWithCosts = newEdgeSwaps
-          .map(move => (move, getDeltaCost(problemInstance, move)))
-          .filter(_._2 < 0)
-
-        val newNodeSwapsOut = getAllNodeSwapsOutForRemovedCities(
+          Pair(edge2.city1, edge1.city1)
+        ) ++ getAllEdgeSwapsForEdge(
+          currentSolution,
+          Pair(edge2.city2, edge1.city2)
+        ) ++ getAllNodeSwapsOutForRemovedCities(
           currentSolution,
           citiesInRemovedEdges,
           availableCities
-        ).map(move => (move, getDeltaCost(problemInstance, move)))
-          .filter(_._2 < 0)
+        )
 
-        val newMovesCombined = newEdgeSwapsWithCosts ++ newNodeSwapsOut
-        improvingMoves.addAll(newMovesCombined)
+        improvingMoves ++= newMoves
+          .map(move => (move, getDeltaCost(problemInstance, move)))
+          .filter(_._2 < 0)
 
       case NodeSwapOut(Triplet(_, removedCity, _), addedCity) =>
         improvingMoves = improvingMoves
           .mapInPlace {
             case (move @ NodeSwapOut(_, city), _) if city == addedCity => {
-              (move, 1)
+              (move, 1) // move cant be applied anymore
             }
 
             case (NodeSwapOut(triplet, city), _)
@@ -303,27 +241,6 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
       }
       .toSeq
   }
-
-  private def getAllEdgeSwapsWithReversedEdges(
-      solution: Solution,
-      edgeSwap: EdgeSwap
-  ): Seq[EdgeSwap] = {
-    val edges = getConsecutivePairs(solution)
-    val (firstEdgeIdx, secondEdgeIdx) = (
-      edges.indexOf(edgeSwap.edge1),
-      edges.indexOf(edgeSwap.edge2)
-    )
-    edges
-      .slice(firstEdgeIdx + 1, secondEdgeIdx)
-      .flatMap(e1 =>
-        edges
-          .filter(e2 =>
-            List(e1.city1, e1.city2, e2.city1, e2.city2).distinct.size == 4
-          )
-          .map(e2 => EdgeSwap(e1, e2))
-      )
-      .toSeq
-  }
 }
 
 object ListOfImprovingMovesSolution {
@@ -336,5 +253,4 @@ object ListOfImprovingMovesSolution {
     instance.init(initialSolution, availableCities)
     instance
   }
-
 }
