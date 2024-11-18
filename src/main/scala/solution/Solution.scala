@@ -7,7 +7,7 @@ case class Solution(path: Array[Int], cost: Int)
 object SolutionFactory {
   def getRandomSolution(
       problemInstance: ProblemInstance,
-      initialCity: Int
+      initialCity: Int = 0
   ): Solution = {
     generate(
       problemInstance,

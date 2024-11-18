@@ -75,27 +75,31 @@ object Main extends App {
     println()
   }
 
-  // val solutionMethods = List(
-  //   (
-  //     "ls_list_of_improving_moves",
-  //     SolutionFactory.getLocalSearchWithListOfImprovingMoves _
-  //   )
-  // )
-  //
-  // for (name <- names) {
-  //   writeHeader(name)
-  //   val initialData = CSVReader.readCSV(s"${name.toUpperCase()}.csv")
-  //   solutionMethods.foreach { case (suffix, method) =>
-  //     processSolutions(name, suffix, initialData, method)
-  //   }
-  //   writeResults("\n", resultsTablePath)
-  //   writeResults("\n", resultsBestPath)
-  // }
+  val solutionMethods = List(
+    (
+      "ls_edges_swaps_steepest_random_start",
+      SolutionFactory.getLocalSearchWithEdgesSwapsSteepestRandomStart _
+    ),
+    (
+      "ls_list_of_improving_moves",
+      SolutionFactory.getLocalSearchWithListOfImprovingMoves _
+    )
+  )
 
-  val tspa = CSVReader.readCSV("TSPA.csv")
-  val sol1 = SolutionFactory.getLocalSearchWithListOfImprovingMoves(tspa, 0)
-  val sol2 =
-    SolutionFactory.getLocalSearchWithEdgesSwapsSteepestRandomStart(tspa, 0)
-  println(s"sol1: ${sol1.cost}")
-  println(s"sol2: ${sol2.cost}")
+  for (name <- names) {
+    writeHeader(name)
+    val initialData = CSVReader.readCSV(s"${name.toUpperCase()}.csv")
+    solutionMethods.foreach { case (suffix, method) =>
+      processSolutions(name, suffix, initialData, method)
+    }
+    writeResults("\n", resultsTablePath)
+    writeResults("\n", resultsBestPath)
+  }
+
+  // val tspa = CSVReader.readCSV("TSPA.csv")
+  // val sol1 = SolutionFactory.getLocalSearchWithListOfImprovingMoves(tspa, 0)
+  // val sol2 =
+  //   SolutionFactory.getLocalSearchWithEdgesSwapsSteepestRandomStart(tspa, 0)
+  // println(s"sol1: ${sol1.cost}")
+  // println(s"sol2: ${sol2.cost}")
 }

@@ -10,6 +10,8 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
     Ordering.by((_: (Move, Int))._2).reverse
   )
 
+  private var lastDiff = 0
+
   def init(initialSolution: Solution, availableCities: Set[Int]): Unit = {
     val edgeSwaps =
       getAllEdgeSwaps(problemInstance, initialSolution, availableCities)
@@ -55,47 +57,64 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
           performMove(currentSolution, trueMove, availableCities)
         }
 
-        {
-          val newCost = Cost.calculateSolutionCost(problemInstance, newSolution)
-          val oldCost = currentSolution.cost
-          val diffBetweenCosts = newCost - (oldCost + deltaCost)
-          val fullNeighbourhood = getAllEdgeSwaps(
-            problemInstance,
-            newSolution,
-            newAvailableCities
-          ) ++ getAllNodeSwapsOut(
-            problemInstance,
-            newSolution,
-            newAvailableCities
-          )
-          val numberOfImprovingMoves = fullNeighbourhood
-            .map(move => (move, getDeltaCost(problemInstance, move)))
-            .count(_._2 < 0)
-
-          val numberOfMovesWithWrongCost = fullNeighbourhood
-            .map(move => (move, getDeltaCost(problemInstance, move)))
-            .filter { case (move, cost) =>
-              cost < 0 && improvingMoves
-                .find(_._1 == move)
-                .map(_._2 != cost)
-                .getOrElse(true)
-            }
-            .count(_ => true)
-
-          val freshDeltaCost = getDeltaCost(problemInstance, trueMove)
-          println(
-            s"Move: $move, delta cost $deltaCost, cost old: $oldCost, real new cost: $newCost, diff: $diffBetweenCosts"
-          )
-          println(
-            s"number of improving moves: ${improvingMoves.size}, expected: $numberOfImprovingMoves"
-          )
-
-          if (freshDeltaCost != deltaCost) {
-            println(
-              s"WARNING!!!!!!     Wrong delta cost for move $move, expected: $freshDeltaCost, got: $deltaCost"
-            )
-          }
-        }
+        // {
+        //   val newCost = Cost.calculateSolutionCost(problemInstance, newSolution)
+        //   val oldCost = currentSolution.cost
+        //   val diffBetweenCosts = newCost - (oldCost + deltaCost)
+        //   if (diffBetweenCosts != 0) {
+        //     throw new Exception(
+        //       s"diff between costs is not 0: $diffBetweenCosts"
+        //     )
+        //   }
+        //   val fullNeighbourhood = getAllEdgeSwaps(
+        //     problemInstance,
+        //     newSolution,
+        //     newAvailableCities
+        //   ) ++ getAllNodeSwapsOut(
+        //     problemInstance,
+        //     newSolution,
+        //     newAvailableCities
+        //   )
+        //   val numberOfImprovingMoves = fullNeighbourhood
+        //     .map(move => (move, getDeltaCost(problemInstance, move)))
+        //     .count(_._2 < 0)
+        //
+        //   val numberOfMovesWithWrongCost = fullNeighbourhood
+        //     .map(move => (move, getDeltaCost(problemInstance, move)))
+        //     .filter { case (move, cost) =>
+        //       cost < 0 && improvingMoves
+        //         .find(_._1 == move)
+        //         .map(_._2 != cost)
+        //         .getOrElse(true)
+        //     }
+        //     .count(_ => true)
+        //
+        //   val freshDeltaCost = getDeltaCost(problemInstance, trueMove)
+        //   println(
+        //     s"Move: $move, delta cost $deltaCost, cost old: $oldCost, real new cost: $newCost, diff: $diffBetweenCosts"
+        //   )
+        //   println(
+        //     s"number of improving moves: ${improvingMoves.size}, expected: $numberOfImprovingMoves"
+        //   )
+        //
+        //   if (
+        //     currentSolution.path.distinct.size != newSolution.path.distinct.size
+        //   ) {
+        //     println(s"faulty move introduced duplicates: $move")
+        //     println(
+        //       s"current Solution:\n ${currentSolution.path.mkString(", ")}"
+        //     )
+        //     println(s"new Solution:\n ${newSolution.path.mkString(", ")}")
+        //   }
+        //   if (diffBetweenCosts != lastDiff) {
+        //     println(
+        //       s"current Solution:\n ${currentSolution.path.mkString(", ")}"
+        //     )
+        //     println(s"new Solution:\n ${newSolution.path.mkString(", ")}")
+        //     lastDiff = diffBetweenCosts
+        //   }
+        //   println
+        // }
 
         improvingMoves = improvingMoves.filter { case (m, _) =>
           m != move
@@ -226,6 +245,10 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
       case NodeSwapOut(Triplet(_, removedCity, _), addedCity) =>
         improvingMoves = improvingMoves
           .mapInPlace {
+            case (move @ NodeSwapOut(_, city), _) if city == addedCity => {
+              (move, 1)
+            }
+
             case (NodeSwapOut(triplet, city), _)
                 if tripletContainsCity(triplet, removedCity) => {
               val newMove = NodeSwapOut(
@@ -238,14 +261,6 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
                     Triplet(a, b, addedCity)
                 },
                 city
-              )
-              (newMove, getDeltaCost(problemInstance, newMove))
-            }
-
-            case (NodeSwapOut(triplet, city), _) if city == addedCity => {
-              val newMove = NodeSwapOut(
-                triplet,
-                removedCity
               )
               (newMove, getDeltaCost(problemInstance, newMove))
             }

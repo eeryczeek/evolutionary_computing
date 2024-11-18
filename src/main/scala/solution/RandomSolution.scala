@@ -13,7 +13,7 @@ object RandomSolution extends CostManager {
     }
     Random.setSeed(System.currentTimeMillis())
     val solutionPath = Random
-      .shuffle(availableCities)
+      .shuffle(availableCities.toSeq)
       .take(problemInstance.expectedSolutionLen)
       .toArray
 
