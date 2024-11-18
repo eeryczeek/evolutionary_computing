@@ -166,52 +166,12 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
   ): Unit = {
     move match {
       case EdgeSwap(edge1, edge2) =>
-        val reversedEdge1 = Pair(edge1.city2, edge1.city1)
-        val reversedEdge2 = Pair(edge2.city2, edge2.city1)
-        val edgeMappings = Map(
-          edge1 -> Pair(edge1.city1, edge2.city1),
-          edge2 -> Pair(edge2.city2, edge1.city2),
-          reversedEdge1 -> Pair(edge2.city1, edge1.city1),
-          reversedEdge2 -> Pair(edge1.city2, edge2.city2)
-        )
-        val mapCities = Map(
-          edge1.city1 -> edge2.city1,
-          edge1.city2 -> edge2.city2,
-          edge2.city1 -> edge1.city1,
-          edge2.city2 -> edge1.city2
-        )
+        // val reversedEdge1 = Pair(edge1.city2, edge1.city1)
+        // val reversedEdge2 = Pair(edge2.city2, edge2.city1)
         val citiesInRemovedEdges =
           Set(edge1.city1, edge1.city2, edge2.city1, edge2.city2)
 
         improvingMoves = improvingMoves
-          // .mapInPlace {
-          //   case (EdgeSwap(e1, e2), _)
-          //       if (e1 == edge1 || e1 == edge2 || e1 == reversedEdge1 || e1 == reversedEdge2) || (e2 == edge2 || e2 == edge1 || e2 == reversedEdge1 || e2 == reversedEdge2) => {
-          //     val newMove = EdgeSwap(
-          //       edgeMappings
-          //         .getOrElse(e1, e1),
-          //       edgeMappings
-          //         .getOrElse(e2, e2)
-          //     )
-          //     (newMove, getDeltaCost(problemInstance, newMove))
-          //   }
-          //   case (NodeSwapOut(triplet, city), _)
-          //       if tripletContainsEdge(triplet, edge1) ||
-          //         tripletContainsEdge(triplet, edge2) => {
-          //     val newMove = NodeSwapOut(
-          //       Triplet(
-          //         mapCities.getOrElse(triplet.city1, triplet.city1),
-          //         mapCities.getOrElse(triplet.city2, triplet.city2),
-          //         mapCities.getOrElse(triplet.city3, triplet.city3)
-          //       ),
-          //       city
-          //     )
-          //     (newMove, getDeltaCost(problemInstance, newMove))
-          //   }
-          //
-          //   case move => move
-          // }
-          // .filter(_._2 < 0)
           .filter {
             case (EdgeSwap(e1, e2), _) =>
               !(e1 == edge1 || e1 == edge2 || e2 == edge1 || e2 == edge2)
@@ -226,6 +186,9 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
         ) ++ getAllEdgeSwapsForEdge(
           currentSolution,
           Pair(edge1.city2, edge2.city2)
+        ) ++ getAllEdgeSwapsWithReversedEdges(
+          currentSolution,
+          move.asInstanceOf[EdgeSwap]
         )
 
         val newEdgeSwapsWithCosts = newEdgeSwaps
@@ -338,6 +301,27 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
       .flatMap { triplet =>
         availableCities.map(city => NodeSwapOut(triplet, city))
       }
+      .toSeq
+  }
+
+  private def getAllEdgeSwapsWithReversedEdges(
+      solution: Solution,
+      edgeSwap: EdgeSwap
+  ): Seq[EdgeSwap] = {
+    val edges = getConsecutivePairs(solution)
+    val (firstEdgeIdx, secondEdgeIdx) = (
+      edges.indexOf(edgeSwap.edge1),
+      edges.indexOf(edgeSwap.edge2)
+    )
+    edges
+      .slice(firstEdgeIdx + 1, secondEdgeIdx)
+      .flatMap(e1 =>
+        edges
+          .filter(e2 =>
+            List(e1.city1, e1.city2, e2.city1, e2.city2).distinct.size == 4
+          )
+          .map(e2 => EdgeSwap(e1, e2))
+      )
       .toSeq
   }
 }
