@@ -5,19 +5,17 @@ object LocalSearchWithCandidateMovesSteepest
     with MoveOperations
     with CostManager {
   def updateSolution(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
     val possibleMoves =
       getCandidateMoves(
-        problemInstance,
         currentSolution,
         availableCities
       )
 
     val bestImprovingMove = possibleMoves
-      .map(move => (move, getDeltaCost(problemInstance, move)))
+      .map(move => (move, getDeltaCost(move)))
       .minBy { case (_, cost) => cost }
 
     bestImprovingMove match {

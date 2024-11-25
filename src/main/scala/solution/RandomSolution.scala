@@ -3,18 +3,18 @@ import scala.util.Random
 
 object RandomSolution extends CostManager {
   def updateSolution(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
-    if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
-      val solutionCost = getSolutionCost(problemInstance, currentSolution)
+    if (
+      currentSolution.path.size == ProblemInstanceHolder.problemInstance.expectedSolutionLen
+    ) {
+      val solutionCost = getSolutionCost(currentSolution)
       return (currentSolution.copy(cost = solutionCost), availableCities)
     }
-    Random.setSeed(System.currentTimeMillis())
     val solutionPath = Random
       .shuffle(availableCities.toSeq)
-      .take(problemInstance.expectedSolutionLen)
+      .take(ProblemInstanceHolder.problemInstance.expectedSolutionLen)
       .toArray
 
     (

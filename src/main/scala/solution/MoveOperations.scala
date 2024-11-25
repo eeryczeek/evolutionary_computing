@@ -8,9 +8,9 @@ case class InsertBetween(pair: Pair, city: Int) extends Move
 case class EdgeSwap(edge1: Pair, edge2: Pair) extends Move
 case class NodeSwapIn(triplet1: Triplet, triplet2: Triplet) extends Move
 case class NodeSwapOut(triplet: Triplet, city: Int) extends Move
+case class TwoNodeExchange(triplet: Triplet, pair: Pair, city: Int) extends Move
 
 trait MoveOperations {
-
   def performMove(
       currentSolution: Solution,
       move: Move,
@@ -49,58 +49,24 @@ trait MoveOperations {
           nodeSwapOut,
           availableCities
         )
+      case twoNodeExchange: TwoNodeExchange =>
+        performTwoNodeExchange(
+          currentSolution,
+          twoNodeExchange,
+          availableCities
+        )
     }
   }
 
-  def getAllPossibleMoves(
-      currentSolutioin: Solution,
-      availableCities: Set[Int]
-  ): Seq[Move] = {
-    val pairs = getConsecutivePairs(currentSolutioin)
-    val triplets = getConsecutiveTriplets(currentSolutioin)
-
-    val insertBetweens = pairs
-      .flatMap(pair => availableCities.map(city => InsertBetween(pair, city)))
-      .toSeq
-    val edgeSwaps = pairs
-      .combinations(2)
-      .collect {
-        case Array(pair1, pair2)
-            if Set(
-              pair1.city1,
-              pair1.city2,
-              pair2.city1,
-              pair2.city2
-            ).size == 4 =>
-          EdgeSwap(pair1, pair2)
-      }
-      .toSeq
-    val nodeSwapsIn = triplets
-      .combinations(2)
-      .collect {
-        case Array(triplet1, triplet2) if !triplet1.equals(triplet2) =>
-          NodeSwapIn(triplet1, triplet2)
-      }
-      .toSeq
-    val nodeSwapsOut = availableCities
-      .flatMap(city => triplets.map(triplet => NodeSwapOut(triplet, city)))
-      .toSeq
-
-    insertBetweens ++ edgeSwaps ++ nodeSwapsIn ++ nodeSwapsOut
+  def getConsecutivePairs(path: Array[Int]): Seq[Pair] = {
+    (path :+ path.head).sliding(2).map { case Array(a, b) => Pair(a, b) }.toSeq
   }
 
-  def getConsecutivePairs(currentSolution: Solution): Array[Pair] = {
-    (currentSolution.path :+ currentSolution.path.head)
-      .sliding(2)
-      .map { case Array(a, b) => Pair(a, b) }
-      .toArray
-  }
-
-  def getConsecutiveTriplets(currentSolution: Solution): Array[Triplet] = {
-    (currentSolution.path ++ currentSolution.path.take(2))
+  def getConsecutiveTriplets(path: Array[Int]): Seq[Triplet] = {
+    (path ++ path.take(2))
       .sliding(3)
       .map { case Array(a, b, c) => Triplet(a, b, c) }
-      .toArray
+      .toSeq
   }
 
   private def performAppendAtEnd(
@@ -190,6 +156,27 @@ trait MoveOperations {
       .updated(currentSolution.path.indexOf(b), city)
 
     val newAvailableCities = availableCities + b - city
+    (currentSolution.copy(path = newPath), newAvailableCities)
+  }
+
+  private def performTwoNodeExchange(
+      currentSolution: Solution,
+      twoNodeExchange: TwoNodeExchange,
+      availableCities: Set[Int]
+  ): (Solution, Set[Int]) = {
+    val TwoNodeExchange(Triplet(a1, b1, c1), Pair(a2, b2), city) =
+      twoNodeExchange
+    val updatedPath = currentSolution.path.filter(_ != b1)
+    val a2index = updatedPath.indexOf(a2)
+    val newPath =
+      updatedPath.take(a2index + 1) ++
+        List(city) ++
+        updatedPath.drop(a2index + 1)
+    val newAvailableCities = availableCities + b1 - city
+    assert(
+      newPath.distinct.size == currentSolution.path.distinct.size,
+      s"$twoNodeExchange\n${currentSolution.path.mkString(" ")} -> ${newPath.mkString(" ")}"
+    )
     (currentSolution.copy(path = newPath), newAvailableCities)
   }
 }

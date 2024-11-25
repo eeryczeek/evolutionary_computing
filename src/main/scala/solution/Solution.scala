@@ -5,356 +5,288 @@ import scala.annotation.tailrec
 case class Solution(path: Array[Int], cost: Int)
 
 object SolutionFactory {
-  def getRandomSolution(
-      problemInstance: ProblemInstance,
-      initialCity: Int = 0
-  ): Solution = {
+  def getRandomSolution(): Solution = {
     generate(
-      problemInstance,
       Solution(Array.empty, 0),
-      problemInstance.cities,
+      ProblemInstanceHolder.problemInstance.cities,
       RandomSolution.updateSolution
     )
   }
 
-  def getGreedyTailSolution(
-      problemInstance: ProblemInstance,
-      initialCity: Int
-  ): Solution = {
+  def getGreedyTailSolution(initialCity: Int): Solution = {
     generate(
-      problemInstance,
       Solution(
         Array(initialCity),
-        problemInstance.cityCosts(initialCity)
+        ProblemInstanceHolder.problemInstance.cityCosts(initialCity)
       ),
-      problemInstance.cities - initialCity,
+      ProblemInstanceHolder.problemInstance.cities - initialCity,
       GreedyTailSolution.updateSolution
     )
   }
 
-  def getGreedyAnyPositionSolution(
-      problemInstance: ProblemInstance,
-      initialCity: Int
-  ): Solution = {
+  def getGreedyAnyPositionSolution(initialCity: Int): Solution = {
     generate(
-      problemInstance,
       Solution(
         Array(initialCity),
-        problemInstance.cityCosts(initialCity)
+        ProblemInstanceHolder.problemInstance.cityCosts(initialCity)
       ),
-      problemInstance.cities - initialCity,
+      ProblemInstanceHolder.problemInstance.cities - initialCity,
       GreedyAtAnyPositionSolution.updateSolution
     )
   }
 
-  def getGreedyCycleSolution(
-      problemInstance: ProblemInstance,
-      initialCity: Int
-  ): Solution = {
+  def getGreedyCycleSolution(initialCity: Int): Solution = {
     generate(
-      problemInstance,
       Solution(
         Array(initialCity),
-        problemInstance.cityCosts(initialCity)
+        ProblemInstanceHolder.problemInstance.cityCosts(initialCity)
       ),
-      problemInstance.cities - initialCity,
+      ProblemInstanceHolder.problemInstance.cities - initialCity,
       GreedyCycleSolution.updateSolution
     )
   }
 
-  def getGreedyCycleRegretSolution(
-      problemInstance: ProblemInstance,
-      initialCity: Int
-  ): Solution = {
+  def getGreedyCycleRegretSolution(initialCity: Int): Solution = {
     generate(
-      problemInstance,
       Solution(
         Array(initialCity),
-        problemInstance.cityCosts(initialCity)
+        ProblemInstanceHolder.problemInstance.cityCosts(initialCity)
       ),
-      problemInstance.cities - initialCity,
+      ProblemInstanceHolder.problemInstance.cities - initialCity,
       GreedyCycleRegretSolution.updateSolution
     )
   }
 
-  def getGreedyCycleWeightedRegretSolution(
-      problemInstance: ProblemInstance,
-      initialCity: Int
-  ): Solution = {
+  def getGreedyCycleWeightedRegretSolution(initialCity: Int): Solution = {
     generate(
-      problemInstance,
       Solution(
         Array(initialCity),
-        problemInstance.cityCosts(initialCity)
+        ProblemInstanceHolder.problemInstance.cityCosts(initialCity)
       ),
-      problemInstance.cities - initialCity,
-      GreedyCycleWeightedRegretSolution.updateSolution
+      ProblemInstanceHolder.problemInstance.cities - initialCity,
+      GreedyCycleWeightedRegretSolution.updateSolution _
     )
   }
 
   def getLocalSearchWithEdgesSwapsGreedyRandomStart(
-      problemInstance: ProblemInstance,
       initialCity: Int
   ): Solution = {
-    val randomSolution = getRandomSolution(problemInstance, initialCity)
+    val randomSolution = getRandomSolution()
     generate(
-      problemInstance,
       randomSolution,
-      problemInstance.cities -- randomSolution.path,
+      ProblemInstanceHolder.problemInstance.cities -- randomSolution.path,
       LocalSearchWithEdgesSwapsGreedy.updateSolution
     )
   }
 
   def getLocalSearchWithEdgesSwapsGreedyHeuristicStart(
-      problemInstance: ProblemInstance,
       initialCity: Int
   ): Solution = {
     val initialSolution =
-      getGreedyAnyPositionSolution(problemInstance, initialCity)
+      getGreedyAnyPositionSolution(initialCity)
     generate(
-      problemInstance,
       initialSolution,
-      problemInstance.cities -- initialSolution.path,
+      ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithEdgesSwapsGreedy.updateSolution
     )
   }
 
   def getLocalSearchWithEdgesSwapsSteepestRandomStart(
-      problemInstance: ProblemInstance,
-      initialCity: Int
+      optionalInitialSolution: Option[Solution] = None
   ): Solution = {
-    val randomSolution = getRandomSolution(problemInstance, initialCity)
+    val initialSolution =
+      optionalInitialSolution.getOrElse(getRandomSolution())
     generate(
-      problemInstance,
-      randomSolution,
-      problemInstance.cities -- randomSolution.path,
+      initialSolution,
+      ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithEdgesSwapsSteepest.updateSolution
     )
   }
 
   def getLocalSearchWithEdgesSwapsSteepestHeuristicStart(
-      problemInstance: ProblemInstance,
       initialCity: Int
   ): Solution = {
     val initialSolution =
-      getGreedyAnyPositionSolution(problemInstance, initialCity)
+      getGreedyAnyPositionSolution(initialCity)
     generate(
-      problemInstance,
       initialSolution,
-      problemInstance.cities -- initialSolution.path,
+      ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithEdgesSwapsSteepest.updateSolution
     )
   }
 
   def getLocalSearchWithNodesSwapsGreedyRandomStart(
-      problemInstance: ProblemInstance,
       initialCity: Int
   ): Solution = {
-    val randomSolution = getRandomSolution(problemInstance, initialCity)
+    val randomSolution = getRandomSolution()
     generate(
-      problemInstance,
       randomSolution,
-      problemInstance.cities -- randomSolution.path,
+      ProblemInstanceHolder.problemInstance.cities -- randomSolution.path,
       LocalSearchWithNodesSwapsGreedy.updateSolution
     )
   }
 
   def getLocalSearchWithNodesSwapsGreedyHeuristicStart(
-      problemInstance: ProblemInstance,
       initialCity: Int
   ): Solution = {
     val initialSolution =
-      getGreedyAnyPositionSolution(problemInstance, initialCity)
+      getGreedyAnyPositionSolution(initialCity)
     generate(
-      problemInstance,
       initialSolution,
-      problemInstance.cities -- initialSolution.path,
+      ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithNodesSwapsGreedy.updateSolution
     )
   }
 
   def getLocalSearchWithNodesSwapsSteepestRandomStart(
-      problemInstance: ProblemInstance,
       initialCity: Int
   ): Solution = {
-    val randomSolution = getRandomSolution(problemInstance, initialCity)
+    val randomSolution = getRandomSolution()
     generate(
-      problemInstance,
       randomSolution,
-      problemInstance.cities -- randomSolution.path,
+      ProblemInstanceHolder.problemInstance.cities -- randomSolution.path,
       LocalSearchWithNodesSwapsSteepest.updateSolution
     )
   }
 
   def getLocalSearchWithNodesSwapsSteepestHeuristicStart(
-      problemInstance: ProblemInstance,
       initialCity: Int
   ): Solution = {
     val initialSolution =
-      getGreedyAnyPositionSolution(problemInstance, initialCity)
+      getGreedyAnyPositionSolution(initialCity)
     generate(
-      problemInstance,
       initialSolution,
-      problemInstance.cities -- initialSolution.path,
+      ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithNodesSwapsSteepest.updateSolution
     )
   }
 
   def getLocalsearchWithCandidateMovesGreedyRandomStart(
-      problemInstance: ProblemInstance,
       initialCity: Int
   ): Solution = {
-    val initialSolution = getRandomSolution(problemInstance, initialCity)
+    val initialSolution = getRandomSolution()
     generate(
-      problemInstance,
       initialSolution,
-      problemInstance.cities -- initialSolution.path,
+      ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithCandidateMovesGreedy.updateSolution
     )
   }
 
   def getLocalsearchWithCandidateMovesSteepestRandomStart(
-      problemInstance: ProblemInstance,
       initialCity: Int
   ): Solution = {
-    val initialSolution = getRandomSolution(problemInstance, initialCity)
+    val initialSolution = getRandomSolution()
     generate(
-      problemInstance,
       initialSolution,
-      problemInstance.cities -- initialSolution.path,
+      ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithCandidateMovesSteepest.updateSolution
     )
   }
 
   def getLocalSearchWithListOfImprovingMoves(
-      problemInstance: ProblemInstance,
-      initialCity: Int
+      optionalInitialSolution: Option[Solution] = None
   ): Solution = {
-    val initialSolution = getRandomSolution(problemInstance, initialCity)
+    val solution = optionalInitialSolution.getOrElse(getRandomSolution())
     val localSearchInstance = ListOfImprovingMovesSolution(
-      problemInstance,
-      initialSolution,
-      problemInstance.cities -- initialSolution.path
+      solution,
+      ProblemInstanceHolder.problemInstance.cities -- solution.path
     )
     generate(
-      problemInstance,
-      initialSolution,
-      problemInstance.cities -- initialSolution.path,
+      solution,
+      ProblemInstanceHolder.problemInstance.cities -- solution.path,
       localSearchInstance.updateSolution
     )
   }
 
-  def getSteepest(
-      problemInstance: ProblemInstance,
-      initialSolution: Solution
-  ): Solution = {
-    val initialSol = initialSolution
-    var solSteepest = initialSolution
-    var prevList = initialSolution
-    var solList = initialSolution
-    var shouldContinue = true
-    val list = ListOfImprovingMovesSolution(
-      problemInstance,
+  def getIteratedLocalSearch(initialCity: Int): Solution = {
+    val initialSolution = getRandomSolution()
+    val updatedSolution = IteratedLSSolution.updateSolution(
       initialSolution,
-      problemInstance.cities -- initialSolution.path
+      ProblemInstanceHolder.problemInstance.cities -- initialSolution.path
     )
-
-    val initialMovesList = list.improvingMoves.toSeq
-
-    while (shouldContinue) {
-      solSteepest = LocalSearchWithEdgesSwapsSteepest
-        .updateSolution(
-          problemInstance,
-          solList,
-          problemInstance.cities -- solList.path
-        )
-        ._1
-
-      prevList = solList
-      solList = list
-        .updateSolution(
-          problemInstance,
-          solList,
-          problemInstance.cities -- solList.path
-        )
-        ._1
-
-      shouldContinue = solSteepest.cost == solList.cost && solList != prevList
-      if (!shouldContinue) {
-        println("Solution path: " + solList.path.mkString(", "))
-        val bestSteepestMove = MoveHistory.getHistorySteepest.last._1
-        println("Edges: " + list.getConsecutivePairs(prevList).mkString(", "))
-        println
-        println(
-          "Triplets: " + list.getConsecutiveTriplets(prevList).mkString(", ")
-        )
-
-        println()
-        println("History List:")
-        MoveHistory.getHistoryList.foreach(x =>
-          println(s"${x._1} -> ${x._2.path.mkString(",")}")
-        )
-      }
-    }
-
-    solSteepest
+    updatedSolution
   }
 
-  def getLocalSearchWithListOfImprovingMoves(
-      problemInstance: ProblemInstance,
-      initialSolution: Solution
-  ): Solution = {
-    val localSearchInstance = ListOfImprovingMovesSolution(
-      problemInstance,
-      initialSolution,
-      problemInstance.cities -- initialSolution.path
-    )
-    generate(
-      problemInstance,
-      initialSolution,
-      problemInstance.cities -- initialSolution.path,
-      localSearchInstance.updateSolution
-    )
-  }
+  // def getSteepest(
+  //     problemInstance: ProblemInstance,
+  //     initialSolution: Solution
+  // ): Solution = {
+  //   val initialSol = initialSolution
+  //   var solSteepest = initialSolution
+  //   var prevList = initialSolution
+  //   var solList = initialSolution
+  //   var shouldContinue = true
+  //   val list = ListOfImprovingMovesSolution(
+  //     problemInstance,
+  //     initialSolution,
+  //     problemInstance.cities -- initialSolution.path
+  //   )
 
-  def getMSLS(
-      problemInstance: ProblemInstance,
-      initialCity: Int
-  ): Solution = {
-    val startTime = System.currentTimeMillis()
-    val sol = MSLS.run(problemInstance)
-    val endTime = System.currentTimeMillis()
-    println(s"Time: ${endTime - startTime} ms")
-    sol
-  }
+  //   val initialMovesList = list.improvingMoves.toSeq
+
+  //   while (shouldContinue) {
+  //     solSteepest = LocalSearchWithEdgesSwapsSteepest
+  //       .updateSolution(
+  //         problemInstance,
+  //         solList,
+  //         problemInstance.cities -- solList.path
+  //       )
+  //       ._1
+
+  //     prevList = solList
+  //     solList = list
+  //       .updateSolution(
+  //         problemInstance,
+  //         solList,
+  //         problemInstance.cities -- solList.path
+  //       )
+  //       ._1
+
+  //     shouldContinue = solSteepest.cost == solList.cost && solList != prevList
+  //     if (!shouldContinue) {
+  //       println("Solution path: " + solList.path.mkString(", "))
+  //       val bestSteepestMove = MoveHistory.getHistorySteepest.last._1
+  //       println("Edges: " + list.getConsecutivePairs(prevList).mkString(", "))
+  //       println
+  //       println(
+  //         "Triplets: " + list.getConsecutiveTriplets(prevList).mkString(", ")
+  //       )
+
+  //       println()
+  //       println("History List:")
+  //       MoveHistory.getHistoryList.foreach(x =>
+  //         println(s"${x._1} -> ${x._2.path.mkString(",")}")
+  //       )
+  //     }
+  //   }
+
+  //   solSteepest
+  // }
+
+  // def getMSLS(
+  //     problemInstance: ProblemInstance,
+  //     initialCity: Int
+  // ): Solution = {
+  //   val startTime = System.currentTimeMillis()
+  //   val sol = MSLS.run(problemInstance)
+  //   val endTime = System.currentTimeMillis()
+  //   println(s"Time: ${endTime - startTime} ms")
+  //   sol
+  // }
 
   @tailrec
   def generate(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
-      availableCities: Set[Int],
-      updateSolution: (
-          ProblemInstance,
-          Solution,
-          Set[Int]
-      ) => (Solution, Set[Int])
+      remainingCities: Set[Int],
+      updateSolution: (Solution, Set[Int]) => (Solution, Set[Int])
   ): Solution = {
-    val (newSolution, newAvailableCities) = updateSolution(
-      problemInstance,
-      currentSolution,
-      availableCities
-    )
+    val (updatedSolution, updatedRemainingCities) =
+      updateSolution(currentSolution, remainingCities)
 
-    if (newSolution == currentSolution) {
-      Solution(currentSolution.path, currentSolution.cost)
+    if (updatedSolution == currentSolution) {
+      currentSolution
     } else {
-      generate(
-        problemInstance,
-        newSolution,
-        newAvailableCities,
-        updateSolution
-      )
+      generate(updatedSolution, updatedRemainingCities, updateSolution)
     }
   }
-
 }

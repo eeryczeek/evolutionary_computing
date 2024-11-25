@@ -2,23 +2,6 @@ import scala.util.Random
 import java.nio.file.AtomicMoveNotSupportedException
 
 trait LocalSearch extends MoveOperations with CostManager {
-
-  def generateCandidateMoves(
-      problemInstance: ProblemInstance,
-      currentSolution: Solution,
-      availableCities: Set[Int]
-  ): Seq[Move] = ???
-  // {
-  //   for (triplet <- getConsecutiveTriplets(currentSolution)) {
-  //     for (city <- problemInstance.candidateEdges(triplet.city2)) {
-  //       if (currentSolution.path.contains(city2)) {
-  //         getCandidateEdgeSwap(currentSolution, city1, city2)
-  //       } else {
-  //         getCandidateNodeSwap(currentSolution, city1, city2)
-  //       }
-  //     }
-  //   }
-
   def getCandidateEdgeSwap(
       currentSolution: Solution,
       city1: Int,
@@ -26,51 +9,65 @@ trait LocalSearch extends MoveOperations with CostManager {
   ): EdgeSwap = ???
 
   def getAllNodeSwapsOut(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): Seq[Move] = {
     for {
-      triplet <- getConsecutiveTriplets(currentSolution)
+      triplet <- getConsecutiveTriplets(currentSolution.path)
       city <- availableCities
     } yield NodeSwapOut(triplet, city)
   }
 
   def getAllEdgeSwaps(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): Seq[Move] = {
     (for {
-      pair1 <- getConsecutivePairs(currentSolution)
-      pair2 <- getConsecutivePairs(currentSolution)
+      pair1 <- getConsecutivePairs(currentSolution.path)
+      pair2 <- getConsecutivePairs(currentSolution.path)
       if Set(pair1.city1, pair1.city2, pair2.city1, pair2.city2).size == 4
     } yield EdgeSwap(pair1, pair2)).toSeq
   }
 
   def getAllNodeSwapsIn(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): Seq[Move] = {
     (for {
-      pair1 <- getConsecutivePairs(currentSolution)
-      pair2 <- getConsecutivePairs(currentSolution)
+      pair1 <- getConsecutivePairs(currentSolution.path)
+      pair2 <- getConsecutivePairs(currentSolution.path)
       if Set(pair1.city1, pair1.city2, pair2.city1, pair2.city2).size == 4
     } yield EdgeSwap(pair1, pair2)).toSeq
   }
 
+  def getAllTwoNodeExchange(
+      currentSolution: Solution,
+      availableCities: Set[Int]
+  ): Seq[Move] = {
+    (for {
+      triplet <- getConsecutiveTriplets(currentSolution.path)
+      pair <- getConsecutivePairs(currentSolution.path)
+      city <- availableCities
+      if Set(
+        triplet.city1,
+        triplet.city2,
+        triplet.city3,
+        pair.city1,
+        pair.city2,
+        city
+      ).size == 6
+    } yield TwoNodeExchange(triplet, pair, city)).toSeq
+  }
+
   def getCandidateMoves(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): Seq[Move] = {
     val possibleMoves = getNeighbourhoodWithEdgesSwapsIn(
-      problemInstance,
       currentSolution,
       availableCities
     )
-    val candidateEdges = problemInstance.candidateEdges
+    val candidateEdges = ProblemInstanceHolder.problemInstance.candidateEdges
     possibleMoves.filter(move => anyEdgeInCandidateEdges(candidateEdges, move))
   }
 
@@ -94,18 +91,17 @@ trait LocalSearch extends MoveOperations with CostManager {
   }
 
   def getNeighbourhoodWithEdgesSwapsIn(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): Seq[Move] = {
     val path = currentSolution.path.toArray
-    val pairs = getConsecutivePairs(currentSolution)
-    val triplets = getConsecutiveTriplets(currentSolution)
+    val pairs = getConsecutivePairs(currentSolution.path)
+    val triplets = getConsecutiveTriplets(currentSolution.path)
 
     val edgeSwapsIn = pairs
       .combinations(2)
       .collect {
-        case Array(pair1, pair2)
+        case Seq(pair1, pair2)
             if Set(
               pair1.city1,
               pair1.city2,
@@ -124,17 +120,16 @@ trait LocalSearch extends MoveOperations with CostManager {
   }
 
   def getNeighbourhoodWithNodesSwapsIn(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): Seq[Move] = {
     val path = currentSolution.path.toArray
-    val triplets = getConsecutiveTriplets(currentSolution)
+    val triplets = getConsecutiveTriplets(currentSolution.path)
 
     val nodeSwapsIn = triplets
       .combinations(2)
       .collect {
-        case Array(triplet1, triplet2) if !triplet1.equals(triplet2) =>
+        case Seq(triplet1, triplet2) if !triplet1.equals(triplet2) =>
           NodeSwapIn(triplet1, triplet2)
       }
       .toSeq

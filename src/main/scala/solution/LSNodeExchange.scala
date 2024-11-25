@@ -1,6 +1,6 @@
 import scala.util.Random
 
-object LocalSearchWithEdgesSwapsGreedy
+object LocalSearchWithNodeExchange
     extends LocalSearch
     with MoveOperations
     with CostManager {

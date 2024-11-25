@@ -2,16 +2,17 @@ object GreedyCycleWeightedRegretSolution
     extends MoveOperations
     with CostManager {
   def updateSolution(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
-    if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
+    if (
+      currentSolution.path.size == ProblemInstanceHolder.problemInstance.expectedSolutionLen
+    ) {
       return (currentSolution, availableCities)
     }
     val currentCycle = currentSolution.path
-    val distances = problemInstance.distances
-    val cityCosts = problemInstance.cityCosts
+    val distances = ProblemInstanceHolder.problemInstance.distances
+    val cityCosts = ProblemInstanceHolder.problemInstance.cityCosts
     val edgesWithIndexes = currentCycle
       .zip(currentCycle.tail :+ currentCycle.head)
       .zipWithIndex

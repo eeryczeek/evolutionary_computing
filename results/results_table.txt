@@ -1,10 +1,10 @@
 Instance: tspa
 | **Method** | **Min** | **Mean** | **Max** | **Time\* (s)** |
 | --- | --- | --- | --- | --- |
-| `ls_candidate_steepest_random` | 77983 | 77983 | 77983 | 13.8109 |
+| `iterated local search` | 69346 | 70259 | 71476 | 130.3478 |
 
 Instance: tspb
 | **Method** | **Min** | **Mean** | **Max** | **Time\* (s)** |
 | --- | --- | --- | --- | --- |
-| `ls_candidate_steepest_random` | 47367 | 47367 | 47367 | 15.3699 |
+| `iterated local search` | 43689 | 44700 | 46114 | 130.2617 |
 

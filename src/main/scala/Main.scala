@@ -43,17 +43,16 @@ object Main extends App {
   def processSolutions(
       instance: String,
       methodName: String,
-      problemInstance: ProblemInstance,
-      solutionMethod: (ProblemInstance, Int) => Solution
+      solutionMethod: (Int) => Solution
   ): Unit = {
     val startTime = System.nanoTime()
-    val totalTasks = problemInstance.cities.size
+    val totalTasks = ProblemInstanceHolder.problemInstance.cities.size
     val completedTasks = new AtomicInteger(0)
 
-    val solutions = problemInstance.cities.toList.view
+    val solutions = ProblemInstanceHolder.problemInstance.cities.toList.view
       .map(city =>
         Future {
-          val solution = solutionMethod(problemInstance, city)
+          val solution = solutionMethod(city)
           val completed = completedTasks.incrementAndGet()
           print(s"\rprocessing $methodName [$completed/$totalTasks]")
           solution
@@ -77,29 +76,23 @@ object Main extends App {
 
   val solutionMethods = List(
     (
-      "ls_edges_swaps_steepest_random_start",
-      SolutionFactory.getLocalSearchWithEdgesSwapsSteepestRandomStart _
-    ),
-    (
-      "ls_list_of_improving_moves",
-      SolutionFactory.getLocalSearchWithListOfImprovingMoves _
+      "iterated local search",
+      SolutionFactory.getIteratedLocalSearch _
     )
   )
 
   for (name <- names) {
     writeHeader(name)
-    val initialData = CSVReader.readCSV(s"${name.toUpperCase()}.csv")
+    ProblemInstanceHolder.problemInstance =
+      CSVReader.readCSV(s"${name.toUpperCase()}.csv")
     solutionMethods.foreach { case (suffix, method) =>
-      processSolutions(name, suffix, initialData, method)
+      processSolutions(name, suffix, method)
     }
     writeResults("\n", resultsTablePath)
     writeResults("\n", resultsBestPath)
   }
+}
 
-  // val tspa = CSVReader.readCSV("TSPA.csv")
-  // val sol1 = SolutionFactory.getLocalSearchWithListOfImprovingMoves(tspa, 0)
-  // val sol2 =
-  //   SolutionFactory.getLocalSearchWithEdgesSwapsSteepestRandomStart(tspa, 0)
-  // println(s"sol1: ${sol1.cost}")
-  // println(s"sol2: ${sol2.cost}")
+object ProblemInstanceHolder {
+  var problemInstance: ProblemInstance = _
 }

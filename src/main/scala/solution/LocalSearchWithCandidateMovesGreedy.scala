@@ -5,24 +5,22 @@ object LocalSearchWithCandidateMovesGreedy
     with MoveOperations
     with CostManager {
   def updateSolution(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
     val possibleMoves =
       getCandidateMoves(
-        problemInstance,
         currentSolution,
         availableCities
       )
 
     val firstImprovingMove = Random
       .shuffle(possibleMoves)
-      .find { move => getDeltaCost(problemInstance, move) < 0 }
+      .find { move => getDeltaCost(move) < 0 }
 
     firstImprovingMove match {
       case Some(move) => {
-        val deltaCost = getDeltaCost(problemInstance, move)
+        val deltaCost = getDeltaCost(move)
         val (newSolution, newAvailableCities) =
           performMove(currentSolution, move, availableCities)
         (

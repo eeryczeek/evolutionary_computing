@@ -2,17 +2,18 @@ import scala.annotation.tailrec
 
 object GreedyAtAnyPositionSolution extends MoveOperations with CostManager {
   def updateSolution(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
-    if (currentSolution.path.size == problemInstance.expectedSolutionLen) {
-      val solutionCost = getSolutionCost(problemInstance, currentSolution)
+    if (
+      currentSolution.path.size == ProblemInstanceHolder.problemInstance.expectedSolutionLen
+    ) {
+      val solutionCost = getSolutionCost(currentSolution)
       return (currentSolution.copy(cost = solutionCost), availableCities)
     }
     val path = currentSolution.path
-    val distances = problemInstance.distances
-    val cityCosts = problemInstance.cityCosts
+    val distances = ProblemInstanceHolder.problemInstance.distances
+    val cityCosts = ProblemInstanceHolder.problemInstance.cityCosts
     val pathIndices = path.zipWithIndex.toMap
 
     val (bestCity, bestCost, insertPosition) =

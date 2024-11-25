@@ -5,28 +5,20 @@ object LocalSearchWithNodesSwapsSteepest
     with MoveOperations
     with CostManager {
   def updateSolution(
-      problemInstance: ProblemInstance,
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
     val possibleMoves =
-      getNeighbourhoodWithNodesSwapsIn(
-        problemInstance,
-        currentSolution,
-        availableCities
-      )
+      getNeighbourhoodWithNodesSwapsIn(currentSolution, availableCities)
 
     val improvingMoves = possibleMoves
-      .map(move => (move, getDeltaCost(problemInstance, move)))
+      .map(move => (move, getDeltaCost(move)))
       .minBy { case (_, cost) => cost }
 
     if (improvingMoves._2 < 0) {
       val (bestMove, deltaCost) = improvingMoves
-      val (newSolution, newAvailableCities) = performMove(
-        currentSolution,
-        bestMove,
-        availableCities
-      )
+      val (newSolution, newAvailableCities) =
+        performMove(currentSolution, bestMove, availableCities)
       (newSolution, newAvailableCities)
     } else {
       (currentSolution, availableCities)
