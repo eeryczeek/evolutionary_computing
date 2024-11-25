@@ -37,9 +37,9 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
   ): (Solution, Set[Int]) = {
     val edges = getConsecutivePairs(currentSolution).toSet
     val triplets = getConsecutiveTriplets(currentSolution).toSet
-    improvingMoves.find { case (move, _) =>
-      isMoveApplicable(move, currentSolution, edges, triplets)
-    } match {
+    findFirstApplicableMove(
+      isMoveApplicable(_, currentSolution, edges, triplets)
+    ) match {
       case Some((move, deltaCost)) =>
         val trueMove = move match {
           case EdgeSwap(edge1, edge2) =>
@@ -121,29 +121,33 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
             case _ => true
           }
 
-        val newMoves = getAllEdgeSwapsForEdge(
-          currentSolution,
-          Pair(edge1.city1, edge2.city1)
-        ) ++ getAllEdgeSwapsForEdge(
-          currentSolution,
-          Pair(edge1.city2, edge2.city2)
-        ) ++ getAllEdgeSwapsForEdge(
-          currentSolution,
-          Pair(edge2.city1, edge1.city1)
-        ) ++ getAllEdgeSwapsForEdge(
-          currentSolution,
-          Pair(edge2.city2, edge1.city2)
-        ) ++ getAllNodeSwapsOutForRemovedCities(
-          currentSolution,
-          citiesInRemovedEdges,
-          availableCities
-        )
+        val newMoves =
+          getAllEdgeSwapsForEdge(
+            currentSolution,
+            Pair(edge1.city1, edge2.city1)
+          ) ++ getAllEdgeSwapsForEdge(
+            currentSolution,
+            Pair(edge1.city2, edge2.city2)
+          ) ++ getAllEdgeSwapsForEdge(
+            currentSolution,
+            Pair(edge2.city1, edge1.city1)
+          ) ++ getAllEdgeSwapsForEdge(
+            currentSolution,
+            Pair(edge2.city2, edge1.city2)
+          ) ++ getAllNodeSwapsOutForRemovedCities(
+            currentSolution,
+            citiesInRemovedEdges,
+            availableCities
+          )
 
         improvingMoves ++= newMoves
           .map(move => (move, getDeltaCost(problemInstance, move)))
           .filter(_._2 < 0)
 
-      case NodeSwapOut(Triplet(_, removedCity, _), addedCity) =>
+      case NodeSwapOut(
+            Triplet(cityBefore, removedCity, cityAfter),
+            addedCity
+          ) =>
         improvingMoves = improvingMoves
           .mapInPlace {
             case (move @ NodeSwapOut(_, city), _) if city == addedCity => {
@@ -184,6 +188,32 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
             case move => move
           }
           .filter(_._2 < 0)
+
+        val newMoves =
+          getAllEdgeSwapsForEdge(
+            currentSolution,
+            Pair(cityBefore, addedCity)
+          ) ++
+            getAllEdgeSwapsForEdge(
+              currentSolution,
+              Pair(addedCity, cityAfter)
+            ) ++
+            getAllEdgeSwapsForEdge(
+              currentSolution,
+              Pair(addedCity, cityBefore)
+            ) ++
+            getAllEdgeSwapsForEdge(
+              currentSolution,
+              Pair(cityAfter, addedCity)
+            ) ++
+            getAllNodeSwapsForGivenCity(currentSolution, removedCity)
+
+        improvingMoves
+          .addAll(
+            newMoves
+              .map(move => (move, getDeltaCost(problemInstance, move)))
+              .filter(_._2 < 0)
+          )
     }
   }
 
@@ -239,7 +269,20 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
       .flatMap { triplet =>
         availableCities.map(city => NodeSwapOut(triplet, city))
       }
-      .toSeq
+      .toList
+  }
+
+  private def getAllNodeSwapsForGivenCity(
+      solution: Solution,
+      city: Int
+  ): List[NodeSwapOut] = {
+    if (solution.path.contains(city)) return List()
+    else {
+      val triplets = getConsecutiveTriplets(solution)
+      triplets
+        .map(triplet => NodeSwapOut(triplet, city))
+        .toList
+    }
   }
 }
 
