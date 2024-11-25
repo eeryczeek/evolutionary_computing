@@ -6,9 +6,7 @@ trait CostManager {
     val cityCosts = ProblemInstanceHolder.problemInstance.cityCosts
     (solution.path :+ solution.path.head)
       .sliding(2)
-      .map { case Array(a, b) =>
-        distances(a)(b) + cityCosts(b)
-      }
+      .map { case Array(a, b) => distances(a)(b) + cityCosts(b) }
       .sum
   }
 

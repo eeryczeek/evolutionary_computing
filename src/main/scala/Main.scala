@@ -43,7 +43,7 @@ object Main extends App {
   def processSolutions(
       instance: String,
       methodName: String,
-      solutionMethod: (Int) => Solution
+      solutionMethod: () => Solution
   ): Unit = {
     val startTime = System.nanoTime()
     val totalTasks = ProblemInstanceHolder.problemInstance.cities.size
@@ -52,7 +52,7 @@ object Main extends App {
     val solutions = ProblemInstanceHolder.problemInstance.cities.toList.view
       .map(city =>
         Future {
-          val solution = solutionMethod(city)
+          val solution = solutionMethod()
           val completed = completedTasks.incrementAndGet()
           print(s"\rprocessing $methodName [$completed/$totalTasks]")
           solution
@@ -76,8 +76,11 @@ object Main extends App {
 
   val solutionMethods = List(
     (
-      "iterated local search",
-      SolutionFactory.getIteratedLocalSearch _
+      "ListOfImprovingMoves",
+      () =>
+        SolutionFactory.getLocalSearchWithEdgesSwapsSteepest(() =>
+          SolutionFactory.getRandomSolution()
+        )
     )
   )
 

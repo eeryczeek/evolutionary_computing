@@ -24,8 +24,7 @@ object LocalSearchWithEdgesSwapsSteepest
           newAvailableCities
         )
       }
-      case _ =>
-        (currentSolution, availableCities)
+      case _ => (currentSolution, availableCities)
     }
   }
 }

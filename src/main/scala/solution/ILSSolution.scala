@@ -13,14 +13,12 @@ object IteratedLSSolution
     var bestSolution = currentSolution
     var bestAvailableCities = availableCities
     val startTime = System.currentTimeMillis()
-    while (System.currentTimeMillis() - startTime < 10000) {
-      val (perturbedSolution, newAvailableCities) = perturbSolution(
-        bestSolution,
-        bestAvailableCities
-      )
+    while (System.currentTimeMillis() - startTime < 60000) {
+      val (perturbedSolution, newAvailableCities) =
+        perturbSolution(bestSolution, bestAvailableCities)
       val updatedSolution =
         SolutionFactory.getLocalSearchWithListOfImprovingMoves(
-          optionalInitialSolution = Some(perturbedSolution)
+          initialSolutionGenerator = () => perturbedSolution
         )
       if (updatedSolution.cost < bestSolution.cost) {
         bestSolution = updatedSolution

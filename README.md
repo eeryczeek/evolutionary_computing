@@ -1,4 +1,4 @@
-# Raport 3 - Local search [GITHUB](https://github.com/eeryczeek/evolutionary_computing)
+# Raport - Iterated Local Search [GITHUB](https://github.com/eeryczeek/evolutionary_computing)
 
 Eryk Ptaszyński: 151950  
 Eryk Walter: 151931
@@ -24,101 +24,119 @@ This visual representation provides an intuitive way to interpret the spatial re
 1. [Modified TSP Problem with Additional Constraints](#modified-tsp-problem-with-additional-constraints)
 2. [Combined TSPA and TSPB results table](#combined-tspa-and-tspb-results-table)
 3. [Solutions](#solutions)
-   - [Local search with edges swaps greedy](#local-search-with-edges-swaps-greedy)
-   - [Local search with edges swaps steepest](#local-search-with-edges-swaps-steepest)
-   - [Local search with candidate moves greedy](#localsearch-with-candidate-moves-greedy)
-   - [Local search with candidate moves steepest](#localsearch-with-candidate-moves-steepest)
+   - [IteratedLocalSearch]
+   - [MSLS]
+   - [GreedyAtAnyPosition]
+   - [ListOfImprovingMoves]
 4. [Conclusions](#conclusions)
 
 <div style="page-break-after: always;"></div>
 
 ## [Combined TSPA and TSPB results table](#combined-tspa-and-tspb-results-table):
 
-Instance TSPA results table:
+Instance: tspa
 
-| **Method**                    | **Min** | **Mean** | **Max** | **Time\* (s)** |
-| ----------------------------- | ------- | -------- | ------- | -------------- |
-| `ls-edges-swaps-greedy`       | 71492   | 73710    | 76560   | 63.7732        |
-| `ls-edges-swaps-steepest`     | 71646   | 73914    | 78738   | 15.9961        |
-| `ls-candidate-moves-greedy`   | 75908   | 80351    | 85536   | 35.0503        |
-| `ls-candidate-moves-steepest` | 77983   | 86789    | 91227   | 11.6452        |
+| **Method**             | **Min** | **Mean** | **Max** | **Time\* (s)** |
+| ---------------------- | ------- | -------- | ------- | -------------- |
+| `IteratedLocalSearch`  | 69353   | 70514    | 71980   | 78.2629        |
+| `MSLS`                 | 71299   | 72745    | 74026   | 71.1501        |
+| `GreedyAtAnyPosition`  | 71263   | 73096    | 76156   | 0.8800         |
+| `ListOfImprovingMoves` | 71564   | 73810    | 77544   | 3.8895         |
 
-Instance TSPB results table:
+**IteratedLocalSearch: ~226 iterations of LocalSearch**
 
-| **Method**                    | **Min** | **Mean** | **Max** | **Time\* (s)** |
-| ----------------------------- | ------- | -------- | ------- | -------------- |
-| `ls-edges-swaps-greedy`       | 46029   | 48352    | 51147   | 66.4630        |
-| `ls-edges-swaps-steepest`     | 46021   | 48303    | 50845   | 16.3699        |
-| `ls-candidate-moves-greedy`   | 44892   | 47775    | 50155   | 36.7747        |
-| `ls-candidate-moves-steepest` | 47367   | 49457    | 52332   | 12.7428        |
+Instance: tspb
+
+| **Method**             | **Min** | **Mean** | **Max** | **Time\* (s)** |
+| ---------------------- | ------- | -------- | ------- | -------------- |
+| `IteratedLocalSearch`  | 43869   | 45008    | 46892   | 78.1519        |
+| `MSLS`                 | 46053   | 47473    | 48854   | 68.7576        |
+| `GreedyAtAnyPosition`  | 44446   | 45916    | 51960   | 0.6027         |
+| `ListOfImprovingMoves` | 45404   | 48409    | 51581   | 3.6014         |
+
+**IteratedLocalSearch: ~226 iterations of LocalSearch**
 
 **Time\* - to solve all 200 instances**
 
 ## Solutions
 
 ```
-function getCandidateMoves():
-   all_moves <- get neighbourhood with edges swaps
-   filtered_moves <- filter out moves with no edge from candidateEdges
-   return filtered_moves
+Perturbation(Triplet, Pair, city)
 
-function updateSolutionSteepest(): {
-   possibleMoves <- getCandidateMoves()
-   bestImprovingMove <- map each move to it's deltaCost and take the one with minimal value
-   if deltaCost of bestImprovingMove < 0:
-      performMove
-      return updatedSolution
-   else return currentSolution
-}
+function generatePerturbation():
+    triplet <- random triplet from consecutive triplets from solution.path
+    pair <- random pair from consecutive pairs from solution.path
+    city <- random city from available cities
+    perturbation = Perturbation(triplet, pair, city)
+
+function applyPerturbation(solution, perturbation):
+    remove perturbation.triplet.city2 from the solution
+    add perturbation.city between the two cities from perturbation.pair
+    return perturbedSolution
+
+function perturbSolution():
+    do:
+        perturbation <- generatePerturbation()
+        solution <- applyPerturbation(solution, perturbation)
+    twice
 ```
 
-![ls-edges-swaps-greedy](plots/local_search_with_edges_swaps_greedy_random.png)
-![ls-candidate-moves-greedy](plots/ls_candidate_greedy_random.png)
-![ls-edges-swaps-steepest](plots/local_search_with_edges_swaps_steepest_random.png)
-![ls-candidate-moves-steepest](plots/ls_candidate_steepest_random.png)
+![ls-edges-swaps-greedy](plots/IteratedLocalSearch.png)
+![ls-candidate-moves-greedy](plots/MSLS.png)
+![ls-edges-swaps-steepest](plots/GreedyAtAnyPosition.png)
+![ls-candidate-moves-steepest](plots/ListOfImprovingMoves.png)
 
 ## [Conclusions](#conclusions)
 
-Performance of Edge Swaps vs. Candidate Moves:
+For both TSPA and TSPB instances, IteratedLocalSearch consistently achieved lower minimum, mean, and maximum costs compared to MSLS. This suggests that IteratedLocalSearch is more effective in finding lower-cost solutions for this modified TSP problem.
 
-For both TSPA and TSPB instances, the methods using edge swaps (ls_edges_swaps_greedy_random and ls_edges_swaps_steepest_random) generally performed better in terms of minimum, mean, and maximum costs compared to the methods using candidate moves (ls_candidate_greedy_random and ls_candidate_steepest_random).
-This suggests that edge swaps are more effective in finding lower-cost solutions for this modified TSP problem.
+### Execution Time
 
-Greedy vs. Steepest Descent:
+The execution time for IteratedLocalSearch is slightly higher than MSLS for both TSPA and TSPB instances. However, the difference in execution time is relatively small compared to the improvement in solution quality.
 
-The steepest descent methods (ls_edges_swaps_steepest_random and ls_candidate_steepest_random) consistently achieved lower mean and maximum costs compared to their greedy counterparts (ls_edges_swaps_greedy_random and ls_candidate_greedy_random).
-This indicates that the steepest descent approach, which explores all possible moves and selects the best one, is more effective in improving solution quality compared to the greedy approach, which selects the first improving move.
+### Summary
 
-Execution Time:
-
-The greedy methods (ls_edges_swaps_greedy_random and ls_candidate_greedy_random) took significantly longer to solve all 200 instances compared to the steepest descent methods.
-For instance, ls_edges_swaps_greedy_random took approximately 63.77 seconds for TSPA and 66.46 seconds for TSPB, whereas ls_edges_swaps_steepest_random took only 15.99 seconds for TSPA and 16.37 seconds for TSPB.
-This suggests that while the greedy methods may explore fewer moves, they may still take longer due to the nature of their search strategy.
-
-Impact of Candidate Moves:
-
-The methods using candidate moves (ls_candidate_greedy_random and ls_candidate_steepest_random) generally resulted in higher costs compared to the edge swap methods.
-This indicates that while candidate moves can reduce the search space and potentially speed up the search process, they may also limit the ability to find the best possible solutions.
+IteratedLocalSearch outperforms MSLS in terms of solution quality, achieving lower costs for both TSPA and TSPB instances. While IteratedLocalSearch takes slightly longer to execute, the trade-off is justified by the significant improvement in solution quality.
 
 ```
 Instance: tspa
-Method: ls_candidate_greedy_random
-Best Solution Path: 69, 108, 117, 0, 143, 183, 89, 23, 137, 94, 124, 148, 33, 9, 62, 102, 49, 144, 14, 138, 32, 178, 106, 52, 55, 185, 40, 165, 7, 164, 27, 90, 81, 196, 31, 13, 56, 113, 175, 171, 88, 16, 78, 145, 92, 57, 129, 25, 44, 120, 2, 125, 152, 1, 75, 86, 101, 97, 121, 53, 180, 154, 135, 70, 127, 123, 162, 151, 133, 79, 63, 80, 176, 51, 59, 197, 115, 46, 139, 193, 41, 42, 43, 116, 65, 149, 112, 4, 84, 190, 10, 177, 54, 184, 160, 34, 146, 22, 159, 18
-Best Solution Cost: 75908
+Method: IteratedLocalSearch
+Best Solution Path: 154, 180, 53, 121, 100, 26, 86, 75, 101, 1, 97, 152, 2, 120, 44, 25, 16, 171, 175, 113, 56, 31, 78, 145, 92, 129, 57, 179, 196, 81, 90, 165, 40, 185, 55, 52, 106, 178, 49, 14, 144, 62, 9, 148, 124, 94, 63, 79, 80, 176, 137, 23, 186, 89, 183, 143, 0, 117, 93, 140, 108, 69, 18, 22, 146, 159, 193, 41, 139, 68, 46, 115, 59, 118, 51, 151, 133, 162, 149, 65, 116, 43, 42, 181, 34, 160, 48, 54, 177, 10, 190, 184, 35, 84, 4, 112, 123, 127, 70, 135
+Best Solution Cost: 69353
 
 Instance: tspa
-Method: ls_candidate_steepest_random
-Best Solution Path: 90, 81, 196, 157, 31, 113, 175, 171, 16, 25, 44, 120, 75, 101, 1, 97, 152, 74, 2, 129, 78, 145, 92, 57, 55, 52, 178, 106, 185, 40, 165, 138, 14, 49, 102, 62, 9, 37, 148, 94, 176, 80, 79, 63, 86, 53, 180, 154, 135, 70, 127, 123, 161, 162, 133, 151, 51, 109, 59, 197, 65, 149, 112, 177, 54, 34, 181, 42, 160, 184, 43, 77, 116, 5, 96, 115, 60, 46, 139, 142, 41, 193, 159, 22, 18, 108, 93, 117, 0, 143, 183, 89, 23, 137, 186, 144, 21, 7, 164, 27
-Best Solution Cost: 77983
+Method: MSLS
+Best Solution Path: 9, 148, 102, 49, 178, 106, 52, 55, 57, 179, 145, 78, 92, 129, 2, 152, 94, 63, 122, 79, 80, 176, 137, 89, 183, 143, 0, 117, 93, 140, 108, 69, 18, 159, 22, 146, 181, 34, 160, 48, 30, 54, 184, 177, 10, 4, 112, 127, 123, 162, 149, 131, 65, 116, 43, 42, 5, 41, 193, 139, 68, 46, 198, 115, 59, 118, 51, 151, 133, 135, 70, 154, 180, 53, 100, 26, 97, 1, 101, 86, 75, 120, 44, 25, 16, 171, 175, 113, 56, 31, 196, 81, 90, 119, 40, 185, 165, 14, 144, 62
+Best Solution Cost: 71299
+
+Instance: tspa
+Method: GreedyAtAnyPosition
+Best Solution Path: 68, 46, 115, 139, 193, 41, 5, 42, 181, 159, 69, 108, 18, 22, 146, 34, 160, 48, 54, 177, 10, 190, 4, 112, 84, 35, 184, 43, 116, 65, 59, 118, 51, 151, 133, 162, 123, 127, 70, 135, 180, 154, 53, 100, 26, 86, 75, 44, 25, 16, 171, 175, 113, 56, 31, 78, 145, 179, 92, 57, 52, 185, 119, 40, 196, 81, 90, 165, 106, 178, 14, 144, 62, 9, 148, 102, 49, 55, 129, 120, 2, 101, 1, 97, 152, 124, 94, 63, 79, 80, 176, 137, 23, 186, 89, 183, 0, 143, 117, 93
+Best Solution Cost: 71263
+
+Instance: tspa
+Method: ListOfImprovingMoves
+Best Solution Path: 117, 0, 143, 183, 89, 23, 137, 15, 62, 9, 148, 49, 102, 144, 14, 3, 178, 106, 52, 55, 185, 40, 119, 165, 164, 7, 27, 90, 81, 196, 31, 113, 175, 171, 16, 78, 145, 179, 57, 92, 129, 25, 44, 120, 2, 75, 86, 101, 1, 97, 152, 94, 26, 100, 53, 180, 154, 135, 70, 127, 123, 162, 151, 133, 79, 63, 122, 80, 176, 51, 118, 59, 149, 65, 116, 115, 139, 46, 68, 193, 41, 181, 43, 42, 160, 184, 84, 112, 4, 190, 10, 177, 54, 34, 22, 159, 18, 69, 108, 93
+Best Solution Cost: 71742
 
 
 Instance: tspb
-Method: ls_candidate_greedy_random
-Best Solution Path: 122, 90, 51, 147, 6, 188, 169, 132, 161, 70, 3, 15, 145, 13, 195, 168, 139, 11, 138, 33, 160, 29, 0, 109, 35, 106, 124, 62, 18, 55, 34, 170, 152, 183, 140, 4, 149, 28, 20, 60, 148, 47, 94, 179, 185, 99, 130, 95, 86, 166, 194, 176, 113, 103, 127, 89, 163, 153, 81, 77, 141, 91, 36, 61, 21, 82, 8, 111, 144, 104, 25, 177, 5, 45, 142, 78, 175, 162, 80, 190, 136, 73, 54, 31, 193, 117, 198, 156, 1, 121, 131, 135, 102, 63, 100, 40, 107, 72, 10, 133
-Best Solution Cost: 44892
+Method: IteratedLocalSearch
+Best Solution Path: 141, 91, 61, 36, 177, 5, 78, 175, 45, 80, 190, 136, 73, 54, 31, 193, 117, 198, 156, 1, 16, 27, 38, 135, 63, 100, 40, 107, 133, 122, 90, 131, 121, 51, 147, 6, 188, 169, 132, 13, 70, 3, 15, 145, 195, 168, 139, 11, 138, 33, 160, 104, 8, 111, 144, 29, 0, 109, 35, 143, 106, 124, 62, 18, 55, 34, 170, 152, 183, 140, 4, 149, 28, 20, 60, 148, 47, 94, 66, 179, 185, 99, 130, 95, 86, 166, 194, 176, 113, 26, 103, 114, 137, 127, 89, 163, 187, 153, 81, 77
+Best Solution Cost: 43869
 
 Instance: tspb
-Method: ls_candidate_steepest_random
-Best Solution Path: 168, 11, 138, 33, 104, 8, 82, 111, 29, 0, 35, 109, 189, 155, 152, 170, 34, 55, 18, 62, 124, 106, 95, 130, 183, 140, 149, 28, 20, 60, 148, 47, 94, 66, 179, 185, 86, 166, 194, 176, 180, 113, 103, 127, 89, 163, 153, 77, 141, 61, 36, 177, 5, 78, 175, 45, 80, 190, 136, 73, 164, 54, 31, 193, 117, 198, 156, 42, 27, 38, 16, 197, 1, 131, 135, 102, 63, 40, 122, 90, 125, 121, 51, 191, 133, 10, 178, 147, 134, 6, 188, 65, 169, 132, 13, 70, 3, 15, 145, 195
-Best Solution Cost: 47367
+Method: MSLS
+Best Solution Path: 11, 138, 182, 139, 168, 195, 13, 145, 15, 3, 70, 161, 132, 169, 188, 6, 147, 51, 121, 131, 90, 122, 40, 107, 63, 102, 135, 38, 27, 16, 197, 1, 156, 198, 117, 193, 31, 54, 73, 190, 80, 175, 78, 142, 5, 177, 8, 82, 21, 61, 36, 141, 97, 77, 81, 153, 187, 163, 89, 127, 114, 103, 26, 113, 176, 194, 166, 86, 95, 130, 99, 185, 22, 179, 94, 47, 148, 60, 28, 20, 183, 140, 152, 34, 55, 18, 62, 124, 106, 159, 143, 35, 109, 0, 29, 160, 144, 104, 33, 49
+Best Solution Cost: 46053
+
+Instance: tspb
+Method: GreedyAtAnyPosition
+Best Solution Path: 40, 107, 100, 63, 122, 135, 38, 27, 16, 1, 156, 198, 117, 54, 31, 193, 73, 136, 190, 80, 162, 175, 78, 142, 45, 5, 177, 36, 61, 91, 141, 77, 81, 153, 187, 163, 89, 127, 137, 114, 103, 113, 180, 176, 194, 166, 86, 95, 130, 99, 22, 185, 179, 66, 94, 47, 148, 60, 20, 28, 149, 4, 140, 183, 152, 170, 34, 55, 18, 62, 124, 106, 143, 35, 109, 0, 29, 160, 33, 138, 182, 11, 139, 168, 195, 145, 15, 3, 70, 13, 132, 169, 188, 6, 147, 191, 90, 51, 121, 131
+Best Solution Cost: 44446
+
+Instance: tspb
+Method: ListOfImprovingMoves
+Best Solution Path: 130, 99, 179, 172, 66, 94, 47, 148, 60, 23, 20, 28, 199, 9, 183, 140, 152, 34, 55, 18, 62, 124, 106, 143, 35, 0, 109, 29, 168, 195, 145, 3, 15, 70, 169, 188, 147, 71, 51, 121, 90, 131, 122, 133, 10, 107, 40, 100, 63, 102, 135, 38, 27, 1, 198, 117, 193, 31, 54, 164, 73, 136, 190, 80, 45, 175, 78, 5, 25, 138, 33, 160, 144, 104, 8, 111, 82, 87, 21, 177, 36, 61, 91, 141, 77, 81, 153, 187, 163, 89, 127, 103, 114, 113, 176, 194, 166, 86, 185, 95
+Best Solution Cost: 46822
 ```
