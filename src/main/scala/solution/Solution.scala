@@ -244,6 +244,90 @@ object SolutionFactory {
     )
   }
 
+  def getSteepest(
+      problemInstance: ProblemInstance,
+      initialSolution: Solution
+  ): Solution = {
+    val initialSol = initialSolution
+    var solSteepest = initialSolution
+    var prevList = initialSolution
+    var solList = initialSolution
+    var shouldContinue = true
+    val list = ListOfImprovingMovesSolution(
+      problemInstance,
+      initialSolution,
+      problemInstance.cities -- initialSolution.path
+    )
+
+    val initialMovesList = list.improvingMoves.toSeq
+
+    while (shouldContinue) {
+      solSteepest = LocalSearchWithEdgesSwapsSteepest
+        .updateSolution(
+          problemInstance,
+          solList,
+          problemInstance.cities -- solList.path
+        )
+        ._1
+
+      prevList = solList
+      solList = list
+        .updateSolution(
+          problemInstance,
+          solList,
+          problemInstance.cities -- solList.path
+        )
+        ._1
+
+      shouldContinue = solSteepest.cost == solList.cost && solList != prevList
+      if (!shouldContinue) {
+        println("Solution path: " + solList.path.mkString(", "))
+        val bestSteepestMove = MoveHistory.getHistorySteepest.last._1
+        println("Edges: " + list.getConsecutivePairs(prevList).mkString(", "))
+        println
+        println(
+          "Triplets: " + list.getConsecutiveTriplets(prevList).mkString(", ")
+        )
+
+        println()
+        println("History List:")
+        MoveHistory.getHistoryList.foreach(x =>
+          println(s"${x._1} -> ${x._2.path.mkString(",")}")
+        )
+      }
+    }
+
+    solSteepest
+  }
+
+  def getLocalSearchWithListOfImprovingMoves(
+      problemInstance: ProblemInstance,
+      initialSolution: Solution
+  ): Solution = {
+    val localSearchInstance = ListOfImprovingMovesSolution(
+      problemInstance,
+      initialSolution,
+      problemInstance.cities -- initialSolution.path
+    )
+    generate(
+      problemInstance,
+      initialSolution,
+      problemInstance.cities -- initialSolution.path,
+      localSearchInstance.updateSolution
+    )
+  }
+
+  def getMSLS(
+      problemInstance: ProblemInstance,
+      initialCity: Int
+  ): Solution = {
+    val startTime = System.currentTimeMillis()
+    val sol = MSLS.run(problemInstance)
+    val endTime = System.currentTimeMillis()
+    println(s"Time: ${endTime - startTime} ms")
+    sol
+  }
+
   @tailrec
   def generate(
       problemInstance: ProblemInstance,

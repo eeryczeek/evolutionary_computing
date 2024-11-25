@@ -254,12 +254,32 @@ class ListOfImprovingMovesSolution(problemInstance: ProblemInstance)
       .toList
   }
 
+  private def findFirstApplicableMove(
+      condition: (Move) => Boolean
+  ): Option[(Move, Int)] = {
+    val removedMoves = mutable.ListBuffer[(Move, Int)]()
+    var best =
+      if (improvingMoves.nonEmpty) improvingMoves.dequeue()
+      else (NodeSwapOut(Triplet(0, 0, 0), 0), 100)
+    while (!condition(best._1) && improvingMoves.nonEmpty && best._2 < 0) {
+      removedMoves += best
+      best = improvingMoves.dequeue()
+    }
+    if (best._2 < 0 && condition(best._1)) {
+      improvingMoves ++= removedMoves
+      Some(best)
+    } else {
+      improvingMoves ++= removedMoves
+      None
+    }
+  }
+
   private def getAllNodeSwapsOutForRemovedCities(
       solution: Solution,
       citiesFromRemovedEdges: Set[Int],
       availableCities: Set[Int]
-  ): Seq[NodeSwapOut] = {
-    val triplets = getConsecutiveTriplets(solution).toSet
+  ): List[NodeSwapOut] = {
+    val triplets = getConsecutiveTriplets(solution)
     triplets
       .filter(t =>
         citiesFromRemovedEdges.contains(t.city1) ||
