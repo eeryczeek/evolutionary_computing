@@ -8,6 +8,25 @@ trait LocalSearch extends MoveOperations with CostManager {
       city2: Int
   ): EdgeSwap = ???
 
+  def getAllTailAppends(
+      currentSolution: Solution,
+      availableCities: Set[Int]
+  ): Seq[Move] = {
+    availableCities
+      .map(city => AppendAtEnd(currentSolution.path.last, city))
+      .toSeq
+  }
+
+  def getAllInsertBetween(
+      currentSolution: Solution,
+      availableCities: Set[Int]
+  ): Seq[InsertBetween] = {
+    for {
+      pair <- getConsecutivePairs(currentSolution.path)
+      city <- availableCities
+    } yield InsertBetween(pair, city)
+  }
+
   def getAllNodeSwapsOut(
       currentSolution: Solution,
       availableCities: Set[Int]

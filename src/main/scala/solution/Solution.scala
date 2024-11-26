@@ -2,31 +2,26 @@ import scala.util.Random
 import scala.util.control.TailCalls.TailRec
 import scala.annotation.tailrec
 
-case class Solution(path: Array[Int], cost: Int)
+case class Solution(path: Seq[Int], cost: Int)
 
 object SolutionFactory {
   def getRandomSolution(): Solution =
-    SolutionGenerator.getRandomSolution()
+    SolutionGenerator.generateRandomSolution()
 
-  def getAlredyFoundSolution(solution: Solution): Solution =
-    SolutionGenerator.getAlreadyFoundSolution(solution)
+  def getGreedyTailSolution(): Solution =
+    SolutionGenerator.generateGreedyTailSolution()
 
-  def getGreedyTailSolution(optionalInitialCity: Option[Int]): Solution =
-    SolutionGenerator.getGreedyTailSolution(optionalInitialCity)
+  def getGreedyAnyPositionSolution(): Solution =
+    SolutionGenerator.generateGreedyAnyPositionSolution()
 
-  def getGreedyAnyPositionSolution(optionalInitialCity: Option[Int]): Solution =
-    SolutionGenerator.getGreedyAnyPositionSolution(optionalInitialCity)
+  def getGreedyCycleSolution(): Solution =
+    SolutionGenerator.getGreedyCycleSolution()
 
-  def getGreedyCycleSolution(optionalInitialCity: Option[Int]): Solution =
-    SolutionGenerator.getGreedyCycleSolution(optionalInitialCity)
+  def getGreedyCycleRegretSolution(): Solution =
+    SolutionGenerator.getGreedyCycleRegretSolution()
 
-  def getGreedyCycleRegretSolution(optionalInitialCity: Option[Int]): Solution =
-    SolutionGenerator.getGreedyCycleRegretSolution(optionalInitialCity)
-
-  def getGreedyCycleWeightedRegretSolution(
-      optionalInitialCity: Option[Int]
-  ): Solution =
-    SolutionGenerator.getGreedyCycleWeightedRegretSolution(optionalInitialCity)
+  def getGreedyCycleWeightedRegretSolution(): Solution =
+    SolutionGenerator.getGreedyCycleWeightedRegretSolution()
 
   def getLocalSearchWithEdgesSwapsGreedy(
       initialSolutionGenerator: () => Solution
@@ -83,24 +78,16 @@ object SolutionFactory {
   def getMSLS(): Solution = SolutionUpdater.getMSLS()
 }
 
-object SolutionGenerator {
-  def getRandomSolution(): Solution = {
-    generate(
-      Solution(Array.empty, 0),
-      ProblemInstanceHolder.problemInstance.cities,
-      RandomSolution.updateSolution
-    )
-  }
+object SolutionGenerator extends CostManager {
+  def generateRandomSolution(): Solution = RandomSolution.generate()
 
-  def getAlreadyFoundSolution(solution: Solution): Solution = solution
-
-  def getGreedyTailSolution(optionalInitialCity: Option[Int]): Solution = {
-    val initialCity = optionalInitialCity.getOrElse(
+  def generateGreedyTailSolution(): Solution = {
+    val initialCity =
       Random.nextInt(ProblemInstanceHolder.problemInstance.cities.size)
-    )
-    generate(
+
+    generateSolution(
       Solution(
-        Array(initialCity),
+        Seq(initialCity),
         ProblemInstanceHolder.problemInstance.cityCosts(initialCity)
       ),
       ProblemInstanceHolder.problemInstance.cities - initialCity,
@@ -108,15 +95,13 @@ object SolutionGenerator {
     )
   }
 
-  def getGreedyAnyPositionSolution(
-      optionalInitialCity: Option[Int]
-  ): Solution = {
-    val initialCity = optionalInitialCity.getOrElse(
+  def generateGreedyAnyPositionSolution(): Solution = {
+    val initialCity =
       Random.nextInt(ProblemInstanceHolder.problemInstance.cities.size)
-    )
-    generate(
+
+    generateSolution(
       Solution(
-        Array(initialCity),
+        Seq(initialCity),
         ProblemInstanceHolder.problemInstance.cityCosts(initialCity)
       ),
       ProblemInstanceHolder.problemInstance.cities - initialCity,
@@ -124,11 +109,11 @@ object SolutionGenerator {
     )
   }
 
-  def getGreedyCycleSolution(optionalInitialCity: Option[Int]): Solution = {
-    val initialCity = optionalInitialCity.getOrElse(
+  def getGreedyCycleSolution(): Solution = {
+    val initialCity =
       Random.nextInt(ProblemInstanceHolder.problemInstance.cities.size)
-    )
-    generate(
+
+    generateSolution(
       Solution(
         Array(initialCity),
         ProblemInstanceHolder.problemInstance.cityCosts(initialCity)
@@ -138,13 +123,11 @@ object SolutionGenerator {
     )
   }
 
-  def getGreedyCycleRegretSolution(
-      optionalInitialCity: Option[Int]
-  ): Solution = {
-    val initialCity = optionalInitialCity.getOrElse(
+  def getGreedyCycleRegretSolution(): Solution = {
+    val initialCity =
       Random.nextInt(ProblemInstanceHolder.problemInstance.cities.size)
-    )
-    generate(
+
+    generateSolution(
       Solution(
         Array(initialCity),
         ProblemInstanceHolder.problemInstance.cityCosts(initialCity)
@@ -154,13 +137,11 @@ object SolutionGenerator {
     )
   }
 
-  def getGreedyCycleWeightedRegretSolution(
-      optionalInitialCity: Option[Int]
-  ): Solution = {
-    val initialCity = optionalInitialCity.getOrElse(
+  def getGreedyCycleWeightedRegretSolution(): Solution = {
+    val initialCity =
       Random.nextInt(ProblemInstanceHolder.problemInstance.cities.size)
-    )
-    generate(
+
+    generateSolution(
       Solution(
         Array(initialCity),
         ProblemInstanceHolder.problemInstance.cityCosts(initialCity)
@@ -171,18 +152,20 @@ object SolutionGenerator {
   }
 
   @tailrec
-  def generate(
+  def generateSolution(
       currentSolution: Solution,
       remainingCities: Set[Int],
       updateSolution: (Solution, Set[Int]) => (Solution, Set[Int])
   ): Solution = {
-    val (updatedSolution, updatedRemainingCities) =
-      updateSolution(currentSolution, remainingCities)
-
-    if (updatedSolution == currentSolution) {
-      currentSolution
+    if (
+      currentSolution.path.size == ProblemInstanceHolder.problemInstance.expectedSolutionLen
+    ) {
+      val currentSolutionCost = calculateSolutionCost(currentSolution.path)
+      currentSolution.copy(cost = currentSolutionCost)
     } else {
-      generate(updatedSolution, updatedRemainingCities, updateSolution)
+      val (updatedSolution, updatedRemainingCities) =
+        updateSolution(currentSolution, remainingCities)
+      generateSolution(updatedSolution, updatedRemainingCities, updateSolution)
     }
   }
 }
@@ -192,7 +175,7 @@ object SolutionUpdater {
       initialSolutionGenerator: () => Solution
   ): Solution = {
     val initialSolution = initialSolutionGenerator()
-    SolutionGenerator.generate(
+    updateSolution(
       initialSolution,
       ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithEdgesSwapsGreedy.updateSolution
@@ -203,7 +186,7 @@ object SolutionUpdater {
       initialSolutionGenerator: () => Solution
   ): Solution = {
     val initialSolution = initialSolutionGenerator()
-    SolutionGenerator.generate(
+    updateSolution(
       initialSolution,
       ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithEdgesSwapsSteepest.updateSolution
@@ -214,7 +197,7 @@ object SolutionUpdater {
       initialSolutionGenerator: () => Solution
   ): Solution = {
     val initialSolution = initialSolutionGenerator()
-    SolutionGenerator.generate(
+    updateSolution(
       initialSolution,
       ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithNodesSwapsGreedy.updateSolution
@@ -225,23 +208,7 @@ object SolutionUpdater {
       initialSolutionGenerator: () => Solution
   ): Solution = {
     val initialSolution = initialSolutionGenerator()
-    SolutionGenerator.generate(
-      initialSolution,
-      ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
-      LocalSearchWithNodesSwapsSteepest.updateSolution
-    )
-  }
-
-  def getLocalSearchWithNodesSwapsSteepestHeuristicStart(
-      optionalInitialCity: Option[Int] = None,
-      optionalInitialSolution: Option[Solution] = None
-  ): Solution = {
-    val initialCity = optionalInitialCity.getOrElse(
-      Random.nextInt(ProblemInstanceHolder.problemInstance.cities.size)
-    )
-    val initialSolution =
-      SolutionGenerator.getGreedyAnyPositionSolution(Some(initialCity))
-    SolutionGenerator.generate(
+    updateSolution(
       initialSolution,
       ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithNodesSwapsSteepest.updateSolution
@@ -252,7 +219,7 @@ object SolutionUpdater {
       initialSolutionGenerator: () => Solution
   ): Solution = {
     val initialSolution = initialSolutionGenerator()
-    SolutionGenerator.generate(
+    updateSolution(
       initialSolution,
       ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithCandidateMovesGreedy.updateSolution
@@ -263,7 +230,7 @@ object SolutionUpdater {
       initialSolutionGenerator: () => Solution
   ): Solution = {
     val initialSolution = initialSolutionGenerator()
-    SolutionGenerator.generate(
+    updateSolution(
       initialSolution,
       ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
       LocalSearchWithCandidateMovesSteepest.updateSolution
@@ -278,7 +245,7 @@ object SolutionUpdater {
       solution,
       ProblemInstanceHolder.problemInstance.cities -- solution.path
     )
-    SolutionGenerator.generate(
+    updateSolution(
       solution,
       ProblemInstanceHolder.problemInstance.cities -- solution.path,
       localSearchInstance.updateSolution
@@ -286,7 +253,7 @@ object SolutionUpdater {
   }
 
   def getIteratedLocalSearch(): Solution = {
-    val initialSolution = SolutionGenerator.getRandomSolution()
+    val initialSolution = SolutionGenerator.generateRandomSolution()
     val updatedSolution = IteratedLSSolution.updateSolution(
       initialSolution,
       ProblemInstanceHolder.problemInstance.cities -- initialSolution.path
@@ -295,4 +262,20 @@ object SolutionUpdater {
   }
 
   def getMSLS(): Solution = { MSLS.run() }
+
+  @tailrec
+  def updateSolution(
+      currentSolution: Solution,
+      remainingCities: Set[Int],
+      solutionUpdater: (Solution, Set[Int]) => (Solution, Set[Int])
+  ): Solution = {
+    val (updatedSolution, updatedRemainingCities) =
+      solutionUpdater(currentSolution, remainingCities)
+
+    if (updatedSolution == currentSolution) {
+      currentSolution
+    } else {
+      updateSolution(updatedSolution, updatedRemainingCities, solutionUpdater)
+    }
+  }
 }

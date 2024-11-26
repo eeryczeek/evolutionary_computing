@@ -5,11 +5,6 @@ object GreedyCycleWeightedRegretSolution
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
-    if (
-      currentSolution.path.size == ProblemInstanceHolder.problemInstance.expectedSolutionLen
-    ) {
-      return (currentSolution, availableCities)
-    }
     val currentCycle = currentSolution.path
     val distances = ProblemInstanceHolder.problemInstance.distances
     val cityCosts = ProblemInstanceHolder.problemInstance.cityCosts

@@ -1,28 +1,15 @@
-object GreedyCycleSolution extends MoveOperations with CostManager {
-
+object GreedyCycleSolution
+    extends MoveOperations
+    with CostManager
+    with LocalSearch {
   def updateSolution(
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
-    if (
-      currentSolution.path.size == ProblemInstanceHolder.problemInstance.expectedSolutionLen
-    ) {
-      val solutionCost = getSolutionCost(currentSolution)
-      return (currentSolution.copy(cost = solutionCost), availableCities)
-    }
-
-    val pairs = getConsecutivePairs(currentSolution.path)
-    val nextMove = availableCities
-      .flatMap { city =>
-        pairs.map { pair =>
-          InsertBetween(pair, city)
-        }
-      }
-      .minBy(getDeltaCost(_))
-
+    val possibleMoves = getAllInsertBetween(currentSolution, availableCities)
+    val move = possibleMoves.minBy(getDeltaCost(_))
     val (newSolution, newAvailableCities) =
-      performMove(currentSolution, nextMove, availableCities)
-
+      performMove(currentSolution, move, availableCities)
     (newSolution, newAvailableCities)
   }
 }

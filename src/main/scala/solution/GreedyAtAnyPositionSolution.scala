@@ -5,12 +5,6 @@ object GreedyAtAnyPositionSolution extends MoveOperations with CostManager {
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
-    if (
-      currentSolution.path.size == ProblemInstanceHolder.problemInstance.expectedSolutionLen
-    ) {
-      val solutionCost = getSolutionCost(currentSolution)
-      return (currentSolution.copy(cost = solutionCost), availableCities)
-    }
     val path = currentSolution.path
     val distances = ProblemInstanceHolder.problemInstance.distances
     val cityCosts = ProblemInstanceHolder.problemInstance.cityCosts

@@ -1,74 +1,29 @@
 import scala.annotation.tailrec
 
-object GreedyCycleRegretSolution extends MoveOperations with CostManager {
+object GreedyCycleRegretSolution
+    extends MoveOperations
+    with CostManager
+    with LocalSearch {
   def updateSolution(
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
-    if (
-      currentSolution.path.size == ProblemInstanceHolder.problemInstance.expectedSolutionLen
-    ) {
-      return (currentSolution, availableCities)
-    }
-    val currentCycle = currentSolution.path
-    val distances = ProblemInstanceHolder.problemInstance.distances
-    val cityCosts = ProblemInstanceHolder.problemInstance.cityCosts
-    val edgesWithIndexes = currentCycle
-      .zip(currentCycle.tail :+ currentCycle.head)
-      .zipWithIndex
-
-    val CityWithPlaceCostAndRegret(
-      cityToInsert,
-      insertIndex,
-      additionalCost,
-      _
-    ) = availableCities.view
-      .flatMap { city =>
-        edgesWithIndexes.map { case ((city1, city2), i) =>
-          val insertionCost = distances(city1)(city) +
-            distances(city)(city2) +
-            cityCosts(city) -
-            distances(city1)(city2)
-          CityWithPlaceAndCost(city, i, insertionCost)
-        }
-      }
-      .groupBy(_.city)
-      .mapValues(_.toList.sortBy(_.cost).take(2))
-      .map { case (city, costs) =>
+    val move = getAllInsertBetween(currentSolution, availableCities)
+      .map(move => (move, getDeltaCost(move)))
+      .groupBy(_._1.city)
+      .mapValues(_.toList.sortBy(_._2).take(2))
+      .map { case (city, moves) =>
         val regret =
-          if (costs.size == 2) costs(1).cost - costs(0).cost
-          else costs.head.cost
-        CityWithPlaceCostAndRegret(
-          city,
-          costs.head.placeToInsert,
-          costs.head.cost,
-          regret
-        )
+          if (moves.size == 2) moves(1)._2 - moves(0)._2
+          else moves.head._2
+        (city, moves.head._1, regret)
       }
-      .maxBy(_.regret)
+      .maxBy(_._3)
+      ._2
 
-    val newCycle = currentCycle.take(insertIndex + 1) ++ List(
-      cityToInsert
-    ) ++ currentCycle.drop(insertIndex + 1)
-    (
-      Solution(
-        newCycle,
-        currentSolution.cost + additionalCost
-      ),
-      availableCities - cityToInsert
-    )
+    val (newSolution, newAvailableCities) =
+      performMove(currentSolution, move, availableCities)
+    (newSolution, newAvailableCities)
   }
 
-  private case class CityWithPlaceAndCost(
-      city: Int,
-      placeToInsert: Int,
-      cost: Int
-  )
-
-  private case class CityWithPlaceCostAndRegret(
-      city: Int,
-      place: Int,
-      cost: Int,
-      regret: Int
-  )
 }

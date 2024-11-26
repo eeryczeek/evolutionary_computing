@@ -1,12 +1,12 @@
 trait CostManager {
-  def getSolutionCost(
-      solution: Solution
+  def calculateSolutionCost(
+      path: Seq[Int]
   ): Int = {
     val distances = ProblemInstanceHolder.problemInstance.distances
     val cityCosts = ProblemInstanceHolder.problemInstance.cityCosts
-    (solution.path :+ solution.path.head)
+    (path :+ path.head)
       .sliding(2)
-      .map { case Array(a, b) => distances(a)(b) + cityCosts(b) }
+      .map { case Seq(a, b) => distances(a)(b) + cityCosts(b) }
       .sum
   }
 

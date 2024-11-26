@@ -58,15 +58,13 @@ trait MoveOperations {
     }
   }
 
-  def getConsecutivePairs(path: Array[Int]): Seq[Pair] = {
-    (path :+ path.head).sliding(2).map { case Array(a, b) => Pair(a, b) }.toSeq
+  def getConsecutivePairs(path: Seq[Int]): Seq[Pair] = {
+    (path :+ path.head).sliding(2).map { case Seq(a, b) => Pair(a, b) }.toSeq
   }
 
-  def getConsecutiveTriplets(path: Array[Int]): Seq[Triplet] = {
-    (path ++ path.take(2))
-      .sliding(3)
-      .map { case Array(a, b, c) => Triplet(a, b, c) }
-      .toSeq
+  def getConsecutiveTriplets(path: Seq[Int]): Seq[Triplet] = {
+    (path ++ path
+      .take(2)).sliding(3).map { case Seq(a, b, c) => Triplet(a, b, c) }.toSeq
   }
 
   private def performAppendAtEnd(
@@ -78,6 +76,7 @@ trait MoveOperations {
     val newAvailableCities = availableCities - appendAtEnd.city
     (currentSolution.copy(path = newPath), newAvailableCities)
   }
+
   private def performPrependAtStart(
       currentSolution: Solution,
       prependAtStart: PrependAtStart,
@@ -96,11 +95,7 @@ trait MoveOperations {
     val InsertBetween(Pair(a, b), city) = insertBetween
     val city1Position = currentSolution.path.indexOf(a)
     val city2Position = currentSolution.path.indexOf(b)
-    val newPath = currentSolution.path.patch(
-      city1Position + 1,
-      Seq(city),
-      0
-    )
+    val newPath = currentSolution.path.patch(city1Position + 1, Seq(city), 0)
 
     val newAvailableCities = availableCities - city
     (currentSolution.copy(path = newPath), newAvailableCities)

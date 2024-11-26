@@ -75,13 +75,22 @@ object Main extends App {
   }
 
   val solutionMethods = List(
+    ("Random", () => SolutionFactory.getRandomSolution),
+    ("GreedyTail", () => SolutionFactory.getGreedyTailSolution),
+    ("GreedyAnyPosition", () => SolutionFactory.getGreedyAnyPositionSolution),
+    ("GreedyCycle", () => SolutionFactory.getGreedyCycleSolution),
+    ("GreedyCycleRegret", () => SolutionFactory.getGreedyCycleRegretSolution),
     (
-      "ListOfImprovingMoves",
-      () =>
-        SolutionFactory.getLocalSearchWithEdgesSwapsSteepest(() =>
-          SolutionFactory.getRandomSolution()
-        )
+      "GreedyCycleWeightedRegret",
+      () => SolutionFactory.getGreedyCycleWeightedRegretSolution
     )
+    // (
+    //   "ListOfImprovingMoves",
+    //   () =>
+    //     SolutionFactory.getLocalSearchWithEdgesSwapsSteepest(() =>
+    //       SolutionFactory.getRandomSolution()
+    //     )
+    // )
   )
 
   for (name <- names) {
