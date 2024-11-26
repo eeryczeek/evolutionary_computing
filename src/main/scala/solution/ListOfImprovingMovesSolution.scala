@@ -144,7 +144,7 @@ class ListOfImprovingMovesSolution()
           ) =>
         improvingMoves = improvingMoves
           .mapInPlace {
-            case (move @ NodeSwapOut(_, city), _) if city == addedCity => {
+            case (move @ NodeSwapOut(_, `addedCity`), _) => {
               (move, 1) // move cant be applied anymore
             }
 
@@ -183,6 +183,40 @@ class ListOfImprovingMovesSolution()
             case move => move
           }
           .filter(_._2 < 0)
+
+        val newMoves =
+          getAllEdgeSwapsForEdge(
+            currentSolution,
+            Pair(cityBefore, addedCity)
+          ) ++
+            getAllEdgeSwapsForEdge(
+              currentSolution,
+              Pair(addedCity, cityAfter)
+            ) ++
+            getAllEdgeSwapsForEdge(
+              currentSolution,
+              Pair(addedCity, cityBefore)
+            ) ++
+            getAllEdgeSwapsForEdge(
+              currentSolution,
+              Pair(cityAfter, addedCity)
+            ) ++
+            getAllNodeSwapsForGivenCity(
+              currentSolution,
+              availableCities,
+              cityBefore
+            ) ++
+            getAllNodeSwapsWithGivenCity(currentSolution, removedCity) ++
+            getAllNodeSwapsForGivenCity(
+              currentSolution,
+              availableCities,
+              cityAfter
+            )
+
+        improvingMoves ++= newMoves
+          .map(move => (move, getDeltaCost(move)))
+          .filter(_._2 < 0)
+
       case _ => ()
     }
   }
@@ -262,7 +296,7 @@ class ListOfImprovingMovesSolution()
       .toList
   }
 
-  private def getAllNodeSwapsForGivenCity(
+  private def getAllNodeSwapsWithGivenCity(
       solution: Solution,
       city: Int
   ): List[NodeSwapOut] = {
@@ -272,6 +306,23 @@ class ListOfImprovingMovesSolution()
       triplets
         .map(triplet => NodeSwapOut(triplet, city))
         .toList
+    }
+  }
+
+  private def getAllNodeSwapsForGivenCity(
+      solution: Solution,
+      availableCities: Set[Int],
+      city: Int
+  ): List[NodeSwapOut] = {
+    if (!solution.path.contains(city)) return List()
+    else {
+      val idx = solution.path.indexOf(city)
+      val triplet = Triplet(
+        solution.path(if (idx == 0) 99 else idx - 1),
+        city,
+        solution.path((idx + 1) % solution.path.length)
+      )
+      availableCities.map(c => NodeSwapOut(triplet, c)).toList
     }
   }
 }
