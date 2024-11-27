@@ -7,7 +7,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 import java.util.concurrent.atomic.AtomicInteger
 
-object Main extends App {
+object Main extends App with MoveGenerator {
   implicit val ec: ExecutionContext = ExecutionContext.global
   val names = List("tspa", "tspb")
   val resultsTablePath = Paths.get("results/results_table.txt")
@@ -75,22 +75,31 @@ object Main extends App {
   }
 
   val solutionMethods = List(
-    ("Random", () => SolutionFactory.getRandomSolution),
-    ("GreedyTail", () => SolutionFactory.getGreedyTailSolution),
-    ("GreedyAnyPosition", () => SolutionFactory.getGreedyAnyPositionSolution),
-    ("GreedyCycle", () => SolutionFactory.getGreedyCycleSolution),
-    ("GreedyCycleRegret", () => SolutionFactory.getGreedyCycleRegretSolution),
+    ("RandomSolution", () => SolutionGenerator.generateRandomSolution),
+    ("TailAppendSolution", () => SolutionGenerator.generateTailAppendSolution),
     (
-      "GreedyCycleWeightedRegret",
-      () => SolutionFactory.getGreedyCycleWeightedRegretSolution
+      "InsertAnyPositionSolution",
+      () => SolutionGenerator.generateInsertAnyPositionSolution
+    ),
+    ("CycleSolution", () => SolutionGenerator.generateCycleSolution),
+    (
+      "CycleRegretSolution",
+      () => SolutionGenerator.generateCycleRegretSolution
+    ),
+    (
+      "CycleWeightedRegretSolution",
+      () => SolutionGenerator.generateCycleWeightedRegretSolution
+    ),
+    (
+      "LocalSerchNodeSwapsGreedy",
+      () =>
+        SolutionModifier.getLocalSearchGreedy(
+          SolutionGenerator.generateCycleSolution,
+          (solution, set) =>
+            getAllNodeSwapsIn(solution, set) ++
+              getAllNodeSwapsOut(solution, set)
+        )
     )
-    // (
-    //   "ListOfImprovingMoves",
-    //   () =>
-    //     SolutionFactory.getLocalSearchWithEdgesSwapsSteepest(() =>
-    //       SolutionFactory.getRandomSolution()
-    //     )
-    // )
   )
 
   for (name <- names) {

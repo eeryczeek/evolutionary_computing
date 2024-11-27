@@ -58,15 +58,6 @@ trait MoveOperations {
     }
   }
 
-  def getConsecutivePairs(path: Seq[Int]): Seq[Pair] = {
-    (path :+ path.head).sliding(2).map { case Seq(a, b) => Pair(a, b) }.toSeq
-  }
-
-  def getConsecutiveTriplets(path: Seq[Int]): Seq[Triplet] = {
-    (path ++ path
-      .take(2)).sliding(3).map { case Seq(a, b, c) => Triplet(a, b, c) }.toSeq
-  }
-
   private def performAppendAtEnd(
       currentSolution: Solution,
       appendAtEnd: AppendAtEnd,

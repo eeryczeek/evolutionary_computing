@@ -2,7 +2,7 @@ import scala.collection.mutable
 import scala.util.Random
 
 object IteratedLSSolution
-    extends LocalSearch
+    extends MoveGenerator
     with MoveOperations
     with CostManager {
 
@@ -17,7 +17,7 @@ object IteratedLSSolution
       val (perturbedSolution, newAvailableCities) =
         perturbSolution(bestSolution, bestAvailableCities)
       val updatedSolution =
-        SolutionFactory.getLocalSearchWithListOfImprovingMoves(
+        SolutionModifier.getLocalSearchWithListOfImprovingMoves(
           initialSolutionGenerator = () => perturbedSolution
         )
       if (updatedSolution.cost < bestSolution.cost) {
@@ -40,10 +40,10 @@ object IteratedLSSolution
     for (_ <- 1 to n) {
       val triplet =
         Random
-          .shuffle(getConsecutiveTriplets(perturbedSolution.path))
+          .shuffle(getCycleConsecutiveTriplets(perturbedSolution.path))
           .head
       val pair =
-        Random.shuffle(getConsecutivePairs(perturbedSolution.path)).head
+        Random.shuffle(getCycleConsecutivePairs(perturbedSolution.path)).head
       val city = Random.shuffle(perturbedAvailableCities.toSeq).head
       if (
         Set(

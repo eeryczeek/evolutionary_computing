@@ -1,9 +1,9 @@
 import scala.annotation.tailrec
 
-object GreedyCycleRegretSolution
+object CycleRegretGenerator
     extends MoveOperations
     with CostManager
-    with LocalSearch {
+    with MoveGenerator {
   def updateSolution(
       currentSolution: Solution,
       availableCities: Set[Int]
@@ -16,14 +16,13 @@ object GreedyCycleRegretSolution
         val regret =
           if (moves.size == 2) moves(1)._2 - moves(0)._2
           else moves.head._2
-        (city, moves.head._1, regret)
+        (moves.head._1, regret)
       }
-      .maxBy(_._3)
-      ._2
+      .maxBy(_._2)
+      ._1
 
     val (newSolution, newAvailableCities) =
       performMove(currentSolution, move, availableCities)
     (newSolution, newAvailableCities)
   }
-
 }

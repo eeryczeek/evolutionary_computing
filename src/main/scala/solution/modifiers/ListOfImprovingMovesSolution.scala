@@ -11,20 +11,15 @@ class ListOfImprovingMovesSolution()
   private var improvingMoves = collection.mutable.PriorityQueue[(Move, Int)]()
 
   def init(initialSolution: Solution, availableCities: Set[Int]): Unit = {
-    val edgeSwaps =
-      getAllEdgeSwaps(initialSolution, availableCities)
-
+    val edgeSwaps = getAllEdgeSwaps(initialSolution, availableCities)
     val invertedEdgeSwaps = edgeSwaps.map {
       case EdgeSwap(edge1, edge2) =>
         EdgeSwap(edge1, Pair(edge2.city2, edge2.city1))
       case _ => throw new Exception("Invalid move")
     }
 
-    val nodeSwapsOut =
-      getAllNodeSwapsOut(initialSolution, availableCities)
-
+    val nodeSwapsOut = getAllNodeSwapsOut(initialSolution, availableCities)
     val possibleMoves = edgeSwaps ++ invertedEdgeSwaps ++ nodeSwapsOut
-
     val improvingMovesWithCosts = possibleMoves
       .map(move => (move, getDeltaCost(move)))
       .filter(_._2 < 0)
@@ -38,9 +33,7 @@ class ListOfImprovingMovesSolution()
   ): (Solution, Set[Int]) = {
     val edges = getConsecutivePairs(currentSolution.path).toSet
     val triplets = getConsecutiveTriplets(currentSolution.path).toSet
-    findFirstApplicableMove(
-      isMoveApplicable(_, edges, triplets)
-    ) match {
+    findFirstApplicableMove(isMoveApplicable(_, edges, triplets)) match {
       case Some((move, deltaCost)) =>
         val trueMove = move match {
           case EdgeSwap(edge1, edge2) =>

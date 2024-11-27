@@ -1,15 +1,18 @@
 import scala.util.Random
+import scala.annotation.tailrec
 
-object LocalSearchWithNodesSwapsSteepest
-    extends LocalSearch
+object LocalSearchSteepest
+    extends MoveGenerator
     with MoveOperations
     with CostManager {
-  def updateSolution(
+
+  @tailrec
+  def modifySolution(
       currentSolution: Solution,
-      availableCities: Set[Int]
+      availableCities: Set[Int],
+      neighbourhoodGenerator: (Solution, Set[Int]) => Seq[Move]
   ): (Solution, Set[Int]) = {
-    val possibleMoves =
-      getNeighbourhoodWithNodesSwapsIn(currentSolution, availableCities)
+    val possibleMoves = neighbourhoodGenerator(currentSolution, availableCities)
 
     val improvingMoves = possibleMoves
       .map(move => (move, getDeltaCost(move)))
@@ -19,7 +22,11 @@ object LocalSearchWithNodesSwapsSteepest
       val (bestMove, deltaCost) = improvingMoves
       val (newSolution, newAvailableCities) =
         performMove(currentSolution, bestMove, availableCities)
-      (newSolution, newAvailableCities)
+      modifySolution(
+        newSolution.copy(cost = currentSolution.cost + deltaCost),
+        newAvailableCities,
+        neighbourhoodGenerator
+      )
     } else {
       (currentSolution, availableCities)
     }

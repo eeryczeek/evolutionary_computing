@@ -1,6 +1,6 @@
 import scala.annotation.tailrec
 
-object GreedyAtAnyPositionSolution extends MoveOperations with CostManager {
+object InsertAnyPositionGenerator extends MoveOperations with CostManager {
   def updateSolution(
       currentSolution: Solution,
       availableCities: Set[Int]

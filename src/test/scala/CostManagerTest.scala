@@ -4,7 +4,7 @@ import org.scalatest.Assertions
 class CostManagerTest
     extends AnyFunSuite
     with CostManager
-    with LocalSearch
+    with MoveGenerator
     with MoveOperations {
 
   test("additional cost should be correct") {

@@ -1,7 +1,30 @@
 import scala.util.Random
 import java.nio.file.AtomicMoveNotSupportedException
 
-trait LocalSearch extends MoveOperations with CostManager {
+trait MoveGenerator extends MoveOperations with CostManager {
+  def getCycleConsecutivePairs(path: Seq[Int]): Seq[Pair] = {
+    (path :+ path.head).sliding(2).map { case Seq(a, b) => Pair(a, b) }.toSeq
+  }
+
+  def getCycleConsecutiveTriplets(path: Seq[Int]): Seq[Triplet] = {
+    (path ++ path
+      .take(2)).sliding(3).map { case Seq(a, b, c) => Triplet(a, b, c) }.toSeq
+  }
+
+  def getPathConsecutivePairs(path: Seq[Int]): Seq[Pair] = {
+    path
+      .sliding(2)
+      .map { case Seq(city1, city2) => Pair(city1, city2) }
+      .toSeq
+  }
+
+  def getPathConsecutiveTriplets(path: Seq[Int]): Seq[Triplet] = {
+    path
+      .sliding(3)
+      .map { case Seq(city1, city2, city3) => Triplet(city1, city2, city3) }
+      .toSeq
+  }
+
   def getCandidateEdgeSwap(
       currentSolution: Solution,
       city1: Int,
@@ -22,7 +45,7 @@ trait LocalSearch extends MoveOperations with CostManager {
       availableCities: Set[Int]
   ): Seq[InsertBetween] = {
     for {
-      pair <- getConsecutivePairs(currentSolution.path)
+      pair <- getCycleConsecutivePairs(currentSolution.path)
       city <- availableCities
     } yield InsertBetween(pair, city)
   }
@@ -32,7 +55,7 @@ trait LocalSearch extends MoveOperations with CostManager {
       availableCities: Set[Int]
   ): Seq[Move] = {
     for {
-      triplet <- getConsecutiveTriplets(currentSolution.path)
+      triplet <- getCycleConsecutiveTriplets(currentSolution.path)
       city <- availableCities
     } yield NodeSwapOut(triplet, city)
   }
@@ -42,8 +65,8 @@ trait LocalSearch extends MoveOperations with CostManager {
       availableCities: Set[Int]
   ): Seq[Move] = {
     (for {
-      pair1 <- getConsecutivePairs(currentSolution.path)
-      pair2 <- getConsecutivePairs(currentSolution.path)
+      pair1 <- getCycleConsecutivePairs(currentSolution.path)
+      pair2 <- getCycleConsecutivePairs(currentSolution.path)
       if Set(pair1.city1, pair1.city2, pair2.city1, pair2.city2).size == 4
     } yield EdgeSwap(pair1, pair2)).toSeq
   }
@@ -53,8 +76,8 @@ trait LocalSearch extends MoveOperations with CostManager {
       availableCities: Set[Int]
   ): Seq[Move] = {
     (for {
-      pair1 <- getConsecutivePairs(currentSolution.path)
-      pair2 <- getConsecutivePairs(currentSolution.path)
+      pair1 <- getCycleConsecutivePairs(currentSolution.path)
+      pair2 <- getCycleConsecutivePairs(currentSolution.path)
       if Set(pair1.city1, pair1.city2, pair2.city1, pair2.city2).size == 4
     } yield EdgeSwap(pair1, pair2)).toSeq
   }
@@ -64,8 +87,8 @@ trait LocalSearch extends MoveOperations with CostManager {
       availableCities: Set[Int]
   ): Seq[Move] = {
     (for {
-      triplet <- getConsecutiveTriplets(currentSolution.path)
-      pair <- getConsecutivePairs(currentSolution.path)
+      triplet <- getCycleConsecutiveTriplets(currentSolution.path)
+      pair <- getCycleConsecutivePairs(currentSolution.path)
       city <- availableCities
       if Set(
         triplet.city1,
@@ -114,8 +137,8 @@ trait LocalSearch extends MoveOperations with CostManager {
       availableCities: Set[Int]
   ): Seq[Move] = {
     val path = currentSolution.path.toArray
-    val pairs = getConsecutivePairs(currentSolution.path)
-    val triplets = getConsecutiveTriplets(currentSolution.path)
+    val pairs = getCycleConsecutivePairs(currentSolution.path)
+    val triplets = getCycleConsecutiveTriplets(currentSolution.path)
 
     val edgeSwapsIn = pairs
       .combinations(2)
@@ -143,7 +166,7 @@ trait LocalSearch extends MoveOperations with CostManager {
       availableCities: Set[Int]
   ): Seq[Move] = {
     val path = currentSolution.path.toArray
-    val triplets = getConsecutiveTriplets(currentSolution.path)
+    val triplets = getCycleConsecutiveTriplets(currentSolution.path)
 
     val nodeSwapsIn = triplets
       .combinations(2)
