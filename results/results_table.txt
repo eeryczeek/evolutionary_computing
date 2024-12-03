@@ -1,10 +1,16 @@
 Instance: tspa
-| **Method** | **Min** | **Mean** | **Max** | **Time\* (s)** |
-| --- | --- | --- | --- | --- |
-| `LocalSerchNodeSwapsGreedy` | 70098 | 71600 | 73422 | 5.4270 |
+| **Method** | **Min** | **Mean** | **Max** | **Avg time (s)** | **Iterations** |
+| --- | --- | --- | --- | --- | --- |
+| `LargeNeighborhoodSearchWithLS` | 69137 | 69521 | 70016 | 33.0230 | 1208 |
+| `LargeNeighborhoodSearchWithoutLS` | 69362 | 69761 | 70392 | 33.0070 | 2207 |
+| `IteratedLocalSearch` | 69224 | 69640 | 70112 | 33.0100 | 2326 |
+| `MSLS` | 70942 | 71392 | 71899 | 32.4680 | 0 |
 
 Instance: tspb
-| **Method** | **Min** | **Mean** | **Max** | **Time\* (s)** |
-| --- | --- | --- | --- | --- |
-| `LocalSerchNodeSwapsGreedy` | 47968 | 50855 | 56845 | 5.3357 |
+| **Method** | **Min** | **Mean** | **Max** | **Avg time (s)** | **Iterations** |
+| --- | --- | --- | --- | --- | --- |
+| `LargeNeighborhoodSearchWithLS` | 43577 | 44106 | 45024 | 33.0120 | 1194 |
+| `LargeNeighborhoodSearchWithoutLS` | 43503 | 44129 | 44581 | 33.0070 | 2156 |
+| `IteratedLocalSearch` | 43552 | 44052 | 44794 | 33.0050 | 2294 |
+| `MSLS` | 45303 | 45761 | 46177 | 35.2770 | 0 |
 

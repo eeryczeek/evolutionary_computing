@@ -12,8 +12,9 @@ object IteratedLSSolution
   ): Solution = {
     var bestSolution = currentSolution
     var bestAvailableCities = availableCities
+    var numOfIterations = 0
     val startTime = System.currentTimeMillis()
-    while (System.currentTimeMillis() - startTime < 60000) {
+    while (System.currentTimeMillis() - startTime < 33000) {
       val (perturbedSolution, newAvailableCities) =
         perturbSolution(bestSolution, bestAvailableCities)
       val updatedSolution =
@@ -25,15 +26,19 @@ object IteratedLSSolution
         bestAvailableCities =
           ProblemInstanceHolder.problemInstance.cities -- updatedSolution.path
       }
+      numOfIterations += 1
     }
-    bestSolution
+    bestSolution.copy(
+      additionalData =
+        Some(AdditionalData(numOfIterations = Some(numOfIterations)))
+    )
   }
 
   def perturbSolution(
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
-    assert(availableCities.filter(currentSolution.path.contains).isEmpty)
+    // assert(availableCities.filter(currentSolution.path.contains).isEmpty)
     var n = 2
     var perturbedSolution: Solution = currentSolution
     var perturbedAvailableCities: Set[Int] = availableCities

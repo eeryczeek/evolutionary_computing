@@ -2,7 +2,12 @@ import scala.util.Random
 import scala.util.control.TailCalls.TailRec
 import scala.annotation.tailrec
 
-case class Solution(path: Seq[Int], cost: Int)
+case class AdditionalData(numOfIterations: Option[Int] = None)
+case class Solution(
+    path: Seq[Int],
+    cost: Int,
+    additionalData: Option[AdditionalData] = None
+)
 
 object SolutionGenerator extends CostManager {
   def generateRandomSolution(): Solution = RandomGenerator.generate()
@@ -152,6 +157,30 @@ object SolutionModifier extends MoveGenerator {
   }
 
   def getMSLS(): Solution = { MSLS.run() }
+
+  def getLargeNeighborhoodSearchWithLocalSearch(): Solution = {
+    val initialSolution = SolutionGenerator.generateRandomSolution()
+    val startingTime = System.currentTimeMillis()
+    val updatedSolution =
+      LargeNeighborhoodSearch.performWithLocalSearch(
+        initialSolution,
+        ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
+        System.currentTimeMillis() - startingTime > 33000
+      )
+    updatedSolution
+  }
+
+  def getLargeNeighborhoodSearchWithoutLocalSearch(): Solution = {
+    val initialSolution = SolutionGenerator.generateRandomSolution()
+    val startingTime = System.currentTimeMillis()
+    val updatedSolution =
+      LargeNeighborhoodSearch.performWithoutLocalSearch(
+        initialSolution,
+        ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
+        System.currentTimeMillis() - startingTime > 33000
+      )
+    updatedSolution
+  }
 
   @tailrec
   def modifySolutionNeighbourhood(

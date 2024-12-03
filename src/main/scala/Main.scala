@@ -31,6 +31,12 @@ object Main extends App with MoveGenerator {
     writeResults(header, resultsTablePath)
   }
 
+  def writeHeaderWithIterations(name: String): Unit = {
+    val header =
+      s"Instance: $name\n| **Method** | **Min** | **Mean** | **Max** | **Avg time (s)** | **Iterations** |\n| --- | --- | --- | --- | --- | --- |\n"
+    writeResults(header, resultsTablePath)
+  }
+
   def writeResults(output: String, path: java.nio.file.Path): Unit = {
     Files.write(
       path,
@@ -45,27 +51,33 @@ object Main extends App with MoveGenerator {
       methodName: String,
       solutionMethod: () => Solution
   ): Unit = {
-    val startTime = System.nanoTime()
-    val totalTasks = ProblemInstanceHolder.problemInstance.cities.size
+    val totalTasks = 20 // ProblemInstanceHolder.problemInstance.cities.size
     val completedTasks = new AtomicInteger(0)
 
-    val solutions = ProblemInstanceHolder.problemInstance.cities.toList.view
+    val solutions = (1 to totalTasks)
       .map(city =>
         Future {
+          val startTime = System.currentTimeMillis()
           val solution = solutionMethod()
+          val endTime = System.currentTimeMillis()
           val completed = completedTasks.incrementAndGet()
           print(s"\rprocessing $methodName [$completed/$totalTasks]")
-          solution
+          (solution, endTime - startTime)
         }
       )
       .toSeq
 
     val result = Await.result(Future.sequence(solutions), 3600.seconds)
-    val endTime = System.nanoTime()
-    val bestSolution = result.minBy(_.cost)
-    val distances = result.map(_.cost).toIndexedSeq
+    val resultsSolutions = result.map(_._1)
+    val averageTimeMS = result.map(_._2).sum / totalTasks
+    val bestSolution = resultsSolutions.minBy(_.cost)
+    val distances = resultsSolutions.map(_.cost).toIndexedSeq
+    val iterations =
+      resultsSolutions.flatMap(_.additionalData).flatMap(_.numOfIterations)
+    val avgIterations =
+      if (iterations.isEmpty) 0 else iterations.sum / iterations.size
     val outputTable =
-      f"| `$methodName` | ${distances.min} | ${distances.sum / distances.size} | ${distances.max} | ${(endTime - startTime) / 1e9}%.4f |\n"
+      f"| `$methodName` | ${distances.min} | ${distances.sum / distances.size} | ${distances.max} | ${averageTimeMS / 1e3}%.4f | $avgIterations |\n"
     writeResults(outputTable, resultsTablePath)
     val outputBest =
       s"Instance: $instance\nMethod: $methodName\nBest Solution Path: ${bestSolution.path
@@ -91,19 +103,28 @@ object Main extends App with MoveGenerator {
     //   () => SolutionGenerator.generateCycleWeightedRegretSolution
     // ),
     (
-      "LocalSerchNodeSwapsGreedy",
+      "LargeNeighborhoodSearchWithLS",
+      () => SolutionModifier.getLargeNeighborhoodSearchWithLocalSearch()
+    ),
+    (
+      "LargeNeighborhoodSearchWithoutLS",
+      () => SolutionModifier.getLargeNeighborhoodSearchWithoutLocalSearch()
+    ),
+    (
+      "IteratedLocalSearch",
       () =>
-        SolutionModifier.getLocalSearchGreedy(
-          SolutionGenerator.generateCycleSolution,
-          (solution, set) =>
-            getAllNodeSwapsIn(solution, set) ++
-              getAllNodeSwapsOut(solution, set)
+        SolutionModifier.getIteratedLocalSearch(
+          SolutionGenerator.generateRandomSolution()
         )
+    ),
+    (
+      "MSLS",
+      () => SolutionModifier.getMSLS()
     )
   )
 
   for (name <- names) {
-    writeHeader(name)
+    writeHeaderWithIterations(name)
     ProblemInstanceHolder.problemInstance =
       CSVReader.readCSV(s"${name.toUpperCase()}.csv")
     solutionMethods.foreach { case (suffix, method) =>

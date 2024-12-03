@@ -34,57 +34,67 @@ This visual representation provides an intuitive way to interpret the spatial re
 
 ## [Combined TSPA and TSPB results table](#combined-tspa-and-tspb-results-table):
 
-Instance: tspa
 
-| **Method**             | **Min** | **Mean** | **Max** | **Time\* (s)** |
-| ---------------------- | ------- | -------- | ------- | -------------- |
-| `IteratedLocalSearch`  | 69353   | 70514    | 71980   | 78.2629        |
-| `MSLS`                 | 71299   | 72745    | 74026   | 71.1501        |
-| `GreedyAtAnyPosition`  | 71263   | 73096    | 76156   | 0.8800         |
-| `ListOfImprovingMoves` | 71564   | 73810    | 77544   | 3.8895         |
+### Instance: **tspa**
 
-**IteratedLocalSearch: ~226 iterations of LocalSearch**
+| **Method**                          | **Min**   | **Mean**  | **Max**   | **Avg time (s)**  |
+|-------------------------------------|-----------|-----------|-----------|-------------------|
+| `LargeNeighborhoodSearchWithLS`     | **69406** | **69703** | **70281** | **33.0160**       |
+| `LargeNeighborhoodSearchWithoutLS`  | **69230** | **69656** | **70398** | **33.0070**       |
+| `MSLS`                              | **70770** | **71193** | **71611** | **35.0760**       |
 
-Instance: tspb
+- **Large Neighborhood without LS**: ~1130 iterations of main loop  
+- **Large Neighborhood with LS**: ~2097 iterations of main loop  
 
-| **Method**             | **Min** | **Mean** | **Max** | **Time\* (s)** |
-| ---------------------- | ------- | -------- | ------- | -------------- |
-| `IteratedLocalSearch`  | 43869   | 45008    | 46892   | 78.1519        |
-| `MSLS`                 | 46053   | 47473    | 48854   | 68.7576        |
-| `GreedyAtAnyPosition`  | 44446   | 45916    | 51960   | 0.6027         |
-| `ListOfImprovingMoves` | 45404   | 48409    | 51581   | 3.6014         |
+---
 
-**IteratedLocalSearch: ~226 iterations of LocalSearch**
+### Instance: **tspb**
 
-**Time\* - to solve all 200 instances**
+| **Method**                          | **Min**  | **Mean**   | **Max**   | **Avg time\* (s)** |
+|-------------------------------------|----------|------------|-----------|--------------------|
+| `LargeNeighborhoodSearchWithLS`     | **43461** | **43990** | **44674** | **33.0130**        |
+| `LargeNeighborhoodSearchWithoutLS`  | **43579** | **44210** | **45756** | **33.0080**        |
+| `MSLS`                              | **45025** | **45728** | **46188** | **34.4420**        |
+
+- **Large Neighborhood without LS**: ~1171 iterations of main loop  
+- **Large Neighborhood with LS**: ~2158 iterations of main loop  
+
+--- 
 
 ## Solutions
 
 ```
-Perturbation(Triplet, Pair, city)
+function destroy(solution):
+    remove 25 cities radomly (uniform distribution) from the solution
 
-function generatePerturbation():
-    triplet <- random triplet from consecutive triplets from solution.path
-    pair <- random pair from consecutive pairs from solution.path
-    city <- random city from available cities
-    perturbation = Perturbation(triplet, pair, city)
+function repair(solution):
+    perform greedy at any position algorithm on the solution
 
-function applyPerturbation(solution, perturbation):
-    remove perturbation.triplet.city2 from the solution
-    add perturbation.city between the two cities from perturbation.pair
-    return perturbedSolution
+function local_search(solution) = SteepestLocalSearch with Node swaps
 
-function perturbSolution():
-    do:
-        perturbation <- generatePerturbation()
-        solution <- applyPerturbation(solution, perturbation)
-    twice
+function LargeNeighborhoodSearchWithLS(solution):
+    cur_solution = local_search(solution)
+    until 33 seconds have passed:
+        new_solution = destroy(solution)
+        new_solution = repair(new_solution)
+        new_solution = local_search(new_solution)
+        if new_solution.cost < cur_solution.cost:
+            cur_solution = new_solution
+    return cur_solution
+
+function LargeNeighborhoodSearchWithoutLS(solution):
+    cur_solution = local_search(solution)
+    until 33 seconds have passed:
+        new_solution = destroy(solution)
+        new_solution = repair(new_solution)
+        if new_solution.cost < cur_solution.cost:
+            cur_solution = new_solution
+    return cur_solution
 ```
 
-![ls-edges-swaps-greedy](plots/IteratedLocalSearch.png)
-![ls-candidate-moves-greedy](plots/MSLS.png)
-![ls-edges-swaps-steepest](plots/GreedyAtAnyPosition.png)
-![ls-candidate-moves-steepest](plots/ListOfImprovingMoves.png)
+![lns-with-ls](plots/LargeNeighborhoodSearchWithLS.png)
+![lns-without-ls](plots/LargeNeighborhoodSearchWithLS.png)
+![msls](plots/MSLS.png)
 
 ## [Conclusions](#conclusions)
 
