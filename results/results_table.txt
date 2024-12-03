@@ -1,22 +1,10 @@
 Instance: tspa
 | **Method** | **Min** | **Mean** | **Max** | **Time\* (s)** |
 | --- | --- | --- | --- | --- |
-| `RandomSolution` | 237665 | 264112 | 296168 | 0.0924 |
-| `TailAppendSolution` | 83182 | 85093 | 89433 | 0.5177 |
-| `InsertAnyPositionSolution` | 71359 | 73210 | 76156 | 0.9778 |
-| `CycleSolution` | 71488 | 72667 | 74410 | 3.3418 |
-| `CycleRegretSolution` | 108935 | 116932 | 125614 | 7.2598 |
-| `CycleWeightedRegretSolution` | 71108 | 72150 | 73395 | 7.2335 |
-| `LocalSerchNodeSwapsGreedy` | 70098 | 71613 | 73459 | 4.9092 |
+| `LocalSerchNodeSwapsGreedy` | 70098 | 71600 | 73422 | 5.4270 |
 
 Instance: tspb
 | **Method** | **Min** | **Mean** | **Max** | **Time\* (s)** |
 | --- | --- | --- | --- | --- |
-| `RandomSolution` | 189872 | 212872 | 236695 | 0.0121 |
-| `TailAppendSolution` | 52323 | 54330 | 59030 | 0.0862 |
-| `InsertAnyPositionSolution` | 44446 | 46078 | 53438 | 0.6437 |
-| `CycleSolution` | 48765 | 51458 | 57324 | 3.1625 |
-| `CycleRegretSolution` | 68255 | 73416 | 79784 | 7.7966 |
-| `CycleWeightedRegretSolution` | 47199 | 50812 | 54296 | 7.5154 |
-| `LocalSerchNodeSwapsGreedy` | 47662 | 50929 | 56917 | 5.3246 |
+| `LocalSerchNodeSwapsGreedy` | 47968 | 50855 | 56845 | 5.3357 |
 

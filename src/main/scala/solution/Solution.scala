@@ -97,17 +97,18 @@ object SolutionGenerator extends CostManager {
 }
 
 object SolutionModifier extends MoveGenerator {
-  // HERE SDKLFASJFLASKJFDLASJFJLSAFJLAS;FJSA;LDFJLKSAFJALSKJF;ASJFJLASHDHFASHFASFLAKSFJK
   def getLocalSearchGreedy(
       initialSolutionGenerator: => Solution,
       neighbourhoodGenerator: (Solution, Set[Int]) => Seq[Move]
   ): Solution = {
     val initialSolution = initialSolutionGenerator
-    LocalSearchGreedy.modifySolution(
-      initialSolution,
-      ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
-      neighbourhoodGenerator
-    )
+    val (modifiedSolution, modifiedAvailableCities) =
+      LocalSearchGreedy.modifySolution(
+        initialSolution,
+        ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
+        neighbourhoodGenerator
+      )
+    modifiedSolution
   }
 
   def getLocalSearchSteepest(
@@ -115,11 +116,13 @@ object SolutionModifier extends MoveGenerator {
       neighbourhoodGenerator: (Solution, Set[Int]) => Seq[Move]
   ): Solution = {
     val initialSolution = initialSolutionGenerator
-    LocalSearchSteepest.modifySolution(
-      initialSolution,
-      ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
-      neighbourhoodGenerator
-    )
+    val (modifiedSolution, modifiedAvailableCities) =
+      LocalSearchSteepest.modifySolution(
+        initialSolution,
+        ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
+        neighbourhoodGenerator
+      )
+    modifiedSolution
   }
 
   def getLocalSearchWithListOfImprovingMoves(

@@ -18,7 +18,7 @@ object IteratedLSSolution
         perturbSolution(bestSolution, bestAvailableCities)
       val updatedSolution =
         SolutionModifier.getLocalSearchWithListOfImprovingMoves(
-          initialSolutionGenerator = () => perturbedSolution
+          perturbedSolution
         )
       if (updatedSolution.cost < bestSolution.cost) {
         bestSolution = updatedSolution

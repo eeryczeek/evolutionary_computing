@@ -75,21 +75,21 @@ object Main extends App with MoveGenerator {
   }
 
   val solutionMethods = List(
-    ("RandomSolution", () => SolutionGenerator.generateRandomSolution),
-    ("TailAppendSolution", () => SolutionGenerator.generateTailAppendSolution),
-    (
-      "InsertAnyPositionSolution",
-      () => SolutionGenerator.generateInsertAnyPositionSolution
-    ),
-    ("CycleSolution", () => SolutionGenerator.generateCycleSolution),
-    (
-      "CycleRegretSolution",
-      () => SolutionGenerator.generateCycleRegretSolution
-    ),
-    (
-      "CycleWeightedRegretSolution",
-      () => SolutionGenerator.generateCycleWeightedRegretSolution
-    ),
+    // ("RandomSolution", () => SolutionGenerator.generateRandomSolution),
+    // ("TailAppendSolution", () => SolutionGenerator.generateTailAppendSolution),
+    // (
+    //   "InsertAnyPositionSolution",
+    //   () => SolutionGenerator.generateInsertAnyPositionSolution
+    // ),
+    // ("CycleSolution", () => SolutionGenerator.generateCycleSolution),
+    // (
+    //   "CycleRegretSolution",
+    //   () => SolutionGenerator.generateCycleRegretSolution
+    // ),
+    // (
+    //   "CycleWeightedRegretSolution",
+    //   () => SolutionGenerator.generateCycleWeightedRegretSolution
+    // ),
     (
       "LocalSerchNodeSwapsGreedy",
       () =>

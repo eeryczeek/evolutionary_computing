@@ -2,7 +2,7 @@ import scala.collection.mutable
 import scala.util.Random
 
 class ListOfImprovingMovesSolution()
-    extends LocalSearch
+    extends MoveGenerator
     with MoveOperations
     with CostManager {
 
@@ -31,8 +31,8 @@ class ListOfImprovingMovesSolution()
       currentSolution: Solution,
       availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
-    val edges = getConsecutivePairs(currentSolution.path).toSet
-    val triplets = getConsecutiveTriplets(currentSolution.path).toSet
+    val edges = getCycleConsecutivePairs(currentSolution.path).toSet
+    val triplets = getCycleConsecutiveTriplets(currentSolution.path).toSet
     findFirstApplicableMove(isMoveApplicable(_, edges, triplets)) match {
       case Some((move, deltaCost)) =>
         val trueMove = move match {
@@ -237,7 +237,7 @@ class ListOfImprovingMovesSolution()
       solution: Solution,
       edge: Pair
   ): List[EdgeSwap] = {
-    val edges = getConsecutivePairs(solution.path).toSet
+    val edges = getCycleConsecutivePairs(solution.path).toSet
     edges
       .filter(e =>
         e != edge && List(
@@ -276,7 +276,7 @@ class ListOfImprovingMovesSolution()
       citiesFromRemovedEdges: Set[Int],
       availableCities: Set[Int]
   ): Seq[NodeSwapOut] = {
-    val triplets = getConsecutiveTriplets(solution.path).toSet
+    val triplets = getCycleConsecutiveTriplets(solution.path).toSet
     triplets
       .filter(t =>
         citiesFromRemovedEdges.contains(t.city1) ||
@@ -295,7 +295,7 @@ class ListOfImprovingMovesSolution()
   ): List[NodeSwapOut] = {
     if (solution.path.contains(city)) return List()
     else {
-      val triplets = getConsecutiveTriplets(solution.path)
+      val triplets = getCycleConsecutiveTriplets(solution.path)
       triplets
         .map(triplet => NodeSwapOut(triplet, city))
         .toList
