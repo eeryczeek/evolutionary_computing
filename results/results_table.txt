@@ -1,16 +1,18 @@
 Instance: tspa
-| **Method** | **Min** | **Mean** | **Max** | **Avg time (s)** | **Iterations** |
-| --- | --- | --- | --- | --- | --- |
-| `LargeNeighborhoodSearchWithLS` | 69137 | 69521 | 70016 | 33.0230 | 1208 |
-| `LargeNeighborhoodSearchWithoutLS` | 69362 | 69761 | 70392 | 33.0070 | 2207 |
-| `IteratedLocalSearch` | 69224 | 69640 | 70112 | 33.0100 | 2326 |
-| `MSLS` | 70942 | 71392 | 71899 | 32.4680 | 0 |
+| **Method**                     | **Min**         | **Mean**        | **Max**         | **Avg time (s)**     | **Iterations**  |
+| ------------------------------ | --------------- | --------------- | --------------- | -------------------- | --------------- |
+| `InsertAnyPositionSolution`    | 71263           | 73229           | 76156           | 0.0240               | -               |
+| `MSLS`                         | 70630           | 71164           | 71554           | 21.6870              | -               |
+| `LargeNeighborhoodSearchWithLS | 69107           | 69496           | 70330           | 22.2230              | 1497            |
+| `LargeNeighborhoodSearchWithou | 69166           | 69645           | 70068           | 22.2190              | 2518            |
+| `IteratedLocalSearch`          | 69100           | 69590           | 70046           | 22.1530              | 2808            |
 
 Instance: tspb
-| **Method** | **Min** | **Mean** | **Max** | **Avg time (s)** | **Iterations** |
-| --- | --- | --- | --- | --- | --- |
-| `LargeNeighborhoodSearchWithLS` | 43577 | 44106 | 45024 | 33.0120 | 1194 |
-| `LargeNeighborhoodSearchWithoutLS` | 43503 | 44129 | 44581 | 33.0070 | 2156 |
-| `IteratedLocalSearch` | 43552 | 44052 | 44794 | 33.0050 | 2294 |
-| `MSLS` | 45303 | 45761 | 46177 | 35.2770 | 0 |
+| **Method**                     | **Min**         | **Mean**        | **Max**         | **Avg time (s)**     | **Iterations**  |
+| ------------------------------ | --------------- | --------------- | --------------- | -------------------- | --------------- |
+| `InsertAnyPositionSolution`    | 44446           | 46246           | 52152           | 0.0210               | -               |
+| `MSLS`                         | 45158           | 45658           | 46156           | 22.3800              | -               |
+| `LargeNeighborhoodSearchWithLS | 43446           | 44108           | 44926           | 22.2240              | 1468            |
+| `LargeNeighborhoodSearchWithou | 43448           | 44293           | 45314           | 22.2190              | 2468            |
+| `IteratedLocalSearch`          | 43477           | 44088           | 44700           | 22.1520              | 2902            |
 

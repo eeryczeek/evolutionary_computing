@@ -73,8 +73,31 @@ object LargeNeighborhoodSearch
     )
   }
 
-  def getCitiesToRemove(currentSolution: Solution): Set[Int] = {
-    Random.shuffle(currentSolution.path).take(25).toSet
+  def getCitiesToRemove(
+      currentSolution: Solution
+  ): Set[Int] = {
+    // val citiesToRemove = collection.mutable.Set[Int]()
+    // val distributionBasedOnCityCosts = currentSolution.path.map { city =>
+    //   ProblemInstanceHolder.problemInstance.cityCosts(city)
+    // }
+    // val totalCost = distributionBasedOnCityCosts.sum
+    // val distribution = distributionBasedOnCityCosts.map { cost =>
+    //   cost / totalCost
+    // }
+    // val cumulativeDistribution = distribution.scanLeft(0.0)(_ + _).tail
+    // var tries = 0
+    // while (citiesToRemove.size < 30 && tries < 40) {
+    //   val randomValue = Random.nextDouble()
+    //   val randomCityIdx = cumulativeDistribution.indexWhere { value =>
+    //     value > randomValue
+    //   }
+    //   val randomCity =
+    //     currentSolution.path(if (randomCityIdx == -1) 99 else randomCityIdx)
+    //   citiesToRemove.add(randomCity)
+    //   tries += 1
+    // }
+    val citiesToRemove = Random.shuffle(currentSolution.path).take(30).toSet
+    citiesToRemove
   }
 
   def repair(

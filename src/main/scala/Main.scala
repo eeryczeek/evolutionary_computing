@@ -6,9 +6,12 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.Executors
 
 object Main extends App with MoveGenerator {
-  implicit val ec: ExecutionContext = ExecutionContext.global
+  implicit val ec: ExecutionContext = ExecutionContext.fromExecutorService(
+    Executors.newFixedThreadPool(5)
+  )
   val names = List("tspa", "tspb")
   val resultsTablePath = Paths.get("results/results_table.txt")
   val resultsBestPath = Paths.get("results/results_best.txt")
@@ -25,18 +28,37 @@ object Main extends App with MoveGenerator {
     StandardOpenOption.TRUNCATE_EXISTING
   )
 
+  val columnWidths = List(30, 15, 15, 15, 20, 15)
+
+  def formatCell(content: String, width: Int): String = {
+    if (content.length >= width) content.take(width) // Truncate if too long
+    else content + " " * (width - content.length) // Pad with spaces
+  }
+
   def writeHeader(name: String): Unit = {
     val header =
-      s"Instance: $name\n| **Method** | **Min** | **Mean** | **Max** | **Time\\* (s)** |\n| --- | --- | --- | --- | --- |\n"
+      s"Instance: $name\n" +
+        "| " + formatCell("**Method**", columnWidths(0)) +
+        " | " + formatCell("**Min**", columnWidths(1)) +
+        " | " + formatCell("**Mean**", columnWidths(2)) +
+        " | " + formatCell("**Max**", columnWidths(3)) +
+        " | " + formatCell("**Time\\* (s)**", columnWidths(4)) + " |\n" +
+        "| " + columnWidths.map("-" * _).mkString(" | ") + " |\n"
     writeResults(header, resultsTablePath)
   }
 
   def writeHeaderWithIterations(name: String): Unit = {
     val header =
-      s"Instance: $name\n| **Method** | **Min** | **Mean** | **Max** | **Avg time (s)** | **Iterations** |\n| --- | --- | --- | --- | --- | --- |\n"
+      s"Instance: $name\n" +
+        "| " + formatCell("**Method**", columnWidths(0)) +
+        " | " + formatCell("**Min**", columnWidths(1)) +
+        " | " + formatCell("**Mean**", columnWidths(2)) +
+        " | " + formatCell("**Max**", columnWidths(3)) +
+        " | " + formatCell("**Avg time (s)**", columnWidths(4)) +
+        " | " + formatCell("**Iterations**", columnWidths(5)) + " |\n" +
+        "| " + columnWidths.map("-" * _).mkString(" | ") + " |\n"
     writeResults(header, resultsTablePath)
   }
-
   def writeResults(output: String, path: java.nio.file.Path): Unit = {
     Files.write(
       path,
@@ -48,10 +70,11 @@ object Main extends App with MoveGenerator {
 
   def processSolutions(
       instance: String,
-      methodName: String,
+      methodName: SolverNames.Value,
       solutionMethod: () => Solution
   ): Unit = {
-    val totalTasks = 20 // ProblemInstanceHolder.problemInstance.cities.size
+    val totalTasks =
+      if (SolverNames.advancedHeuristics.contains(methodName)) 20 else 200
     val completedTasks = new AtomicInteger(0)
 
     val solutions = (1 to totalTasks)
@@ -76,8 +99,25 @@ object Main extends App with MoveGenerator {
       resultsSolutions.flatMap(_.additionalData).flatMap(_.numOfIterations)
     val avgIterations =
       if (iterations.isEmpty) 0 else iterations.sum / iterations.size
+
     val outputTable =
-      f"| `$methodName` | ${distances.min} | ${distances.sum / distances.size} | ${distances.max} | ${averageTimeMS / 1e3}%.4f | $avgIterations |\n"
+      "| " +
+        formatCell(s"`$methodName`", columnWidths(0)) +
+        " | " +
+        formatCell(distances.min.toString, columnWidths(1)) +
+        " | " +
+        formatCell((distances.sum / distances.size).toString, columnWidths(2)) +
+        " | " +
+        formatCell(distances.max.toString, columnWidths(3)) +
+        " | " +
+        formatCell(f"${averageTimeMS / 1e3}%.4f", columnWidths(4)) +
+        " | " +
+        formatCell(
+          if (avgIterations == 0) "-" else avgIterations.toString,
+          columnWidths(5)
+        ) +
+        " |\n"
+
     writeResults(outputTable, resultsTablePath)
     val outputBest =
       s"Instance: $instance\nMethod: $methodName\nBest Solution Path: ${bestSolution.path
@@ -87,39 +127,28 @@ object Main extends App with MoveGenerator {
   }
 
   val solutionMethods = List(
-    // ("RandomSolution", () => SolutionGenerator.generateRandomSolution),
-    // ("TailAppendSolution", () => SolutionGenerator.generateTailAppendSolution),
-    // (
-    //   "InsertAnyPositionSolution",
-    //   () => SolutionGenerator.generateInsertAnyPositionSolution
-    // ),
-    // ("CycleSolution", () => SolutionGenerator.generateCycleSolution),
-    // (
-    //   "CycleRegretSolution",
-    //   () => SolutionGenerator.generateCycleRegretSolution
-    // ),
-    // (
-    //   "CycleWeightedRegretSolution",
-    //   () => SolutionGenerator.generateCycleWeightedRegretSolution
-    // ),
     (
-      "LargeNeighborhoodSearchWithLS",
+      SolverNames.InsertAnyPositionSolution,
+      () => SolutionGenerator.generateInsertAnyPositionSolution
+    ),
+    (
+      SolverNames.MSLS,
+      () => SolutionModifier.getMSLS()
+    ),
+    (
+      SolverNames.LNSWithLS,
       () => SolutionModifier.getLargeNeighborhoodSearchWithLocalSearch()
     ),
     (
-      "LargeNeighborhoodSearchWithoutLS",
+      SolverNames.LNSWithoutLS,
       () => SolutionModifier.getLargeNeighborhoodSearchWithoutLocalSearch()
     ),
     (
-      "IteratedLocalSearch",
+      SolverNames.ILS,
       () =>
         SolutionModifier.getIteratedLocalSearch(
           SolutionGenerator.generateRandomSolution()
         )
-    ),
-    (
-      "MSLS",
-      () => SolutionModifier.getMSLS()
     )
   )
 

@@ -165,7 +165,7 @@ object SolutionModifier extends MoveGenerator {
       LargeNeighborhoodSearch.performWithLocalSearch(
         initialSolution,
         ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
-        System.currentTimeMillis() - startingTime > 33000
+        System.currentTimeMillis() - startingTime > 22215
       )
     updatedSolution
   }
@@ -177,7 +177,7 @@ object SolutionModifier extends MoveGenerator {
       LargeNeighborhoodSearch.performWithoutLocalSearch(
         initialSolution,
         ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
-        System.currentTimeMillis() - startingTime > 33000
+        System.currentTimeMillis() - startingTime > 22215
       )
     updatedSolution
   }

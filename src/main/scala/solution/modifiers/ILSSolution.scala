@@ -14,7 +14,7 @@ object IteratedLSSolution
     var bestAvailableCities = availableCities
     var numOfIterations = 0
     val startTime = System.currentTimeMillis()
-    while (System.currentTimeMillis() - startTime < 33000) {
+    while (System.currentTimeMillis() - startTime < 22150) {
       val (perturbedSolution, newAvailableCities) =
         perturbSolution(bestSolution, bestAvailableCities)
       val updatedSolution =
