@@ -103,15 +103,13 @@ object SolutionGenerator extends CostManager {
 
 object SolutionModifier extends MoveGenerator {
   def getLocalSearchGreedy(
-      initialSolutionGenerator: => Solution,
-      neighbourhoodGenerator: (Solution, Set[Int]) => Seq[Move]
+      initialSolutionGenerator: => Solution
   ): Solution = {
     val initialSolution = initialSolutionGenerator
     val (modifiedSolution, modifiedAvailableCities) =
       LocalSearchGreedy.modifySolution(
         initialSolution,
-        ProblemInstanceHolder.problemInstance.cities -- initialSolution.path,
-        neighbourhoodGenerator
+        ProblemInstanceHolder.problemInstance.cities -- initialSolution.path
       )
     modifiedSolution
   }

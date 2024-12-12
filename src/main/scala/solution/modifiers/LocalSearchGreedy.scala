@@ -9,14 +9,17 @@ object LocalSearchGreedy
   @tailrec
   def modifySolution(
       currentSolution: Solution,
-      availableCities: Set[Int],
-      neighbourhoodGenerator: (Solution, Set[Int]) => Seq[Move]
+      availableCities: Set[Int]
   ): (Solution, Set[Int]) = {
-    val possibleMoves = neighbourhoodGenerator(currentSolution, availableCities)
-
-    val firstImprovingMove = Random
-      .shuffle(possibleMoves)
-      .find(move => getDeltaCost(move) < 0)
+    val iterations = currentSolution.additionalData
+      .getOrElse(AdditionalData(Some(0)))
+      .numOfIterations
+      .getOrElse(0)
+    val firstImprovingMove =
+      getFirstImprovingMoveFromEdgeSwapNeighborhood(
+        currentSolution,
+        availableCities
+      )
 
     firstImprovingMove match {
       case Some(move) =>
@@ -24,9 +27,11 @@ object LocalSearchGreedy
         val (newSolution, newAvailableCities) =
           performMove(currentSolution, move, availableCities)
         modifySolution(
-          newSolution.copy(cost = currentSolution.cost + deltaCost),
-          newAvailableCities,
-          neighbourhoodGenerator
+          newSolution.copy(
+            cost = currentSolution.cost + deltaCost,
+            additionalData = Some(AdditionalData(Some(iterations + 1)))
+          ),
+          newAvailableCities
         )
       case None =>
         (currentSolution, availableCities)

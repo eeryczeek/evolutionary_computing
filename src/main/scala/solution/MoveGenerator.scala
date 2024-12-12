@@ -161,6 +161,38 @@ trait MoveGenerator extends MoveOperations with CostManager {
     edgeSwapsIn ++ nodeSwapsOut
   }
 
+  def getFirstImprovingMoveFromEdgeSwapNeighborhood(
+      solution: Solution,
+      availableCities: Set[Int]
+  ): Option[Move] = {
+    val path = solution.path.toArray
+    val pairs = getCycleConsecutivePairs(solution.path)
+    val triplets = getCycleConsecutiveTriplets(solution.path)
+    val basicStructs = Random.shuffle(pairs ++ triplets)
+
+    basicStructs.view.flatMap {
+      case pair: Pair =>
+        pairs
+          .collectFirst {
+            case pair2
+                if Array(
+                  pair.city1,
+                  pair.city2,
+                  pair2.city1,
+                  pair2.city2
+                ).distinct.size == 4 &&
+                  getDeltaCost(EdgeSwap(pair, pair2)) < 0 =>
+              EdgeSwap(pair, pair2)
+          }
+
+      case triplet: Triplet =>
+        availableCities.collectFirst {
+          case city if getDeltaCost(NodeSwapOut(triplet, city)) < 0 =>
+            NodeSwapOut(triplet, city)
+        }
+    }.headOption
+  }
+
   def getNeighbourhoodWithNodesSwapsIn(
       currentSolution: Solution,
       availableCities: Set[Int]
