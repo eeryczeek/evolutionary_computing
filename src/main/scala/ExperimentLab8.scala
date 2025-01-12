@@ -7,7 +7,10 @@ import java.util.concurrent.Executors
 import java.nio.file.Paths
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
-object ExperimentLab8 extends App with MoveGenerator {
+object ExperimentLab8
+    extends MoveGenerator
+    // with App
+    {
   implicit val ec: ExecutionContext = ExecutionContext.fromExecutorService(
     Executors.newFixedThreadPool(10)
   )

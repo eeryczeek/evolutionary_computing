@@ -12,6 +12,19 @@ case class Solution(
 object SolutionGenerator extends CostManager {
   def generateRandomSolution(): Solution = RandomGenerator.generate()
 
+  def generateSemiRandomSolution(numberOfCitiesToSwap: Int): Solution = {
+    val initialSolution = generateInsertAnyPositionSolution()
+    val shuffledPath = Random.shuffle(
+      (ProblemInstanceHolder.problemInstance.cities -- initialSolution.path).toSeq
+    )
+    val randomizedPath = shuffledPath.take(numberOfCitiesToSwap) ++
+      shuffledPath.drop(numberOfCitiesToSwap)
+    Solution(
+      randomizedPath,
+      calculateSolutionCost(randomizedPath)
+    )
+  }
+
   def generateTailAppendSolution(): Solution = {
     val initialCity =
       Random.nextInt(ProblemInstanceHolder.problemInstance.cities.size)
@@ -178,6 +191,14 @@ object SolutionModifier extends MoveGenerator {
         System.currentTimeMillis() - startingTime > 22215
       )
     updatedSolution
+  }
+
+  def getHybridEvolutionaryRandom(): Solution = {
+    HybridEvolutionary.searchRandom()
+  }
+
+  def getHybridEvolutionaryHeuristic(): Solution = {
+    HybridEvolutionary.searchHeuristic()
   }
 
   @tailrec

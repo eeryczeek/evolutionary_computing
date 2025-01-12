@@ -152,16 +152,22 @@ object Main extends App with MoveGenerator {
     )
   )
 
-  for (name <- names) {
-    writeHeaderWithIterations(name)
-    ProblemInstanceHolder.problemInstance =
-      CSVReader.readCSV(s"${name.toUpperCase()}.csv")
-    solutionMethods.foreach { case (suffix, method) =>
-      processSolutions(name, suffix, method)
-    }
-    writeResults("\n", resultsTablePath)
-    writeResults("\n", resultsBestPath)
-  }
+  // for (name <- names) {
+  //   writeHeaderWithIterations(name)
+  //   ProblemInstanceHolder.problemInstance =
+  //     CSVReader.readCSV(s"${name.toUpperCase()}.csv")
+  //   solutionMethods.foreach { case (suffix, method) =>
+  //     processSolutions(name, suffix, method)
+  //   }
+  //   writeResults("\n", resultsTablePath)
+  //   writeResults("\n", resultsBestPath)
+  // }
+
+  ProblemInstanceHolder.problemInstance =
+    CSVReader.readCSV(s"${names(0).toUpperCase()}.csv")
+
+  val solution = SolutionModifier.getHybridEvolutionaryRandom()
+  println(solution.cost)
 }
 
 object ProblemInstanceHolder {
