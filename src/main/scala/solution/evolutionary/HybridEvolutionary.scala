@@ -11,7 +11,7 @@ object HybridEvolutionary
     val population = Population(70)
     var numOfIterations = 0
     val startTime = System.currentTimeMillis()
-    while (System.currentTimeMillis() - startTime < 72481) {
+    while (System.currentTimeMillis() - startTime < 20000) {
       val parents = selectParents(population)
       val child = recombinationOperator(parents._1, parents._2)
       population.updatePopulationInPlace(child)
