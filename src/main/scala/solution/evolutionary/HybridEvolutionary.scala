@@ -10,21 +10,13 @@ object HybridEvolutionary
   ): Solution = {
     val population = Population(70)
     var numOfIterations = 0
-    println(
-      s"Initial costs: ${population.solutions.map(_.cost).mkString(", ")}"
-    )
     val startTime = System.currentTimeMillis()
-    while (System.currentTimeMillis() - startTime < 20000) {
+    while (System.currentTimeMillis() - startTime < 72481) {
       val parents = selectParents(population)
-      println()
-      println(s"Iteration: $numOfIterations")
       val child = recombinationOperator(parents._1, parents._2)
-      println(s"Child cost: ${child.cost}")
       population.updatePopulationInPlace(child)
       numOfIterations += 1
-      println(s"Best solution cost: ${population.best.cost}")
     }
-    println(s"population costs: ${population.solutions.map(_.cost)}")
 
     population.best.copy(additionalData =
       Some(AdditionalData(Some(numOfIterations)))
@@ -82,15 +74,12 @@ object HybridEvolutionary
   ): Solution = {
     val commonParts = RecombinationUtils.destroy2(parent1, parent2)
 
-    val mergedPath = RecombinationUtils.mergePartsHeuristically(
+    val mergedSolution = RecombinationUtils.mergePartsHeuristically2(
       commonParts,
       ProblemInstanceHolder.problemInstance.cities -- commonParts.flatten
     )
 
-    Solution(
-      mergedPath,
-      calculateSolutionCost(mergedPath)
-    )
+    SolutionModifier.getLocalSearchWithListOfImprovingMoves(mergedSolution)
   }
 
   private def selectParents(

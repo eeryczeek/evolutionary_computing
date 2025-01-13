@@ -198,4 +198,17 @@ object RecombinationUtils extends CostManager {
 
     partsToEdit.take(partsToEdit.size - 1).flatten
   }
+
+  def mergePartsHeuristically2(
+      parts: Seq[Seq[Int]],
+      availableCities: Set[Int]
+  ): Solution = {
+    val initialPartialSolution = Solution(parts.flatten, 0)
+    SolutionGenerator
+      .generateSolution(
+        initialPartialSolution,
+        availableCities,
+        InsertAnyPositionGenerator.updateSolution
+      )
+  }
 }

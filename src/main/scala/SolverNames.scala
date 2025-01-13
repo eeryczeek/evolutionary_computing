@@ -14,11 +14,15 @@ object SolverNames extends Enumeration {
   val ILS = Value("IteratedLocalSearch")
   val LNSWithLS = Value("LargeNeighborhoodSearchWithLS")
   val LNSWithoutLS = Value("LargeNeighborhoodSearchWithoutLS")
+  val HybridEvolutionaryRandom = Value("HybridEvolutionaryRandom")
+  val HybridEvolutionaryHeuristic = Value("HybridEvolutionaryHeuristic")
 
   val advancedHeuristics = List(
     LNSWithLS,
     LNSWithoutLS,
     ILS,
-    MSLS
+    MSLS,
+    HybridEvolutionaryHeuristic,
+    HybridEvolutionaryRandom
   )
 }

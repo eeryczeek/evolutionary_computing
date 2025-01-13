@@ -127,47 +127,58 @@ object Main extends App with MoveGenerator {
   }
 
   val solutionMethods = List(
+    // (
+    //   SolverNames.InsertAnyPositionSolution,
+    //   () => SolutionGenerator.generateInsertAnyPositionSolution
+    // ),
+    // (
+    //   SolverNames.MSLS,
+    //   () => SolutionModifier.getMSLS()
+    // ),
+    // (
+    //   SolverNames.LNSWithLS,
+    //   () => SolutionModifier.getLargeNeighborhoodSearchWithLocalSearch()
+    // ),
+    // (
+    //   SolverNames.LNSWithoutLS,
+    //   () => SolutionModifier.getLargeNeighborhoodSearchWithoutLocalSearch()
+    // ),
+    // (
+    //   SolverNames.ILS,
+    //   () =>
+    //     SolutionModifier.getIteratedLocalSearch(
+    //       SolutionGenerator.generateRandomSolution()
+    //     )
+    // )
     (
-      SolverNames.InsertAnyPositionSolution,
-      () => SolutionGenerator.generateInsertAnyPositionSolution
+      SolverNames.HybridEvolutionaryRandom,
+      () => SolutionModifier.getHybridEvolutionaryRandom()
     ),
     (
-      SolverNames.MSLS,
-      () => SolutionModifier.getMSLS()
-    ),
-    (
-      SolverNames.LNSWithLS,
-      () => SolutionModifier.getLargeNeighborhoodSearchWithLocalSearch()
-    ),
-    (
-      SolverNames.LNSWithoutLS,
-      () => SolutionModifier.getLargeNeighborhoodSearchWithoutLocalSearch()
-    ),
-    (
-      SolverNames.ILS,
-      () =>
-        SolutionModifier.getIteratedLocalSearch(
-          SolutionGenerator.generateRandomSolution()
-        )
+      SolverNames.HybridEvolutionaryHeuristic,
+      () => SolutionModifier.getHybridEvolutionaryHeuristic()
     )
   )
 
-  // for (name <- names) {
-  //   writeHeaderWithIterations(name)
-  //   ProblemInstanceHolder.problemInstance =
-  //     CSVReader.readCSV(s"${name.toUpperCase()}.csv")
-  //   solutionMethods.foreach { case (suffix, method) =>
-  //     processSolutions(name, suffix, method)
-  //   }
-  //   writeResults("\n", resultsTablePath)
-  //   writeResults("\n", resultsBestPath)
-  // }
+  for (name <- names) {
+    writeHeaderWithIterations(name)
+    ProblemInstanceHolder.problemInstance =
+      CSVReader.readCSV(s"${name.toUpperCase()}.csv")
+    solutionMethods.foreach { case (suffix, method) =>
+      processSolutions(name, suffix, method)
+    }
+    writeResults("\n", resultsTablePath)
+    writeResults("\n", resultsBestPath)
+  }
 
-  ProblemInstanceHolder.problemInstance =
-    CSVReader.readCSV(s"${names(0).toUpperCase()}.csv")
-
-  val solution = SolutionModifier.getHybridEvolutionaryRandom()
-  println(solution.cost)
+  // ProblemInstanceHolder.problemInstance =
+  //   CSVReader.readCSV(s"${names(0).toUpperCase()}.csv")
+  //
+  // val startTime = System.currentTimeMillis()
+  // val solution = SolutionModifier.getHybridEvolutionaryHeuristic()
+  // val endTime = System.currentTimeMillis()
+  // println(solution.cost)
+  // println(s"Time: ${(endTime - startTime).toDouble / 1e3} s")
 }
 
 object ProblemInstanceHolder {
