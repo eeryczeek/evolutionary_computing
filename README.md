@@ -22,20 +22,36 @@ This visual representation provides an intuitive way to interpret the spatial re
 ## [Table of Contents](#table-of-contents)
 
 1. [Modified TSP Problem with Additional Constraints](#modified-tsp-problem-with-additional-constraints)
-2. [Similarities graphs](#similarities-graphs)
+2. [Experiment results](#results)
 3. [Conclusions](#conclusions)
 
 <div style="page-break-after: always;"></div>
 
-## Similarities graphs (#similarities-graphs)
+## Experiment results (#results)
 
-![similarities-tspa](plots/tspa-similarity.png)
-![similarities-tspb](plots/tspb-similarity.png)
+### Instance A
+
+| **Method**                        | **Min** | **Mean** | **Max** | **Avg time (s)** | **Iterations** |
+| --------------------------------- | ------- | -------- | ------- | ---------------- | -------------- |
+| `InsertAnyPositionSolution`       | 71263   | 73229    | 76156   | 0.0240           | -              |
+| `MSLS`                            | 70630   | 71164    | 71554   | 21.6870          | -              |
+| `LargeNeighborhoodSearchWithLS    | 69107   | 69496    | 70330   | 22.2230          | 1497           |
+| `LargeNeighborhoodSearchWithoutLS | 69166   | 69645    | 70068   | 22.2190          | 2518           |
+| `IteratedLocalSearch`             | 69100   | 69590    | 70046   | 22.1530          | 2808           |
+
+### Instance B
+
+| **Method**                     | **Min** | **Mean** | **Max** | **Avg time (s)** | **Iterations** |
+| ------------------------------ | ------- | -------- | ------- | ---------------- | -------------- |
+| `InsertAnyPositionSolution`    | 44446   | 46246    | 52152   | 0.0210           | -              |
+| `MSLS`                         | 45158   | 45658    | 46156   | 22.3800          | -              |
+| `LargeNeighborhoodSearchWithLS | 43446   | 44108    | 44926   | 22.2240          | 1468           |
+| `LargeNeighborhoodSearchWithou | 43448   | 44293    | 45314   | 22.2190          | 2468           |
+| `IteratedLocalSearch`          | 43477   | 44088    | 44700   | 22.1520          | 2902           |
+
+![results-random](./plots/HybridEvolutionaryRandom.png)
+![results-heuristic](./plots/HybridEvolutionaryHeuristic.png)
 
 ## [Conclusions](#conclusions)
 
-In all cases, the correlation coefficients are negative, suggesting that as the cost increases, solutions tend to become less similar on average. This aligns with the expectation that higher-cost solutions may deviate more significantly from optimal patterns.
-
-A surprising observation is the shape of the average similarity curves. One might expect a parabolic relationship, where middle-cost solutions exhibit the highest similarity on average. However, the graphs reveal a steady, linear decline in similarity with increasing cost. This trend likely arises because some edges or nodes are "obvious" to include in most solutions, while others are less so. Higher-cost solutions likely fail to include these less obvious components consistently, leading to a gradual decrease in similarity.
-
-The best solutions, by contrast, tend to incorporate both the obvious and the more challenging edges/nodes, making them structurally closer to the majority of solutions. This structural consistency may explain why these solutions exhibit higher similarity compared to suboptimal ones.
+The results show that the Hybrid Evolutionary Search is comparable to the previous advanced techniques. For sure there is space for further optimizations in our implementation but comparing how complicated was implementing this method compared to other ones, this one is probably the trickiest of them all.
